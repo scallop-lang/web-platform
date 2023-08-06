@@ -13,6 +13,13 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import { Label } from "~/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { Switch } from "~/components/ui/switch";
 
 const Header = () => {
@@ -77,7 +84,7 @@ const CreateRelationModal = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="bg-pink-300 text-black hover:bg-pink-400">
+        <Button className="shrink-0 bg-pink-300 text-black hover:bg-pink-400">
           <PlusSquare className="mr-2 h-5 w-5" />
           <span className="text-base">Create Relation</span>
         </Button>
@@ -95,11 +102,30 @@ const CreateRelationModal = () => {
   );
 };
 
+const TableSelect = () => {
+  return (
+    <Select>
+      <SelectTrigger className="grow">
+        <SelectValue placeholder="Select an input table"></SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="name(a: String, b: String)">
+          <span className="font-mono">name(a: String, b: String)</span>
+        </SelectItem>
+        <SelectItem value="is_a(x: String, y: String)">
+          <span className="font-mono">is_dsadasda(x: String, y: String)</span>
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  );
+};
+
 const TableEditor = () => {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-10">
         <CreateRelationModal />
+        <TableSelect />
         <div className="flex items-center gap-3">
           <Label className="text-base">Input</Label>
           <Switch />
