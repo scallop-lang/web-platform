@@ -78,7 +78,7 @@ const TableEditor = () => {
         </Button>
         <div className="flex items-center gap-3">
           <Label className="text-base">Input</Label>
-          <Switch className="text-blue-400" />
+          <Switch />
           <Label className="text-base">Output</Label>
         </div>
       </div>
