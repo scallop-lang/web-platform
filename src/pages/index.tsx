@@ -16,7 +16,9 @@ import { Label } from "~/components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
@@ -109,12 +111,18 @@ const TableSelect = () => {
         <SelectValue placeholder="Select an input table"></SelectValue>
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="name(a: String, b: String)">
-          <span className="font-mono">name(a: String, b: String)</span>
-        </SelectItem>
-        <SelectItem value="is_a(x: String, y: String)">
-          <span className="font-mono">is_dsadasda(x: String, y: String)</span>
-        </SelectItem>
+        <SelectGroup>
+          <SelectLabel>
+            Of course, num_animals(n) is an <br /> output relation, so it&apos;s
+            not displayed here.
+          </SelectLabel>
+          <SelectItem value="name(a: String, b: String)">
+            <span className="font-mono">name(a: String, b: String)</span>
+          </SelectItem>
+          <SelectItem value="is_a(x: String, y: String)">
+            <span className="font-mono">is_a(x: String, y: String)</span>
+          </SelectItem>
+        </SelectGroup>
       </SelectContent>
     </Select>
   );
@@ -133,7 +141,7 @@ const TableEditor = () => {
         </div>
       </div>
       <div className="grow rounded-md bg-zinc-200 p-4">
-        this is where tables are rendered eventually.
+        this is where we&apos;re going to render the tables.
       </div>
     </div>
   );
