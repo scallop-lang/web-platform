@@ -9,12 +9,12 @@ const Playground = () => {
         <Link href="/">
           <Image
             src="/content/logo.svg"
-            width={60}
-            height={60}
+            width={50}
+            height={50}
             alt="Scallop logo"
           />
         </Link>
-        <h1 className="text-2xl font-bold">Scallop Playground</h1>
+        <h1 className="text-2xl font-semibold">Scallop Playground</h1>
       </header>
       <div className="flex items-center justify-center">Hello world!</div>
     </div>
