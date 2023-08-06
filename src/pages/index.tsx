@@ -27,7 +27,10 @@ import { Switch } from "~/components/ui/switch";
 const Header = () => {
   return (
     <header className="flex max-h-min flex-row items-center gap-3 bg-zinc-100 p-3">
-      <Link href="/">
+      <Link
+        href="https://scallop-lang.github.io/"
+        target="_blank"
+      >
         <Image
           className="transition hover:brightness-110"
           src="/content/logo.svg"
