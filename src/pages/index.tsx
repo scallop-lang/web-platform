@@ -1,3 +1,4 @@
+import CodeMirror from "@uiw/react-codemirror";
 import { FileDown, PlayCircle, PlusSquare } from "lucide-react";
 import Head from "next/head";
 import Image from "next/image";
@@ -74,17 +75,20 @@ const EditorToolbar = ({ code }: { code: string }) => {
 
 const CodeEditor = () => {
   const [code, setCode] = useState(
-    `// this will eventually be a fully functioning code editor.\n// for now, it holds some placeholder text I put in.\n// currently it's just a <textarea>. feel free to edit.\n\nrel name(a, b) :- name(a, c), is_a(c, b)\nrel num_animals(n) :- n = count(o: name(o, "animal"))\n\n// of course, the real editor will have syntax highlighting.`
+    `rel name(a, b) :- name(a, b), is_a(c, b)\nrel num_animals(n) :- count(o: name(o, "animal"))`
   );
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col space-y-4">
       <EditorToolbar code={code} />
-      <div className="grow rounded-md bg-zinc-200 p-4">
-        <textarea
-          className="h-full w-full resize-none bg-inherit font-mono text-base"
+      <div className="h-0 grow rounded-md bg-zinc-200 p-4">
+        <CodeMirror
           value={code}
-          onChange={(e) => setCode(e.target.value)}
+          height="100%"
+          autoFocus={true}
+          placeholder={`// write your Scallop program here`}
+          style={{ height: "100%" }}
+          onChange={setCode}
         />
       </div>
     </div>
