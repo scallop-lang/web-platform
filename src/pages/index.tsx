@@ -4,6 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 
@@ -65,17 +73,33 @@ const CodeEditor = () => {
   );
 };
 
+const CreateRelationModal = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button className="bg-pink-300 text-black hover:bg-pink-400">
+          <PlusSquare className="mr-2 h-5 w-5" />
+          <span className="text-base">Create Relation</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Relation</DialogTitle>
+          <DialogDescription>
+            This is where you&apos;ll be creating and editing your relation
+            signatures/arguments. Work in progress.
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const TableEditor = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <Button
-          className="bg-pink-300 text-black hover:bg-pink-400"
-          onClick={() => alert("will eventually bring up popup window")}
-        >
-          <PlusSquare className="mr-2 h-5 w-5" />
-          <span className="text-base">Create Relation</span>
-        </Button>
+        <CreateRelationModal />
         <div className="flex items-center gap-3">
           <Label className="text-base">Input</Label>
           <Switch />
