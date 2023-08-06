@@ -26,13 +26,15 @@ const App = () => {
     <>
       <Head>
         <title>Scallop Playground</title>
-        <meta
-          name="description"
-          content="Scallop Playground"
+        <link
+          rel="icon"
+          type="image/svg+xml"
+          href="/favicon.svg"
         />
         <link
           rel="icon"
-          href="/favicon.ico"
+          type="image/png"
+          href="/favicon.png"
         />
       </Head>
       <Playground />
