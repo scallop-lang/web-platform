@@ -1,9 +1,10 @@
-import { FileDown, PlayCircle } from "lucide-react";
+import { FileDown, PlayCircle, PlusSquare } from "lucide-react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import { Switch } from "~/components/ui/switch";
 
 const Header = () => {
   return (
@@ -63,13 +64,36 @@ const CodeEditor = () => {
   );
 };
 
+const TableEditor = () => {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <Button
+          className="bg-pink-300 text-black hover:bg-pink-400"
+          onClick={() => alert("will eventually bring up popup window")}
+        >
+          <PlusSquare className="mr-2 h-5 w-5" />
+          <span className="text-base">Create Relation</span>
+        </Button>
+        <div className="flex items-center"></div>
+        <span>
+          Input <Switch /> Output
+        </span>
+      </div>
+      <div className="grow rounded-md bg-zinc-200 p-4">
+        this is where tables are rendered eventually.
+      </div>
+    </div>
+  );
+};
+
 const Playground = () => {
   return (
     <div className="min-h-screen">
       <Header />
       <main className="grid h-[calc(100vh-74px)] grid-cols-1 gap-8 p-8 lg:grid-cols-2">
         <CodeEditor />
-        <div className="bg-green-100">Test</div>
+        <TableEditor />
       </main>
     </div>
   );
