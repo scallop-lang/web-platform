@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 
 const Header = () => {
@@ -75,10 +76,11 @@ const TableEditor = () => {
           <PlusSquare className="mr-2 h-5 w-5" />
           <span className="text-base">Create Relation</span>
         </Button>
-        <div className="flex items-center"></div>
-        <span>
-          Input <Switch /> Output
-        </span>
+        <div className="flex items-center gap-3">
+          <Label className="text-base">Input</Label>
+          <Switch className="text-blue-400" />
+          <Label className="text-base">Output</Label>
+        </div>
       </div>
       <div className="grow rounded-md bg-zinc-200 p-4">
         this is where tables are rendered eventually.
