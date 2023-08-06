@@ -4,25 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
-import { Label } from "~/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
-import { Switch } from "~/components/ui/switch";
+import TableEditor from "~/components/TableEditor";
 
 const Header = () => {
   return (
@@ -80,71 +62,6 @@ const CodeEditor = () => {
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
-      </div>
-    </div>
-  );
-};
-
-const CreateRelationModal = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button className="shrink-0 bg-pink-300 text-black hover:bg-pink-400">
-          <PlusSquare className="mr-2 h-5 w-5" />
-          <span className="text-base">Create Relation</span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create Relation</DialogTitle>
-          <DialogDescription>
-            This is where you&apos;ll be creating and editing your relation
-            signatures/arguments. Work in progress.
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const TableSelect = () => {
-  return (
-    <Select>
-      <SelectTrigger className="grow">
-        <SelectValue placeholder="Select an input table"></SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>
-            Of course, num_animals(n) is an <br /> output relation, so it&apos;s
-            not displayed here.
-          </SelectLabel>
-          <SelectItem value="name(a: String, b: String)">
-            <span className="font-mono">name(a: String, b: String)</span>
-          </SelectItem>
-          <SelectItem value="is_a(x: String, y: String)">
-            <span className="font-mono">is_a(x: String, y: String)</span>
-          </SelectItem>
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  );
-};
-
-const TableEditor = () => {
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-10">
-        <CreateRelationModal />
-        <TableSelect />
-        <div className="flex items-center gap-3">
-          <Label className="text-base">Input</Label>
-          <Switch />
-          <Label className="text-base">Output</Label>
-        </div>
-      </div>
-      <div className="grow rounded-md bg-zinc-200 p-4">
-        this is where we&apos;re going to render the tables.
       </div>
     </div>
   );
