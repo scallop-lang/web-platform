@@ -38,8 +38,9 @@ const Playground = () => {
             <Button
               variant="link"
               className="text-base"
+              onClick={() => alert("download file!")}
             >
-              Download raw <span className="font-mono">.scl</span> file
+              Download raw Scallop (.scl) file
             </Button>
           </div>
         </div>

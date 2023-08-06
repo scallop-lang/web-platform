@@ -12,6 +12,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["var(--font-inter)"],
+        mono: ["var(--font-plex-mono)"],
       },
       keyframes: {
         "accordion-down": {
