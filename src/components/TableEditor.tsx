@@ -16,7 +16,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
@@ -38,24 +37,29 @@ interface Relation {
 }
 
 const TableSelect = ({ jsonArray }: { jsonArray: Relation[] }) => {
+  const relationList = jsonArray.map((rel, index) => (
+    <SelectItem
+      key={index}
+      value={rel.name}
+    >
+      {rel.name}
+    </SelectItem>
+  ));
+
+  const isEmpty = relationList.length === 0;
+
   return (
-    <Select>
+    <Select disabled={isEmpty}>
       <SelectTrigger className="grow">
-        <SelectValue placeholder="Select an input table"></SelectValue>
+        <SelectValue
+          placeholder={
+            isEmpty
+              ? "Create a relation first"
+              : "Select an input relation table"
+          }
+        ></SelectValue>
       </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Select a relation</SelectLabel>
-          {jsonArray.map((rel, index) => (
-            <SelectItem
-              key={index}
-              value={rel.name + rel.id}
-            >
-              <span className="font-mono">{rel.name}</span>
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
+      <SelectContent>{relationList}</SelectContent>
     </Select>
   );
 };
