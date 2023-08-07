@@ -28,7 +28,7 @@ export const scallopRouter = createTRPCRouter({
         body: JSON.stringify(input),
       });
 
-      const schema = z.tuple([z.number(), z.any().array()]).array().array();
+      const schema = z.record(z.tuple([z.number(), z.any().array()]).array())
       const body = schema.parse(await res.json());
 
       return body;

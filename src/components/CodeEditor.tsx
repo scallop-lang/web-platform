@@ -8,17 +8,21 @@ import { api } from "~/utils/api";
 const EditorToolbar = ({ code }: { code: string }) => {
   const [query, setQuery] = useState("");
 
-  const res = api.scallop.runScallop.useQuery({
-            "inputs": [
-                {
-                    "name": "parent",
-                    "facts": [[1, ["Alice", "Bob"]], [1, ["Bob", "Emily"]]],
-                }
-            ],
-            "program": "rel grandparent(a, c) = parent(a, b), parent(b, c)",
-            "outputs": ["grandparent"],
-        })
-        
+  const { data } = api.scallop.runScallop.useQuery({
+    inputs: [
+      {
+        name: "parent",
+        facts: [
+          [1, ["Alice", "Bob"]],
+          [1, ["Bob", "Emily"]],
+        ],
+      },
+    ],
+    program: "rel grandparent(a, c) = parent(a, b), parent(b, c)",
+    outputs: ["grandparent"],
+  });
+  console.log(data);
+
   return (
     <div className="flex items-center justify-between">
       <Button
