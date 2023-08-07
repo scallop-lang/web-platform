@@ -248,6 +248,7 @@ function TableEditor() {
                 <span className="text-base">Delete</span>
               </Button>
               <Button
+                disabled={isEmpty}
                 onClick={addItem}
                 className="bg-sky-300 text-black hover:bg-sky-400"
               >
