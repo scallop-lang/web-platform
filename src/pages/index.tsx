@@ -3,6 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import TableEditor from "~/components/TableEditor";
+import {
+  type ScallopInputs,
+  type ScallopOutputs,
+  type ScallopProgram,
+} from "~/server/api/routers/scallop";
 import { CodeEditor } from "../components/CodeEditor";
 
 const Header = () => {
@@ -26,9 +31,19 @@ const Header = () => {
 };
 
 const Playground = () => {
-  const [program, setProgram] = useState(
+  const [program, setProgram] = useState<ScallopProgram>(
     "rel grandparent(a, c) = parent(a, b), parent(b, c)"
   );
+  const [inputs, setInputs] = useState<ScallopInputs>([
+    {
+      name: "parent",
+      facts: [
+        [1, ["Alice", "Bob"]],
+        [1, ["Bob", "Emily"]],
+      ],
+    },
+  ]);
+  const [outputs, setOutputs] = useState<ScallopOutputs>(["grandparent"]);
 
   return (
     <div className="min-h-screen">
