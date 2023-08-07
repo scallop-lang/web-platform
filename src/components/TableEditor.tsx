@@ -38,8 +38,8 @@ interface Argument {
 interface Relation {
   id: number;
   name: string;
-  columns: Argument[];
-  rows: Record<string, string>[];
+  column: Argument[];
+  row: Record<string, string>[];
   // column array, each element is a column component
   // row array, each element is a row component
 }
@@ -88,8 +88,8 @@ function TableEditor() {
     const newItem: Relation = {
       id: Date.now(),
       name: relationName,
-      columns: colArray,
-      rows: rowArray,
+      column: colArray,
+      row: rowArray,
     };
     setJsonArray((prevState) => [...prevState, newItem]);
     resetItem();
@@ -114,14 +114,6 @@ function TableEditor() {
     const newColArray = [...colArray];
     newColArray.splice(i, 1);
     setColArray(newColArray);
-  }
-
-  function titleChange(column: Argument, title: string) {
-    column.name = title;
-  }
-
-  function typeChange(column: Argument, type: string) {
-    column.type = type;
   }
 
   const isEmpty = colArray.length === 0;
@@ -190,13 +182,11 @@ function TableEditor() {
                 >
                   <Input
                     type="text"
-                    onChange={(e) => titleChange(columnField, e.target.value)}
+                    onChange={(name) => (columnField.name = name.target.value)}
                     placeholder="Argument name (optional)"
                     className="basis-1/2"
                   />
-                  <Select
-                    onValueChange={(type) => typeChange(columnField, type)}
-                  >
+                  <Select onValueChange={(type) => (columnField.type = type)}>
                     <SelectTrigger className="basis-1/3">
                       <SelectValue placeholder="Select a type" />
                     </SelectTrigger>
