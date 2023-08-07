@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Switch } from "~/components/ui/switch";
-import { Checkbox } from "./ui/checkbox";
 import { Input } from "./ui/input";
 import { Separator } from "./ui/separator";
 import {
@@ -79,7 +78,6 @@ function TableEditor() {
   const [rowArray, setRowArray] = useState<Record<string, string>[]>([]); // kind of useless atm
   const [open, setOpen] = useState(false); // toggle dialog box
   const [relationName, setRelationName] = useState("");
-  const [probability, setProbability] = useState(true);
 
   // for debugging, remove later
   useEffect(() => {
@@ -141,29 +139,6 @@ function TableEditor() {
                 argument takes an optional name and a datatype.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-1">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  checked={probability}
-                  onCheckedChange={setProbability}
-                  id="probability"
-                />
-                <Label
-                  htmlFor="probability"
-                  className="text-base"
-                >
-                  Probabilistic
-                </Label>
-              </div>
-              {probability ? (
-                <></>
-              ) : (
-                <p className="text-base text-zinc-500 dark:text-zinc-400">
-                  Note: when off, all tuples in your relation are assumed to
-                  have a probability of 1.
-                </p>
-              )}
-            </div>
             <div className="grid w-full gap-1.5">
               <Label
                 className="text-base"
