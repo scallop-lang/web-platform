@@ -3,18 +3,24 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { env } from "../../../env.mjs";
 
+const scallopProgram = z.string();
+
+const scallopInputs = z
+  .object({
+    name: z.string(),
+    facts: z.tuple([z.number(), z.any().array()]).array(),
+  })
+  .array();
+
+const scallopOutputs = z.string().array();
+
 export const scallopRouter = createTRPCRouter({
   run: publicProcedure
     .input(
       z.object({
-        program: z.string(),
-        inputs: z
-          .object({
-            name: z.string(),
-            facts: z.tuple([z.number(), z.any().array()]).array(),
-          })
-          .array(),
-        outputs: z.string().array(),
+        program: scallopProgram,
+        inputs: scallopInputs,
+        outputs: scallopOutputs,
       })
     )
     .query(async ({ input }) => {
@@ -34,3 +40,7 @@ export const scallopRouter = createTRPCRouter({
       return body;
     }),
 });
+
+export type ScallopInputs = z.infer<typeof scallopInputs>;
+export type ScallopProgram = z.infer<typeof scallopProgram>;
+export type ScallopOutputs = z.infer<typeof scallopOutputs>;

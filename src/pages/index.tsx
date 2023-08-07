@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import TableEditor from "~/components/TableEditor";
 import { CodeEditor } from "../components/CodeEditor";
 
@@ -25,6 +26,10 @@ const Header = () => {
 };
 
 const Playground = () => {
+  const [program, setProgram] = useState(
+    "rel grandparent(a, c) = parent(a, b), parent(b, c)"
+  );
+
   return (
     <div className="min-h-screen">
       <Header />
