@@ -1,3 +1,4 @@
+import CodeMirror from "@uiw/react-codemirror";
 import { FileDown, PlayCircle, PlusSquare } from "lucide-react";
 import Head from "next/head";
 import Image from "next/image";
@@ -44,41 +45,56 @@ const Header = () => {
   );
 };
 
+const downloadRawScallopFile = (code: string) => {
+  const a = document.createElement("a");
+  const url = URL.createObjectURL(new Blob([code], { type: "text/plain" }));
+
+  a.href = url;
+  a.download = "raw.scl";
+  a.click();
+
+  URL.revokeObjectURL(url);
+};
+
+const EditorToolbar = ({ code }: { code: string }) => {
+  return (
+    <div className="flex items-center justify-between">
+      <Button
+        className="bg-pink-300 text-black hover:bg-pink-400"
+        onClick={() =>
+          alert("should eventually run the following code:\n\n" + code)
+        }
+      >
+        <PlayCircle className="mr-2 h-5 w-5" />
+        <span className="text-base">Run Program</span>
+      </Button>
+      <Button
+        variant="outline"
+        onClick={() => downloadRawScallopFile(code)}
+      >
+        <FileDown className="mr-2 h-5 w-5" />
+        <span className="text-base">Download raw Scallop (.scl) file</span>
+      </Button>
+    </div>
+  );
+};
+
 const CodeEditor = () => {
   const [code, setCode] = useState(
-    `// this will eventually be a fully functioning code editor.\n// for now, it holds some placeholder text I put in.\n// currently it's just a <textarea>. feel free to edit.\n\nrel name(a, b) :- name(a, c), is_a(c, b)\nrel num_animals(n) :- n = count(o: name(o, "animal"))\n\n// of course, the real editor will have syntax highlighting.`
+    `rel name(a, b) :- name(a, b), is_a(c, b)\nrel num_animals(n) :- count(o: name(o, "animal"))`
   );
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <Button
-          className="bg-pink-300 text-black hover:bg-pink-400"
-          onClick={() =>
-            alert("should eventually run the following code:\n\n" + code)
-          }
-        >
-          <PlayCircle className="mr-2 h-5 w-5" />
-          <span className="text-base">Run Program</span>
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() =>
-            alert(
-              "should eventually download the following code, concatenated with stuff from the tables:\n\n" +
-                code
-            )
-          }
-        >
-          <FileDown className="mr-2 h-5 w-5" />
-          <span className="text-base">Download raw Scallop (.scl) file</span>
-        </Button>
-      </div>
-      <div className="grow rounded-md bg-zinc-200 p-4">
-        <textarea
-          className="h-full w-full resize-none bg-inherit font-mono text-base"
+    <div className="flex flex-col space-y-4">
+      <EditorToolbar code={code} />
+      <div className="h-0 grow rounded-md bg-zinc-200 p-4">
+        <CodeMirror
           value={code}
-          onChange={(e) => setCode(e.target.value)}
+          height="100%"
+          autoFocus={true}
+          placeholder={`// write your Scallop program here`}
+          style={{ height: "100%" }}
+          onChange={setCode}
         />
       </div>
     </div>
