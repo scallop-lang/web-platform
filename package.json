@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev",
+    "flask-dev": "flask --app server/api --debug run -p 5328",
+    "next-dev": "next dev",
+    "dev": "concurrently \"pnpm next-dev\" \"pnpm flask-dev\"",
     "lint": "next lint",
     "start": "next start"
   },
@@ -41,6 +43,7 @@
     "@typescript-eslint/eslint-plugin": "6.0.0",
     "@typescript-eslint/parser": "6.0.0",
     "autoprefixer": "^10.4.14",
+    "concurrently": "^8.2.0",
     "eslint": "^8.40.0",
     "eslint-config-next": "^13.4.2",
     "postcss": "^8.4.21",

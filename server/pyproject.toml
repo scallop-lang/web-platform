@@ -1,0 +1,13 @@
+[project]
+name = "scallop-playground-server"
+version = "0.0.1"
+
+[tool.setuptools]
+py-modules = ["api"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["api"]
