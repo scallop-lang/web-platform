@@ -22,6 +22,12 @@ import {
 import { Switch } from "~/components/ui/switch";
 import { Input } from "./ui/input";
 import { Separator } from "./ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 interface ColumnField {
   id: number;
@@ -215,13 +221,20 @@ function TableEditor() {
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => removeColumnField(index)}
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => removeColumnField(index)}
+                        >
+                          <X className="h-5 w-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete argument</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               ))}
             </div>
