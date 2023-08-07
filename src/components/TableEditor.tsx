@@ -1,4 +1,4 @@
-import { Plus, PlusSquare } from "lucide-react";
+import { Check, Plus, PlusSquare, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
@@ -21,6 +21,7 @@ import {
 } from "~/components/ui/select";
 import { Switch } from "~/components/ui/switch";
 import { Input } from "./ui/input";
+import { Separator } from "./ui/separator";
 
 interface ColumnField {
   id: number;
@@ -103,7 +104,7 @@ function TableEditor() {
     setColArray((prevState) => [...prevState, newColumnField]);
   }
 
-  function removeColumnField({ i }: { i: number }) {
+  function removeColumnField(i: number) {
     const newColArray = [...colArray];
     newColArray.splice(i, 1);
     setColArray(newColArray);
@@ -121,6 +122,8 @@ function TableEditor() {
   function typeChange({ column, type }: { column: ColumnField; type: string }) {
     column.type = type;
   }
+
+  const isEmpty = colArray.length === 0;
 
   return (
     <div className="flex flex-col gap-4">
@@ -177,14 +180,14 @@ function TableEditor() {
                 </Label>
               </div>
             </div>
-
-            <div className="columnList">
+            {isEmpty ? <></> : <Separator />}
+            <div>
               {colArray.map((columnField, index) => (
                 <div
-                  className="mb-2 flex justify-between"
+                  className="grid w-full grid-cols-3 gap-3"
                   key={index}
                 >
-                  <input
+                  <Input
                     type="text"
                     onChange={(e) =>
                       titleChange({
@@ -192,8 +195,7 @@ function TableEditor() {
                         title: e.target.value,
                       })
                     }
-                    placeholder="Enter the title here..."
-                    className="bg-neutral-200"
+                    placeholder="Argument name (optional)"
                   />
                   <Select
                     defaultValue={"String"}
@@ -201,7 +203,7 @@ function TableEditor() {
                       typeChange({ column: columnField, type: e })
                     }
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger>
                       <SelectValue placeholder="Select a type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -211,19 +213,30 @@ function TableEditor() {
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                  <Button onClick={() => removeColumnField({ i: index })}>
-                    Delete
+                  <Button
+                    size="icon"
+                    onClick={() => removeColumnField(index)}
+                  >
+                    <X className="h-5 w-5" />
                   </Button>
                 </div>
               ))}
             </div>
-            <DialogFooter className="mt-6">
-              <Button onClick={resetItem}>Delete</Button>
+            {isEmpty ? <></> : <Separator />}
+            <DialogFooter>
+              <Button
+                variant="destructive"
+                onClick={resetItem}
+              >
+                <Trash className="mr-2 h-5 w-5" />
+                <span className="text-base">Delete</span>
+              </Button>
               <Button
                 onClick={addItem}
-                className="shrink-0 bg-sky-300 text-black hover:bg-sky-400"
+                className="bg-sky-300 text-black hover:bg-sky-400"
               >
-                Confirm
+                <Check className="mr-2 h-5 w-5" />
+                <span className="text-base">Confirm</span>
               </Button>
             </DialogFooter>
           </DialogContent>
