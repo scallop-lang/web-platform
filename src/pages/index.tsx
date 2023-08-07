@@ -1,29 +1,8 @@
-import CodeMirror from "@uiw/react-codemirror";
-import { FileDown, PlayCircle, PlusSquare } from "lucide-react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
-import { Label } from "~/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
-import { Switch } from "~/components/ui/switch";
+import TableEditor from "~/components/TableEditor";
+import { CodeEditor } from "../components/CodeEditor";
 
 const Header = () => {
   return (
@@ -42,127 +21,6 @@ const Header = () => {
       </Link>
       <h1 className="select-none text-2xl font-semibold">Scallop Playground</h1>
     </header>
-  );
-};
-
-const downloadRawScallopFile = (code: string) => {
-  const a = document.createElement("a");
-  const url = URL.createObjectURL(new Blob([code], { type: "text/plain" }));
-
-  a.href = url;
-  a.download = "raw.scl";
-  a.click();
-
-  URL.revokeObjectURL(url);
-};
-
-const EditorToolbar = ({ code }: { code: string }) => {
-  return (
-    <div className="flex items-center justify-between">
-      <Button
-        className="bg-pink-300 text-black hover:bg-pink-400"
-        onClick={() =>
-          alert("should eventually run the following code:\n\n" + code)
-        }
-      >
-        <PlayCircle className="mr-2 h-5 w-5" />
-        <span className="text-base">Run Program</span>
-      </Button>
-      <Button
-        variant="outline"
-        onClick={() => downloadRawScallopFile(code)}
-      >
-        <FileDown className="mr-2 h-5 w-5" />
-        <span className="text-base">Download raw Scallop (.scl) file</span>
-      </Button>
-    </div>
-  );
-};
-
-const CodeEditor = () => {
-  const [code, setCode] = useState(
-    `rel name(a, b) :- name(a, b), is_a(c, b)\nrel num_animals(n) :- count(o: name(o, "animal"))`
-  );
-
-  return (
-    <div className="flex flex-col space-y-4">
-      <EditorToolbar code={code} />
-      <div className="h-0 grow rounded-md bg-zinc-200 p-4">
-        <CodeMirror
-          value={code}
-          height="100%"
-          autoFocus={true}
-          placeholder={`// write your Scallop program here`}
-          style={{ height: "100%" }}
-          onChange={setCode}
-        />
-      </div>
-    </div>
-  );
-};
-
-const CreateRelationModal = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button className="shrink-0 bg-pink-300 text-black hover:bg-pink-400">
-          <PlusSquare className="mr-2 h-5 w-5" />
-          <span className="text-base">Create Relation</span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create Relation</DialogTitle>
-          <DialogDescription>
-            This is where you&apos;ll be creating and editing your relation
-            signatures/arguments. Work in progress.
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const TableSelect = () => {
-  return (
-    <Select>
-      <SelectTrigger className="grow">
-        <SelectValue placeholder="Select an input table"></SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>
-            Of course, num_animals(n) is an <br /> output relation, so it&apos;s
-            not displayed here.
-          </SelectLabel>
-          <SelectItem value="name(a: String, b: String)">
-            <span className="font-mono">name(a: String, b: String)</span>
-          </SelectItem>
-          <SelectItem value="is_a(x: String, y: String)">
-            <span className="font-mono">is_a(x: String, y: String)</span>
-          </SelectItem>
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  );
-};
-
-const TableEditor = () => {
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-10">
-        <CreateRelationModal />
-        <TableSelect />
-        <div className="flex items-center gap-3">
-          <Label className="text-base">Input</Label>
-          <Switch />
-          <Label className="text-base">Output</Label>
-        </div>
-      </div>
-      <div className="grow rounded-md bg-zinc-200 p-4">
-        this is where we&apos;re going to render the tables.
-      </div>
-    </div>
   );
 };
 
