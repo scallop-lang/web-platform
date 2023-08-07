@@ -18,7 +18,8 @@ export const scallopRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      const res = await fetch(env.FLASK_SERVER + "api/run-scallop", {
+      const endpoint = new URL("api/run-scallop", env.FLASK_SERVER);
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -26,7 +27,10 @@ export const scallopRouter = createTRPCRouter({
         },
         body: JSON.stringify(input),
       });
-      
-      return res;
+
+      const schema = z.tuple([z.number(), z.any().array()]).array().array();
+      const body = schema.parse(await res.json());
+
+      return body;
     }),
 });
