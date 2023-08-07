@@ -4,16 +4,16 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { env } from "../../../env.mjs";
 
 export const scallopRouter = createTRPCRouter({
-  runScallop: publicProcedure
+  run: publicProcedure
     .input(
       z.object({
+        program: z.string(),
         inputs: z
           .object({
             name: z.string(),
             facts: z.tuple([z.number(), z.any().array()]).array(),
           })
           .array(),
-        program: z.string(),
         outputs: z.string().array(),
       })
     )
@@ -28,7 +28,7 @@ export const scallopRouter = createTRPCRouter({
         body: JSON.stringify(input),
       });
 
-      const schema = z.record(z.tuple([z.number(), z.any().array()]).array())
+      const schema = z.record(z.tuple([z.number(), z.any().array()]).array());
       const body = schema.parse(await res.json());
 
       return body;
