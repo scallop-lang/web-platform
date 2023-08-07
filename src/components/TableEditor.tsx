@@ -175,18 +175,18 @@ function TableEditor() {
             </div>
             {isEmpty ? <></> : <Separator />}
             <div className="space-y-2">
-              {colArray.map((columnField, index) => (
+              {colArray.map((field, index) => (
                 <div
                   className="flex justify-between space-x-2"
                   key={index}
                 >
                   <Input
                     type="text"
-                    onChange={(name) => (columnField.name = name.target.value)}
+                    onChange={(name) => (field.name = name.target.value)}
                     placeholder="Argument name (optional)"
                     className="basis-1/2"
                   />
-                  <Select onValueChange={(type) => (columnField.type = type)}>
+                  <Select onValueChange={(type) => (field.type = type)}>
                     <SelectTrigger className="basis-1/3">
                       <SelectValue placeholder="Select a type" />
                     </SelectTrigger>
