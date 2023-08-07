@@ -1,6 +1,0 @@
-pyproject.toml
-scallop_playground_server.egg-info/PKG-INFO
-scallop_playground_server.egg-info/SOURCES.txt
-scallop_playground_server.egg-info/dependency_links.txt
-scallop_playground_server.egg-info/top_level.txt
-tests/test_scallop_run.py
