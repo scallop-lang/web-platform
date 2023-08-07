@@ -14,9 +14,19 @@ const plexMono = IBM_Plex_Mono({
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
-    <div className={`${inter.variable} ${plexMono.variable} font-sans`}>
-      <Component {...pageProps} />
-    </div>
+    <>
+      <style
+        jsx
+        global
+      >{`
+        html {
+          font-family: ${inter.style.fontFamily};
+        }
+      `}</style>
+      <div className={`${inter.variable} ${plexMono.variable} font-sans`}>
+        <Component {...pageProps} />
+      </div>
+    </>
   );
 };
 
