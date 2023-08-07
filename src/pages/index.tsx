@@ -49,7 +49,10 @@ const Playground = () => {
     <div className="min-h-screen">
       <Header />
       <main className="grid h-[calc(100vh-74px)] grid-cols-1 gap-8 p-8 lg:grid-cols-2">
-        <CodeEditor />
+        <CodeEditor
+          program={program}
+          onProgramChange={setProgram}
+        />
         <TableEditor />
       </main>
     </div>

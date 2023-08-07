@@ -1,7 +1,7 @@
 import CodeMirror from "@uiw/react-codemirror";
 import { FileDown, PlayCircle } from "lucide-react";
-import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import { type ScallopProgram } from "~/server/api/routers/scallop";
 import { api } from "~/utils/api";
 import { download } from "../utils/download";
 
@@ -40,22 +40,25 @@ const EditorToolbar = ({ code }: { code: string }) => {
     </div>
   );
 };
-export const CodeEditor = () => {
-  const [code, setCode] = useState(
-    `rel name(a, b) :- name(a, b), is_a(c, b)\nrel num_animals(n) :- count(o: name(o, "animal"))`
-  );
 
+export const CodeEditor = ({
+  program,
+  onProgramChange,
+}: {
+  program: string;
+  onProgramChange: React.Dispatch<React.SetStateAction<ScallopProgram>>;
+}) => {
   return (
     <div className="flex flex-col space-y-4">
-      <EditorToolbar code={code} />
+      <EditorToolbar code={program} />
       <div className="h-0 grow rounded-md bg-zinc-200 p-4">
         <CodeMirror
-          value={code}
+          value={program}
           height="100%"
           autoFocus={true}
           placeholder={`// write your Scallop program here`}
           style={{ height: "100%" }}
-          onChange={setCode}
+          onChange={onProgramChange}
         />
       </div>
     </div>
