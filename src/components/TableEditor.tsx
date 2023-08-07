@@ -116,16 +116,11 @@ function TableEditor() {
     setColArray(newColArray);
   }
 
-  function titleChange({
-    column,
-    title,
-  }: {
-    column: ColumnField;
-    title: string;
-  }) {
+  function titleChange(column: ColumnField, title: string) {
     column.name = title;
   }
-  function typeChange({ column, type }: { column: ColumnField; type: string }) {
+
+  function typeChange(column: ColumnField, type: string) {
     column.type = type;
   }
 
@@ -195,19 +190,12 @@ function TableEditor() {
                 >
                   <Input
                     type="text"
-                    onChange={(e) =>
-                      titleChange({
-                        column: columnField,
-                        title: e.target.value,
-                      })
-                    }
+                    onChange={(e) => titleChange(columnField, e.target.value)}
                     placeholder="Argument name (optional)"
                     className="basis-1/2"
                   />
                   <Select
-                    onValueChange={(e) =>
-                      typeChange({ column: columnField, type: e })
-                    }
+                    onValueChange={(type) => typeChange(columnField, type)}
                   >
                     <SelectTrigger className="basis-1/3">
                       <SelectValue placeholder="Select a type" />
