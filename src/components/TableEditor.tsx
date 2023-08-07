@@ -29,7 +29,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-interface ColumnField {
+interface Argument {
   id: number;
   name: string;
   type: string;
@@ -38,7 +38,7 @@ interface ColumnField {
 interface Relation {
   id: number;
   name: string;
-  columns: ColumnField[];
+  columns: Argument[];
   rows: Record<string, string>[];
   // column array, each element is a column component
   // row array, each element is a row component
@@ -74,7 +74,7 @@ const TableSelect = ({ jsonArray }: { jsonArray: Relation[] }) => {
 
 function TableEditor() {
   const [jsonArray, setJsonArray] = useState<Relation[]>([]); // this stores the relations
-  const [colArray, setColArray] = useState<ColumnField[]>([]);
+  const [colArray, setColArray] = useState<Argument[]>([]);
   const [rowArray, setRowArray] = useState<Record<string, string>[]>([]); // kind of useless atm
   const [open, setOpen] = useState(false); // toggle dialog box
   const [relationName, setRelationName] = useState("");
@@ -102,7 +102,7 @@ function TableEditor() {
   }
 
   function addColumnField() {
-    const newColumnField: ColumnField = {
+    const newColumnField: Argument = {
       id: Date.now(),
       name: "",
       type: "String",
@@ -116,11 +116,11 @@ function TableEditor() {
     setColArray(newColArray);
   }
 
-  function titleChange(column: ColumnField, title: string) {
+  function titleChange(column: Argument, title: string) {
     column.name = title;
   }
 
-  function typeChange(column: ColumnField, type: string) {
+  function typeChange(column: Argument, type: string) {
     column.type = type;
   }
 
@@ -177,7 +177,7 @@ function TableEditor() {
                   htmlFor="add-argument"
                   className="text-base font-normal"
                 >
-                  Add argument
+                  Add new argument
                 </Label>
               </div>
             </div>
