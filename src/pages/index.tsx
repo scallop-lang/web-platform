@@ -1,11 +1,11 @@
 import CodeMirror from "@uiw/react-codemirror";
-import { FileDown, PlayCircle, PlusSquare } from "lucide-react";
+import { FileDown, PlayCircle } from "lucide-react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "~/components/ui/button";
 import TableEditor from "~/components/TableEditor";
+import { Button } from "~/components/ui/button";
 
 const Header = () => {
   return (
