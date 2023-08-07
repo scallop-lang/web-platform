@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "flask-dev": "FLASK_DEBUG=1 pip3 install -r requirements.txt && python3 -m flask --app server/index run -p 5328",
+    "flask-dev": "flask --app server/flaskr run -p 5328",
     "next-dev": "next dev",
     "dev": "concurrently \"npm run next-dev\" \"npm run flask-dev\"",
     "lint": "next lint",
