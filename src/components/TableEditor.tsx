@@ -1,4 +1,4 @@
-import { PlusSquare } from "lucide-react";
+import { Plus, PlusSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Switch } from "~/components/ui/switch";
+import { Input } from "./ui/input";
 
 interface ColumnField {
   id: number;
@@ -69,8 +70,9 @@ function TableEditor() {
   const [colArray, setColArray] = useState<ColumnField[]>([]);
   const [rowArray, setRowArray] = useState<Record<string, string>[]>([]); // kind of useless atm
   const [open, setOpen] = useState(false); // toggle dialog box
-  const [newItemName, setNewItemName] = useState("");
+  const [relationName, setRelationName] = useState("");
 
+  // for debugging, remove later
   useEffect(() => {
     console.log(jsonArray);
   }, [jsonArray]);
@@ -78,7 +80,7 @@ function TableEditor() {
   function addItem() {
     const newItem: Relation = {
       id: Date.now(),
-      name: newItemName,
+      name: relationName,
       columns: colArray,
       rows: rowArray,
     };
@@ -88,7 +90,7 @@ function TableEditor() {
 
   function resetItem() {
     setOpen(false);
-    setNewItemName("");
+    setRelationName("");
     setColArray([]);
   }
 
@@ -122,7 +124,7 @@ function TableEditor() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-10">
+      <div className="flex items-center justify-between space-x-10">
         <Dialog
           open={open}
           onOpenChange={setOpen}
@@ -135,80 +137,95 @@ function TableEditor() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create Relation</DialogTitle>
-              <input
-                type="text"
-                value={newItemName}
-                onChange={(e) => setNewItemName(e.target.value)}
-                placeholder="Enter the name here..."
-                className="bg-neutral-200"
-              />
-              <DialogHeader>
-                <DialogTitle>Arguments</DialogTitle>
-                <DialogDescription>
-                  Enter an optional name, datatype, then rearrange the order.
-                </DialogDescription>
-              </DialogHeader>
+              <DialogTitle className="text-2xl">Create relation</DialogTitle>
+              <DialogDescription className="text-base">
+                Enter a name for your relation. Then, add your arguments. Each
+                argument takes an optional name and a datatype.
+              </DialogDescription>
             </DialogHeader>
-            <div className="overflow-hidden">
-              <div className="columnAdjuster">
-                <div className="mb-2 flex items-center">
-                  <Button
-                    onClick={addColumnField}
-                    className="h-10 w-10 shrink-0 bg-sky-300 text-black hover:bg-sky-400"
-                  ></Button>
-                  <p className="ml-2">Add your arguments here</p>
-                </div>
-                <div className="columnList">
-                  {colArray.map((columnField, index) => (
-                    <div
-                      className="mb-2 flex justify-between"
-                      key={index}
-                    >
-                      <input
-                        type="text"
-                        onChange={(e) =>
-                          titleChange({
-                            column: columnField,
-                            title: e.target.value,
-                          })
-                        }
-                        placeholder="Enter the title here..."
-                        className="bg-neutral-200"
-                      />
-                      <Select
-                        defaultValue={"String"}
-                        onValueChange={(e) =>
-                          typeChange({ column: columnField, type: e })
-                        }
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Select a type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="String">String</SelectItem>
-                            <SelectItem value="Int32">Int-32</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <Button onClick={() => removeColumnField({ i: index })}>
-                        Delete
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <DialogFooter className="mt-6">
-                <Button onClick={resetItem}>Delete</Button>
+            <div className="grid w-full gap-1.5">
+              <Label
+                className="text-base"
+                htmlFor="relation-name"
+              >
+                Relation name
+              </Label>
+              <Input
+                type="text"
+                id="relation-name"
+                placeholder="Required"
+                value={relationName}
+                onChange={(e) => setRelationName(e.target.value)}
+              />
+            </div>
+            <div className="grid w-full gap-1.5">
+              <p className="text-base font-medium">Arguments</p>
+              <div className="flex items-center space-x-3">
                 <Button
-                  onClick={addItem}
+                  onClick={addColumnField}
+                  size="icon"
+                  id="add-argument"
                   className="shrink-0 bg-sky-300 text-black hover:bg-sky-400"
                 >
-                  Confirm
+                  <Plus className="h-5 w-5" />
                 </Button>
-              </DialogFooter>
+                <Label
+                  htmlFor="add-argument"
+                  className="text-base font-normal"
+                >
+                  Add argument
+                </Label>
+              </div>
             </div>
+
+            <div className="columnList">
+              {colArray.map((columnField, index) => (
+                <div
+                  className="mb-2 flex justify-between"
+                  key={index}
+                >
+                  <input
+                    type="text"
+                    onChange={(e) =>
+                      titleChange({
+                        column: columnField,
+                        title: e.target.value,
+                      })
+                    }
+                    placeholder="Enter the title here..."
+                    className="bg-neutral-200"
+                  />
+                  <Select
+                    defaultValue={"String"}
+                    onValueChange={(e) =>
+                      typeChange({ column: columnField, type: e })
+                    }
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="String">String</SelectItem>
+                        <SelectItem value="Int32">Int-32</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={() => removeColumnField({ i: index })}>
+                    Delete
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <DialogFooter className="mt-6">
+              <Button onClick={resetItem}>Delete</Button>
+              <Button
+                onClick={addItem}
+                className="shrink-0 bg-sky-300 text-black hover:bg-sky-400"
+              >
+                Confirm
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
         <TableSelect jsonArray={jsonArray} />
