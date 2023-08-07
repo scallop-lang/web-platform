@@ -12,4 +12,4 @@ def test_scallop_parent(client):
             "outputs": ["grandparent"],
         },
     )
-    assert response.json == [[[1.0, ["Emily", "Alice"]]]]
+    assert response.json == {"grandparent": [[1.0, ["Emily", "Alice"]]]}
