@@ -8,6 +8,7 @@ import {
   type ScallopOutputs,
   type ScallopProgram,
 } from "~/server/api/routers/scallop";
+import { api } from "~/utils/api";
 import { CodeEditor } from "../components/CodeEditor";
 
 const Header = () => {
@@ -44,6 +45,13 @@ const Playground = () => {
     },
   ]);
   const [outputs, setOutputs] = useState<ScallopOutputs>(["grandparent"]);
+
+  const { data } = api.scallop.run.useQuery({
+    program: program,
+    inputs: inputs,
+    outputs: outputs,
+  });
+  console.log(data);
 
   return (
     <div className="min-h-screen">

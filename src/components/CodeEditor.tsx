@@ -2,25 +2,9 @@ import CodeMirror from "@uiw/react-codemirror";
 import { FileDown, PlayCircle } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { type ScallopProgram } from "~/server/api/routers/scallop";
-import { api } from "~/utils/api";
 import { download } from "../utils/download";
 
 const EditorToolbar = ({ code }: { code: string }) => {
-  const { data } = api.scallop.run.useQuery({
-    program: "rel grandparent(a, c) = parent(a, b), parent(b, c)",
-    inputs: [
-      {
-        name: "parent",
-        facts: [
-          [1, ["Alice", "Bob"]],
-          [1, ["Bob", "Emily"]],
-        ],
-      },
-    ],
-    outputs: ["grandparent"],
-  });
-  console.log(data);
-
   return (
     <div className="flex items-center justify-between">
       <Button
@@ -28,7 +12,7 @@ const EditorToolbar = ({ code }: { code: string }) => {
         onClick={() => alert("will eventually update program state.")}
       >
         <PlayCircle className="mr-2 h-5 w-5" />
-        <span className="text-base">Run Program</span>
+        <span className="text-base">Run program</span>
       </Button>
       <Button
         variant="outline"
