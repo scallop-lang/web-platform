@@ -45,7 +45,7 @@ const TableSelect = ({ jsonArray } : {jsonArray : Relation[]}) => {
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectLabel>Select a relationship to see</SelectLabel>
+            <SelectLabel>Select a relation</SelectLabel>
             {jsonArray.map((rel, index) => (
                 <SelectItem key={index} value={rel.name + rel.id}>
                   <span className="font-mono">{rel.name}</span>
