@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "flask-dev": "flask --app server/flaskr --debug run -p 5328",
+    "flask-dev": "flask --app server/api --debug run -p 5328",
     "next-dev": "next dev",
     "dev": "concurrently \"pnpm next-dev\" \"pnpm flask-dev\"",
     "lint": "next lint",
