@@ -45,6 +45,17 @@ const Header = () => {
   );
 };
 
+const downloadRawScallopFile = (code: string) => {
+  const a = document.createElement("a");
+  const url = URL.createObjectURL(new Blob([code], { type: "text/plain" }));
+
+  a.href = url;
+  a.download = "raw.scl";
+  a.click();
+
+  URL.revokeObjectURL(url);
+};
+
 const EditorToolbar = ({ code }: { code: string }) => {
   return (
     <div className="flex items-center justify-between">
@@ -59,12 +70,7 @@ const EditorToolbar = ({ code }: { code: string }) => {
       </Button>
       <Button
         variant="outline"
-        onClick={() =>
-          alert(
-            "should eventually download the following code, concatenated with stuff from the tables:\n\n" +
-              code
-          )
-        }
+        onClick={() => downloadRawScallopFile(code)}
       >
         <FileDown className="mr-2 h-5 w-5" />
         <span className="text-base">Download raw Scallop (.scl) file</span>
