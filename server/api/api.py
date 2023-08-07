@@ -7,6 +7,7 @@ api_routes = Blueprint("api_routes", __name__)
 
 @api_routes.route("/api/run-scallop", methods=["POST"])
 def run_scallop():
+    # Process request
     request_data = request.get_json()
     inputs, program, outputs = (
         request_data["inputs"],
@@ -39,8 +40,6 @@ def run_scallop():
     ctx.run()
 
     # Extract output relations
-    data = []
-    for relation in outputs:
-        data.append(list(ctx.relation(relation)))
-
+    data = [list(ctx.relation(relation)) for relation in outputs]
+    
     return jsonify(data)
