@@ -181,10 +181,10 @@ function TableEditor() {
               </div>
             </div>
             {isEmpty ? <></> : <Separator />}
-            <div>
+            <div className="space-y-2">
               {colArray.map((columnField, index) => (
                 <div
-                  className="grid w-full grid-cols-3 gap-3"
+                  className="flex justify-between space-x-2"
                   key={index}
                 >
                   <Input
@@ -196,25 +196,28 @@ function TableEditor() {
                       })
                     }
                     placeholder="Argument name (optional)"
+                    className="basis-1/2"
                   />
                   <Select
-                    defaultValue={"String"}
                     onValueChange={(e) =>
                       typeChange({ column: columnField, type: e })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="basis-1/3">
                       <SelectValue placeholder="Select a type" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectItem value="String">String</SelectItem>
-                        <SelectItem value="Int32">Int-32</SelectItem>
+                        <SelectItem value="Int32">Int32</SelectItem>
+                        <SelectItem value="Float">Float</SelectItem>
+                        <SelectItem value="Tensor">Tensor</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
                   <Button
                     size="icon"
+                    variant="ghost"
                     onClick={() => removeColumnField(index)}
                   >
                     <X className="h-5 w-5" />
