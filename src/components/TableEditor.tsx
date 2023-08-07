@@ -128,7 +128,7 @@ function TableEditor() {
           <DialogTrigger asChild>
             <Button className="shrink-0 bg-pink-300 text-black hover:bg-pink-400">
               <PlusSquare className="mr-2 h-5 w-5" />
-              <span className="text-base">Create Relation</span>
+              <span className="text-base">Create relation</span>
             </Button>
           </DialogTrigger>
           <DialogContent>

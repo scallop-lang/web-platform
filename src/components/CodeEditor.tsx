@@ -4,7 +4,7 @@ import { Button } from "~/components/ui/button";
 import { type ScallopProgram } from "~/server/api/routers/scallop";
 import { download } from "../utils/download";
 
-const EditorToolbar = ({ code }: { code: string }) => {
+const EditorToolbar = ({ program }: { program: string }) => {
   return (
     <div className="flex items-center justify-between">
       <Button
@@ -16,7 +16,7 @@ const EditorToolbar = ({ code }: { code: string }) => {
       </Button>
       <Button
         variant="outline"
-        onClick={() => download(code)}
+        onClick={() => download(program)}
       >
         <FileDown className="mr-2 h-5 w-5" />
         <span className="text-base">Download raw Scallop (.scl) file</span>
@@ -34,7 +34,7 @@ export const CodeEditor = ({
 }) => {
   return (
     <div className="flex flex-col space-y-4">
-      <EditorToolbar code={program} />
+      <EditorToolbar program={program} />
       <div className="h-0 grow rounded-md bg-zinc-200 p-4">
         <CodeMirror
           value={program}
