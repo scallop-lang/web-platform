@@ -2,8 +2,8 @@ import CodeMirror from "@uiw/react-codemirror";
 import { FileDown, PlayCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
-import { downloadRawFile } from "../utils/downloadRawFile";
 import { api } from "~/utils/api";
+import { download } from "../utils/download";
 
 const EditorToolbar = ({ code }: { code: string }) => {
   const [query, setQuery] = useState("");
@@ -34,7 +34,7 @@ const EditorToolbar = ({ code }: { code: string }) => {
       </Button>
       <Button
         variant="outline"
-        onClick={() => downloadRawFile(code)}
+        onClick={() => download(code)}
       >
         <FileDown className="mr-2 h-5 w-5" />
         <span className="text-base">Download raw Scallop (.scl) file</span>
