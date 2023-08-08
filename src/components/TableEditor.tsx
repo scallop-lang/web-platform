@@ -1,5 +1,5 @@
 import { Check, Plus, PlusSquare, Trash, X } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -44,18 +44,12 @@ interface Argument {
 interface Relation {
   id: number;
   name: string;
-  column: Argument[]; // arguments
-  row: Record<number, string>[]; // facts
+  column: Argument[];
+  row: Record<number, string>[];
   editable: boolean;
 }
 
-const Table = ({
-  relation,
-  handleChange,
-}: {
-  relation: ScallopInput | ScallopOutput;
-  handleChange: React.Dispatch<React.SetStateAction<ScallopInput>>;
-}) => {
+const Table = ({ relation }: { relation: ScallopInput | ScallopOutput }) => {
   function addFact(probability: number, values: string[]) {
     switch (relation.type) {
       case "input":
@@ -74,86 +68,39 @@ const Table = ({
     }
   }
 
-  let tableRows = [];
-
-  // header
-  // tableRows
-
-  // get each row
-  // combine rows into table
+  let tableRows: React.ReactNode[] = [];
 
   switch (relation.type) {
     case "input":
-      tableRows = relation.facts.map((fact) => {
+      tableRows = relation.facts.map((fact, index) => {
         // tuple array, each element is number, string[]
         // row elements = string[], or this is fact[1]...........
-        fact[1].map((arg) => {
-          <Input
-            type="text"
-            value={arg}
-          />;
-        });
+        return (
+          <div
+            className="flex space-x-2"
+            key={index}
+          >
+            {fact[1].map((arg) => (
+              <Input
+                key={arg}
+                type="text"
+                value={arg}
+                className="grow"
+              />
+            ))}
+          </div>
+        );
       });
+      console.log(tableRows);
       break;
     case "output":
-      tableRows = relation.args.map((arg) => {
-        <Input
-          type="text"
-          disabled={true}
-          value={arg.name}
-        />;
-      });
       break;
   }
 
+  console.log(tableRows);
+
   // that button is supposed to add rows, have it show when you hover over the last row
-  return (
-    <div>
-      <>{tableRows}</>
-      <Button>Test</Button>
-    </div>
-  );
-};
-
-const TableSelect = ({
-  list,
-  isOutput,
-  setSelectedRelation,
-}: {
-  list: ScallopInput[] | ScallopOutput[];
-  isOutput: boolean;
-  setSelectedRelation: React.Dispatch<React.SetStateAction<string>>;
-}) => {
-  const state = isOutput ? "output" : "input";
-
-  const relationList = list.map((rel, index) => (
-    <SelectItem
-      key={index}
-      value={rel.name}
-    >
-      {rel.name}
-    </SelectItem>
-  ));
-
-  const isEmpty = list.length === 0;
-
-  return (
-    <Select
-      disabled={isEmpty}
-      onValueChange={(type) => setSelectedRelation(type)}
-    >
-      <SelectTrigger className="grow">
-        <SelectValue
-          placeholder={
-            isEmpty
-              ? `Create an ${state} relation first`
-              : `Select an ${state} relation table`
-          }
-        ></SelectValue>
-      </SelectTrigger>
-      <SelectContent>{relationList}</SelectContent>
-    </Select>
-  );
+  return <div className="flex flex-col space-y-2">{tableRows}</div>;
 };
 
 const CreateRelationDialog = ({
@@ -360,6 +307,43 @@ const CreateRelationDialog = ({
   );
 };
 
+const RelationSelect = ({
+  list: relationList,
+  isOutput,
+  setSelectedRelation,
+}: {
+  list: ScallopInput[] | ScallopOutput[];
+  isOutput: boolean;
+  setSelectedRelation: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  const isEmpty = relationList.length === 0;
+  const state = isOutput ? "output" : "input";
+  const placeholder = isEmpty
+    ? `Create an ${state} relation first!`
+    : `Select an ${state} table to start editing.`;
+
+  const selectItems = relationList.map((relation, index) => (
+    <SelectItem
+      key={index}
+      value={relation.name}
+    >
+      {relation.name}
+    </SelectItem>
+  ));
+
+  return (
+    <Select
+      disabled={isEmpty}
+      onValueChange={(relationName) => setSelectedRelation(relationName)}
+    >
+      <SelectTrigger className="grow">
+        <SelectValue placeholder={placeholder}></SelectValue>
+      </SelectTrigger>
+      <SelectContent>{selectItems}</SelectContent>
+    </Select>
+  );
+};
+
 const TableEditor = ({
   inputs,
   outputs,
@@ -374,26 +358,9 @@ const TableEditor = ({
   const [isOutput, setIsOutput] = useState(false);
   const [activeRelation, setActiveRelation] = useState("");
 
-  /*
-  function getRelation(relationName: string) {
-    if(isOutput){
-      for(int i=0; i<outputs.length; i++){
-        if(outputs[i].name === relationName){
-          return outputs[i];
-        }
-      }
-      return;
-    }
-    for(int i=0; i<inputs.length; i++){
-      if(inputs[i].name === relationName){
-        return inputs[i];
-      }
-    }
-    return null;
-    // if isOutput, comb through outputs and return the ScallopOutput with .name === relationName
-    // else, comb thorugh inputs and return the ScallopInput with .name === relationName.. idc good enough for me
-  }
-  */
+  console.log("relation", activeRelation);
+
+  // TODO: get relation from relation name
 
   function handleRelation(relation: Relation) {
     const args: { name: string; type: string }[] = [];
@@ -423,18 +390,25 @@ const TableEditor = ({
       : onOutputsChange([...outputs, newOutput]);
   }
 
+  const test = inputs[0];
+  if (!test) {
+    throw new Error("test is undefined");
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between space-x-10">
         <CreateRelationDialog handleRelation={handleRelation} />
-        <TableSelect
+        <RelationSelect
           list={isOutput ? outputs : inputs}
           isOutput={isOutput}
           setSelectedRelation={setActiveRelation}
         />
         <div className="flex items-center gap-3">
           <Label
-            className="text-base"
+            className={`text-base transition ${
+              isOutput ? "text-zinc-500 dark:text-zinc-400" : ""
+            }`}
             htmlFor="io-table"
           >
             Input
@@ -445,7 +419,9 @@ const TableEditor = ({
             id="io-table"
           />
           <Label
-            className="text-base"
+            className={`text-base transition ${
+              isOutput ? "" : "text-zinc-500 dark:text-zinc-400"
+            }`}
             htmlFor="io-table"
           >
             Output
@@ -453,26 +429,7 @@ const TableEditor = ({
         </div>
       </div>
       <Card className="h-0 grow p-4">
-        <div className="flex flex-col space-y-2">
-          <div className="flex space-x-2">
-            <Input />
-            <Input />
-            <Input />
-            <Input />
-          </div>
-          <div className="flex space-x-2">
-            <Input />
-            <Input />
-            <Input />
-            <Input />
-          </div>
-          <div className="flex space-x-2">
-            <Input />
-            <Input />
-            <Input />
-            <Input />
-          </div>
-        </div>
+        <Table relation={test} />
       </Card>
     </div>
   );

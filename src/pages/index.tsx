@@ -32,7 +32,6 @@ const Header = () => {
 };
 
 const Playground = () => {
-  /**
   const [program, setProgram] = useState<ScallopProgram>(
     "rel grandparent(a, c) = parent(a, b), parent(b, c)"
   );
@@ -51,39 +50,14 @@ const Playground = () => {
     },
   ]);
   const [outputs, setOutputs] = useState<ScallopOutput[]>([
-    {
-      type: "output",
-      name: "grandparent",
-      args: [
-        { name: "a", type: "String" },
-        { name: "b", type: "String" },
-      ],
-    },
-  ]); */
-
-  const [program, setProgram] = useState<ScallopProgram>(
-    "rel sum(a + b) = int(a, c), int(b, d)"
-  );
-  const [inputs, setInputs] = useState<ScallopInput[]>([
-    {
-      type: "input",
-      name: "int",
-      args: [
-        { name: "a", type: "Integer" },
-        { name: "b", type: "Boolean" },
-      ],
-      facts: [
-        [1, ["1", "true"]],
-        [1, ["3", "False"]],
-      ],
-    },
-  ]);
-  const [outputs, setOutputs] = useState<ScallopOutput[]>([
-    {
-      type: "output",
-      name: "sum",
-      args: [{ name: "a", type: "Integer" }],
-    },
+    // {
+    //   type: "output",
+    //   name: "grandparent",
+    //   args: [
+    //     { name: "a", type: "String" },
+    //     { name: "b", type: "String" },
+    //   ],
+    // },
   ]);
 
   const { data } = api.scallop.run.useQuery({
