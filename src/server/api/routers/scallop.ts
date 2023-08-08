@@ -33,27 +33,24 @@ function relationToZodSchema(
 ) {
   const schema: ZodTypeAny[] = [];
   args.forEach((arg) => {
-    const error = {
-      required_error: `${name}: missing value for ${arg.name}`,
-      invalid_type_error: `${name}: ${arg.name} must be a ${arg.type}`,
+    const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
+      return {
+        message: `[@relation ${name}]: values for \`${arg.name}\` must be of type \`${arg.type}\``,
+      };
     };
-    const msg = {
-      message: `${name}: ${arg.name} must be a ${arg.type}`,
-    };
+    z.setErrorMap(customErrorMap);
+
     const schemas: Record<string, ZodTypeAny> = {
-      String: z.coerce.string(error),
-      Integer: z.coerce.number(error).int(msg),
-      Float: z.coerce.number(error),
+      String: z.coerce.string(),
+      Integer: z.coerce.number().int(),
+      Float: z.coerce.number(),
       Boolean: z
-        .union(
-          [
-            z.literal("true"),
-            z.literal("True"),
-            z.literal("false"),
-            z.literal("False"),
-          ],
-          error
-        )
+        .union([
+          z.literal("true"),
+          z.literal("True"),
+          z.literal("false"),
+          z.literal("False"),
+        ])
         .transform((val) => {
           if (val === "true" || val === "True") {
             return true;
@@ -61,6 +58,7 @@ function relationToZodSchema(
           return false;
         }),
     };
+
     schema.push(schemas[arg.type]!);
   });
   return z.tuple([z.number(), z.tuple(schema as [])]).array();
@@ -85,7 +83,7 @@ export const scallopRouter = createTRPCRouter({
         };
       });
 
-      console.log("PARSED INPUT:", JSON.stringify(input));
+      console.log(JSON.stringify(input.inputs));
 
       const endpoint = new URL("api/run-scallop", env.FLASK_SERVER);
       const res = await fetch(endpoint, {
