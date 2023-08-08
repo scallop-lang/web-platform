@@ -3,8 +3,9 @@ import { FileDown, PlayCircle } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { type ScallopProgram } from "~/server/api/routers/scallop";
 import { download } from "../utils/download";
+import { Card } from "./ui/card";
 
-const EditorToolbar = ({ program }: { program: string }) => {
+const CodeToolbar = ({ program }: { program: string }) => {
   return (
     <div className="flex items-center justify-between">
       <Button
@@ -29,13 +30,13 @@ export const CodeEditor = ({
   program,
   onProgramChange,
 }: {
-  program: string;
+  program: ScallopProgram;
   onProgramChange: React.Dispatch<React.SetStateAction<ScallopProgram>>;
 }) => {
   return (
     <div className="flex flex-col space-y-4">
-      <EditorToolbar program={program} />
-      <div className="h-0 grow rounded-md bg-zinc-200 p-4">
+      <CodeToolbar program={program} />
+      <Card className="h-0 grow p-4">
         <CodeMirror
           value={program}
           height="100%"
@@ -44,7 +45,7 @@ export const CodeEditor = ({
           style={{ height: "100%" }}
           onChange={onProgramChange}
         />
-      </div>
+      </Card>
     </div>
   );
 };

@@ -9,7 +9,7 @@ def test_scallop_parent(client):
                 }
             ],
             "program": "rel grandparent(a, c) = parent(a, b), parent(b, c)",
-            "outputs": ["grandparent"],
+            "outputs": [{"name": "grandparent"}],
         },
     )
     assert response.json == {"grandparent": [[1.0, ["Emily", "Alice"]]]}

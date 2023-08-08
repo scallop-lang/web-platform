@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import TableEditor from "~/components/TableEditor";
 import {
-  type ScallopInputs,
-  type ScallopOutputs,
+  type ScallopInput,
+  type ScallopOutput,
   type ScallopProgram,
 } from "~/server/api/routers/scallop";
 import { api } from "~/utils/api";
@@ -32,26 +32,67 @@ const Header = () => {
 };
 
 const Playground = () => {
+  /**
   const [program, setProgram] = useState<ScallopProgram>(
     "rel grandparent(a, c) = parent(a, b), parent(b, c)"
   );
-  const [inputs, setInputs] = useState<ScallopInputs>([
+  const [inputs, setInputs] = useState<ScallopInput[]>([
     {
+      type: "input",
       name: "parent",
+      args: [
+        { name: "a", type: "String" },
+        { name: "b", type: "String" },
+      ],
       facts: [
         [1, ["Alice", "Bob"]],
         [1, ["Bob", "Emily"]],
       ],
     },
   ]);
-  const [outputs, setOutputs] = useState<ScallopOutputs>(["grandparent"]);
+  const [outputs, setOutputs] = useState<ScallopOutput[]>([
+    {
+      type: "output",
+      name: "grandparent",
+      args: [
+        { name: "a", type: "String" },
+        { name: "b", type: "String" },
+      ],
+    },
+  ]); */
+
+  const [program, setProgram] = useState<ScallopProgram>(
+    "rel sum(a + b) = int(a, c), int(b, d)"
+  );
+  const [inputs, setInputs] = useState<ScallopInput[]>([
+    {
+      type: "input",
+      name: "int",
+      args: [
+        { name: "a", type: "Integer" },
+        { name: "b", type: "Boolean" },
+      ],
+      facts: [
+        [1, ["1", "true"]],
+        [1, ["3", "False"]],
+      ],
+    },
+  ]);
+  const [outputs, setOutputs] = useState<ScallopOutput[]>([
+    {
+      type: "output",
+      name: "sum",
+      args: [{ name: "a", type: "Integer" }],
+    },
+  ]);
 
   const { data } = api.scallop.run.useQuery({
     program: program,
     inputs: inputs,
     outputs: outputs,
   });
-  console.log(data);
+
+  console.log("data:", data);
 
   return (
     <div className="min-h-screen">
@@ -61,7 +102,12 @@ const Playground = () => {
           program={program}
           onProgramChange={setProgram}
         />
-        <TableEditor />
+        <TableEditor
+          inputs={inputs}
+          outputs={outputs}
+          onInputsChange={setInputs}
+          onOutputsChange={setOutputs}
+        />
       </main>
     </div>
   );

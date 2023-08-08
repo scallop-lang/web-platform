@@ -40,6 +40,6 @@ def run_scallop():
     ctx.run()
 
     # Extract output relations
-    data = {relation: list(ctx.relation(relation)) for relation in outputs}
+    data = {relation["name"]: list(ctx.relation(relation["name"])) for relation in outputs}
 
     return jsonify(data)
