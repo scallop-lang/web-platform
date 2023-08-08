@@ -1,4 +1,4 @@
-import { Check, Plus, PlusSquare, Trash, X } from "lucide-react";
+import { Plus, PlusSquare, Trash, X } from "lucide-react";
 import React, { useState } from "react";
 import {
   Select,
@@ -158,13 +158,13 @@ const CreateRelationDialog = ({
 
   const argumentList = args.map((argument, index) => (
     <div
-      className="flex w-full justify-between space-x-2"
+      className="flex w-full justify-between space-x-4"
       key={index}
     >
       <Input
         type="text"
         onChange={(name) => (argument.name = name.target.value)}
-        placeholder="Argument name (optional)"
+        placeholder="Name (optional)"
         className="basis-1/2"
       />
       <Select
@@ -175,15 +175,13 @@ const CreateRelationDialog = ({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectGroup>
-            <SelectItem value="String">String</SelectItem>
-            <SelectItem value="Integer">Integer</SelectItem>
-            <SelectItem value="Float">Float</SelectItem>
-            <SelectItem value="Tensor">Tensor</SelectItem>
-          </SelectGroup>
+          <SelectItem value="String">String</SelectItem>
+          <SelectItem value="Integer">Integer</SelectItem>
+          <SelectItem value="Float">Float</SelectItem>
+          <SelectItem value="Tensor">Tensor</SelectItem>
         </SelectContent>
       </Select>
-      <TooltipProvider>
+      <TooltipProvider delayDuration={400}>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -191,7 +189,7 @@ const CreateRelationDialog = ({
               variant="ghost"
               onClick={() => removeArgument(index)}
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Delete argument</TooltipContent>
@@ -212,32 +210,24 @@ const CreateRelationDialog = ({
       }}
     >
       <DialogTrigger asChild>
-        <Button className="shrink-0 bg-pink-300 text-black hover:bg-pink-400">
-          <PlusSquare className="mr-2 h-5 w-5" />
-          <span className="text-base">Create relation</span>
+        <Button>
+          <PlusSquare className="mr-2 h-4 w-4" /> Create relation
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-2xl">
-            Create {dialogState} relation
-          </DialogTitle>
-          <DialogDescription className="text-base">
+          <DialogTitle>Create {dialogState} relation</DialogTitle>
+          <DialogDescription>
             Name your relation, then add your arguments below. Each argument
             takes an optional name and a datatype.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex items-center justify-between space-x-8 rounded-md border p-4">
-          <div className="grid gap-0.5">
-            <Label
-              className="text-base"
-              htmlFor="io-switch"
-            >
-              {capitalize(dialogState)}
-            </Label>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="flex items-center justify-between space-x-10 rounded-md border p-4">
+          <div className="grid gap-1">
+            <Label htmlFor="io-switch">{capitalize(dialogState)}</Label>
+            <p className="text-sm text-muted-foreground">
               {isOutput
-                ? "These tables are readonly and will contain your output upon running the program."
+                ? "These tables are readonly and will contain your output relations upon running the program."
                 : "These tables are editable in the visual editor and are used as facts in your program."}
             </p>
           </div>
@@ -247,13 +237,8 @@ const CreateRelationDialog = ({
             onCheckedChange={setIsOutput}
           />
         </div>
-        <div className="grid w-full gap-1.5">
-          <Label
-            className="w-fit text-base"
-            htmlFor="relation-name"
-          >
-            Relation name
-          </Label>
+        <div className="grid gap-1.5">
+          <Label htmlFor="relation-name">Relation name</Label>
           <Input
             type="text"
             id="relation-name"
@@ -262,48 +247,38 @@ const CreateRelationDialog = ({
             onChange={(e) => setRelationName(e.target.value)}
           />
         </div>
-        <div className="grid w-full gap-1.5">
-          <Label
-            className="w-fit text-base font-medium"
-            htmlFor="add-argument"
-          >
+        <div className="grid gap-1.5">
+          <p className="cursor-default text-sm font-medium leading-none">
             Arguments
-          </Label>
-          <div className="flex items-center space-x-3">
-            <Button
-              onClick={addArgument}
-              id="add-argument"
-              className="w-full bg-sky-300 text-black hover:bg-sky-400"
-            >
-              <Plus className="mr-2 h-5 w-5" />
-              <span className="text-base">Add new</span>
-            </Button>
+          </p>
+          <Button
+            onClick={addArgument}
+            id="add-argument"
+          >
+            Add new argument
+          </Button>
+          <div className="flex max-h-[33vh] flex-col items-center justify-between space-y-2 overflow-y-auto rounded-md border p-4">
+            {isArgListEmpty ? (
+              <span className="cursor-default text-sm text-muted-foreground">
+                Currently empty. At least one argument is required.
+              </span>
+            ) : (
+              argumentList
+            )}
           </div>
-        </div>
-        <div className="flex max-h-[33vh] flex-col items-center justify-between space-y-3 overflow-y-auto overscroll-auto rounded-md border p-4">
-          {isArgListEmpty ? (
-            <span className="cursor-default text-sm text-zinc-500 dark:text-zinc-400">
-              Currently empty. At least one argument is required.
-            </span>
-          ) : (
-            argumentList
-          )}
         </div>
         <DialogFooter>
           <Button
             variant="destructive"
             onClick={closeDialog}
           >
-            <Trash className="mr-2 h-5 w-5" />
-            <span className="text-base">Delete</span>
+            <Trash className="mr-2 h-4 w-4" /> Delete
           </Button>
           <Button
             disabled={isArgListEmpty || relationName === ""}
             onClick={addRelation}
-            className="bg-sky-300 text-black hover:bg-sky-400"
           >
-            <Check className="mr-2 h-5 w-5" />
-            <span className="text-base">Confirm</span>
+            <Plus className="mr-2 h-4 w-4" /> Create
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -355,7 +330,7 @@ const RelationSelect = ({
       onValueChange={setActiveRelation}
       disabled={bothEmpty}
     >
-      <SelectTrigger className="grow">
+      <SelectTrigger className="basis-1/2">
         <SelectValue
           placeholder={
             bothEmpty
@@ -391,7 +366,7 @@ const TableEditor = ({
 }) => {
   const [activeRelation, setActiveRelation] = useState("");
 
-  console.log("relation", activeRelation);
+  console.log("current relation:", activeRelation);
 
   // TODO: get relation from relation name
 
@@ -425,7 +400,7 @@ const TableEditor = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between space-x-10">
+      <div className="flex justify-between space-x-10">
         <CreateRelationDialog handleRelation={handleRelation} />
         <RelationSelect
           inputs={inputs}

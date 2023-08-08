@@ -20,7 +20,10 @@ const DownloadButton = ({ program }: { program: string }) => {
           <FileDown className="mr-2 h-4 w-4" /> Download raw file
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="grid gap-3">
+      <PopoverContent
+        className="grid gap-3"
+        sideOffset={10}
+      >
         <p className="text-sm text-muted-foreground">
           Download a single Scallop (.scl) file that contains both your program
           code and all relation table content.
@@ -51,7 +54,7 @@ const CodeToolbar = ({ program }: { program: string }) => {
   return (
     <div className="flex justify-between">
       <Button onClick={() => alert("will eventually update program state.")}>
-        <PlayCircle className="mr-2 h-5 w-5" /> Run program
+        <PlayCircle className="mr-2 h-4 w-4" /> Run program
       </Button>
       <DownloadButton program={program} />
     </div>
