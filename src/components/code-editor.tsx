@@ -1,68 +1,49 @@
 import CodeMirror from "@uiw/react-codemirror";
 import { FileDown, PlayCircle } from "lucide-react";
 import { useState } from "react";
-import { Button } from "~/components/ui/button";
 import { type ScallopProgram } from "~/server/api/routers/scallop";
 import { download } from "../utils/download";
+
+import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 const DownloadButton = ({ program }: { program: string }) => {
   const [filename, setFilename] = useState("raw");
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <Popover modal={true}>
+      <PopoverTrigger asChild>
         <Button variant="outline">
-          <FileDown className="mr-2 h-5 w-5" />
-          <span className="text-base">Download raw file</span>
+          <FileDown className="mr-2 h-4 w-4" /> Download raw file
         </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="text-2xl">Download</DialogTitle>
-          <DialogDescription className="text-base">
-            This will download a Scallop (.scl) file containing any program code
-            you&apos;ve written, along with your input and output tables. Table
-            content is appended to the file.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-1.5">
-          <Label
-            className="text-base"
-            htmlFor="filename"
-          >
-            Name your file
-          </Label>
+      </PopoverTrigger>
+      <PopoverContent className="grid gap-3">
+        <p className="text-sm text-muted-foreground">
+          Download a single Scallop (.scl) file that contains both your program
+          code and all relation table content.
+        </p>
+        <div className="mb-2 grid gap-2">
+          <Label htmlFor="filename">Name your file</Label>
           <Input
             type="text"
-            placeholder="Filename"
+            placeholder="Filename (required)"
             id="filename"
             value={filename}
             onChange={(e) => setFilename(e.target.value)}
           />
         </div>
-        <DialogFooter>
-          <Button
-            className="bg-pink-300 text-black hover:bg-pink-400"
-            onClick={() => download(program, filename)}
-          >
-            <FileDown className="mr-2 h-5 w-5" />
-            <span className="text-base">Download</span>
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <Button
+          disabled={filename.length === 0}
+          onClick={() => download(program, filename)}
+          className="transition"
+        >
+          Download
+        </Button>
+      </PopoverContent>
+    </Popover>
   );
 };
 
