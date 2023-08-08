@@ -50,14 +50,14 @@ const Playground = () => {
     },
   ]);
   const [outputs, setOutputs] = useState<ScallopOutput[]>([
-    // {
-    //   type: "output",
-    //   name: "grandparent",
-    //   args: [
-    //     { name: "a", type: "String" },
-    //     { name: "b", type: "String" },
-    //   ],
-    // },
+    {
+      type: "output",
+      name: "grandparent",
+      args: [
+        { name: "a", type: "String" },
+        { name: "b", type: "String" },
+      ],
+    },
   ]);
 
   const { data } = api.scallop.run.useQuery({
