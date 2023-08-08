@@ -36,18 +36,18 @@ const Playground = () => {
     "rel grandparent(a, c) = parent(a, b), parent(b, c)"
   );
   const [inputs, setInputs] = useState<ScallopInput[]>([
-    {
-      type: "input",
-      name: "parent",
-      args: [
-        { name: "a", type: "String" },
-        { name: "b", type: "String" },
-      ],
-      facts: [
-        [1, ["Alice", "Bob"]],
-        [1, ["Bob", "Emily"]],
-      ],
-    },
+    // {
+    //   type: "input",
+    //   name: "parent",
+    //   args: [
+    //     { name: "a", type: "String" },
+    //     { name: "b", type: "String" },
+    //   ],
+    //   facts: [
+    //     [1, ["Alice", "Bob"]],
+    //     [1, ["Bob", "Emily"]],
+    //   ],
+    // },
   ]);
   const [outputs, setOutputs] = useState<ScallopOutput[]>([
     {

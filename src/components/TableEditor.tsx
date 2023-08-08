@@ -311,11 +311,11 @@ const CreateRelationDialog = ({
 };
 
 const RelationSelect = ({
-  list: relationList,
+  relationList,
   isOutput,
   setSelectedRelation,
 }: {
-  list: ScallopInput[] | ScallopOutput[];
+  relationList: ScallopInput[] | ScallopOutput[];
   isOutput: boolean;
   setSelectedRelation: React.Dispatch<React.SetStateAction<string>>;
 }) => {
@@ -393,17 +393,12 @@ const TableEditor = ({
       : onOutputsChange([...outputs, newOutput]);
   }
 
-  const test = inputs[0];
-  if (!test) {
-    throw new Error("test is undefined");
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between space-x-10">
         <CreateRelationDialog handleRelation={handleRelation} />
         <RelationSelect
-          list={isOutput ? outputs : inputs}
+          relationList={isOutput ? outputs : inputs}
           isOutput={isOutput}
           setSelectedRelation={setActiveRelation}
         />
@@ -432,7 +427,7 @@ const TableEditor = ({
         </div>
       </div>
       <Card className="h-0 grow p-4">
-        <Table relation={test} />
+        {inputs[0] ? <Table relation={inputs[0]} /> : <>Empty table!!!</>}
       </Card>
     </div>
   );
