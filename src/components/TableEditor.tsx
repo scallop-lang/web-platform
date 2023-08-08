@@ -146,11 +146,11 @@ const CreateRelationDialog = ({
   }
 
   function closeDialog() {
-    setDialogOpen(false);
-
     setIsOutput(false);
     setRelationName("");
     setArgs([]);
+
+    setDialogOpen(false);
   }
 
   const isArgListEmpty = args.length === 0;
@@ -203,7 +203,13 @@ const CreateRelationDialog = ({
   return (
     <Dialog
       open={dialogOpen}
-      onOpenChange={setDialogOpen}
+      onOpenChange={(open) => {
+        setDialogOpen(open);
+
+        if (!open) {
+          closeDialog();
+        }
+      }}
     >
       <DialogTrigger asChild>
         <Button className="shrink-0 bg-pink-300 text-black hover:bg-pink-400">
