@@ -33,21 +33,22 @@ const Header = () => {
 
 const Playground = () => {
   const [program, setProgram] = useState<ScallopProgram>(
-    "rel grandparent(a, c) = parent(a, b), parent(b, c)"
+    "rel grandparent(a, c) = parent(a, b, true), parent(b, c, true)"
   );
   const [inputs, setInputs] = useState<ScallopInput[]>([
-    // {
-    //   type: "input",
-    //   name: "parent",
-    //   args: [
-    //     { name: "a", type: "String" },
-    //     { name: "b", type: "String" },
-    //   ],
-    //   facts: [
-    //     [1, ["Alice", "Bob"]],
-    //     [1, ["Bob", "Emily"]],
-    //   ],
-    // },
+    {
+      type: "input",
+      name: "parent",
+      args: [
+        { name: "a", type: "String" },
+        { name: "b", type: "String" },
+        { name: "c", type: "Boolean" },
+      ],
+      facts: [
+        [1, ["Alice", "Bob", "true"]],
+        [1, ["Bob", "Emily", "true"]],
+      ],
+    },
   ]);
   const [outputs, setOutputs] = useState<ScallopOutput[]>([
     {
