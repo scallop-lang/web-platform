@@ -31,22 +31,15 @@ const typeToSchema: Record<string, ZodTypeAny> = {
   String: z.coerce.string(),
   Integer: z.coerce.number().int(),
   Float: z.coerce.number(),
-  Boolean: z
-    .union([
-      z.literal("true"),
-      z.literal("True"),
-      z.literal("false"),
-      z.literal("False"),
-    ])
-    .transform((val) => {
-      if (val === "true" || val === "True") {
-        return true;
-      }
-      return false;
-    }),
+  Boolean: z.enum(["true", "True", "false", "False"]).transform((val) => {
+    if (val === "true" || val === "True") {
+      return true;
+    }
+    return false;
+  }),
 };
 
-function relationToSchema(relation: Relation) {
+function relationToSchema(relation: ScallopRelation) {
   const schema = relation.args.map((arg) => typeToSchema[arg.type]!);
   return z.tuple([z.number(), z.tuple(schema as [])]).array();
 }
@@ -72,6 +65,8 @@ export const scallopRouter = createTRPCRouter({
           facts: relationToSchema(relation).parse(relation.facts),
         };
       });
+
+      console.log(JSON.stringify(input.inputs))
 
       const endpoint = new URL("api/run-scallop", env.FLASK_SERVER);
       const res = await fetch(endpoint, {
@@ -101,7 +96,7 @@ export const scallopRouter = createTRPCRouter({
     }),
 });
 
-export type Relation = {
+export type ScallopRelation = {
   name: string;
   args: {
     name: string;
