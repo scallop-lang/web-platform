@@ -81,7 +81,7 @@ const CodeToolbar = ({ program }: { program: string }) => {
   );
 };
 
-export const CodeEditor = ({
+const CodeEditor = ({
   program,
   onProgramChange,
 }: {
@@ -104,3 +104,5 @@ export const CodeEditor = ({
     </div>
   );
 };
+
+export default CodeEditor;

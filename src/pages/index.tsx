@@ -1,16 +1,20 @@
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+
 import { useState } from "react";
-import TableEditor from "~/components/TableEditor";
+
 import { buttonVariants } from "~/components/ui/button";
+
 import {
   type ScallopInput,
   type ScallopOutput,
   type ScallopProgram,
 } from "~/server/api/routers/scallop";
 import { api } from "~/utils/api";
-import { CodeEditor } from "../components/CodeEditor";
+
+import TableEditor from "~/components/table-editor";
+import CodeEditor from "../components/code-editor";
 
 const Header = () => {
   return (
