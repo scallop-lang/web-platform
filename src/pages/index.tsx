@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { useState } from "react";
 
-import { buttonVariants } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 
 import {
   type ScallopInput,
@@ -16,9 +16,20 @@ import { api } from "~/utils/api";
 import TableEditor from "~/components/table-editor";
 import CodeEditor from "../components/code-editor";
 
+import { Laptop2, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+
 const Header = () => {
+  const { resolvedTheme, setTheme } = useTheme();
+
   return (
-    <header className="flex w-full items-center justify-between border-b bg-zinc-50 p-3">
+    <header className="flex w-full items-center justify-between border-b border-border bg-neutral-50 p-3 dark:bg-neutral-950">
       <div className="flex items-center space-x-3">
         <Image
           src="/content/logo.svg"
@@ -30,7 +41,7 @@ const Header = () => {
           Scallop Playground
         </h1>
       </div>
-      <div className="flex">
+      <div className="flex space-x-3">
         <Link
           href="https://scallop-lang.github.io/"
           target="_blank"
@@ -45,6 +56,37 @@ const Header = () => {
         >
           GitHub
         </Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon"
+              variant="outline"
+            >
+              {resolvedTheme === "light" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              <div className="flex w-full items-center justify-between">
+                Light <Sun className="h-4 w-4" />
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              <div className="flex w-full items-center justify-between">
+                Dark <Moon className="h-4 w-4" />
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              <div className="flex w-full items-center justify-between">
+                System <Laptop2 className="h-4 w-4" />
+              </div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
@@ -91,7 +133,7 @@ const Playground = () => {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="grid h-[calc(100vh-65px)] grid-cols-1 gap-5 p-5 lg:grid-cols-2 lg:gap-8 lg:p-8">
+      <main className="grid h-[calc(100vh-65px)] grid-cols-1 gap-5 bg-background p-5 lg:grid-cols-2 lg:gap-8 lg:p-8">
         <CodeEditor
           program={program}
           onProgramChange={setProgram}

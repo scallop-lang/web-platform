@@ -222,7 +222,7 @@ const CreateRelationDialog = ({
             takes an optional name and a datatype.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex items-center justify-between space-x-10 rounded-md border p-4">
+        <div className="flex items-center justify-between space-x-10 rounded-md border border-border p-4">
           <div className="grid gap-1">
             <Label htmlFor="io-switch">{capitalize(dialogState)}</Label>
             <p className="text-sm text-muted-foreground">
@@ -257,7 +257,7 @@ const CreateRelationDialog = ({
           >
             Add new argument
           </Button>
-          <div className="flex max-h-[33vh] flex-col items-center justify-between space-y-2 overflow-y-auto rounded-md border p-4">
+          <div className="flex max-h-[33vh] flex-col items-center justify-between space-y-2 overflow-y-auto rounded-md border border-border p-4">
             {isArgListEmpty ? (
               <span className="cursor-default text-sm text-muted-foreground">
                 Currently empty. At least one argument is required.

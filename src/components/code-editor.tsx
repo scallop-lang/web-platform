@@ -4,6 +4,7 @@ import { useState } from "react";
 import { type ScallopProgram } from "~/server/api/routers/scallop";
 import { download } from "../utils/download";
 
+import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
@@ -68,6 +69,8 @@ const CodeEditor = ({
   program: ScallopProgram;
   onProgramChange: React.Dispatch<React.SetStateAction<ScallopProgram>>;
 }) => {
+  const { resolvedTheme } = useTheme();
+
   return (
     <div className="flex flex-col space-y-4">
       <CodeToolbar program={program} />
@@ -75,6 +78,7 @@ const CodeEditor = ({
         <CodeMirror
           value={program}
           height="100%"
+          theme={resolvedTheme === "light" ? "light" : "dark"}
           autoFocus={true}
           placeholder={`// write your Scallop program here`}
           style={{ height: "100%" }}
