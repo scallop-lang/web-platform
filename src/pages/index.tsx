@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import TableEditor from "~/components/TableEditor";
+import { buttonVariants } from "~/components/ui/button";
 import {
   type ScallopInput,
   type ScallopOutput,
@@ -13,20 +14,34 @@ import { CodeEditor } from "../components/CodeEditor";
 
 const Header = () => {
   return (
-    <header className="flex max-h-min flex-row items-center gap-3 bg-zinc-100 p-3">
-      <Link
-        href="https://scallop-lang.github.io/"
-        target="_blank"
-      >
+    <header className="flex w-full items-center justify-between border-b bg-zinc-50 p-3">
+      <div className="flex items-center space-x-3">
         <Image
-          className="transition hover:brightness-110"
           src="/content/logo.svg"
-          width={50}
-          height={50}
+          width={35}
+          height={35}
           alt="Scallop logo"
         />
-      </Link>
-      <h1 className="select-none text-2xl font-semibold">Scallop Playground</h1>
+        <h1 className="cursor-default text-xl font-semibold">
+          Scallop Playground
+        </h1>
+      </div>
+      <div className="flex">
+        <Link
+          href="https://scallop-lang.github.io/"
+          target="_blank"
+          className={buttonVariants({ variant: "link" })}
+        >
+          Website
+        </Link>
+        <Link
+          href="https://github.com/scallop-lang"
+          target="_blank"
+          className={buttonVariants({ variant: "link" })}
+        >
+          GitHub
+        </Link>
+      </div>
     </header>
   );
 };
