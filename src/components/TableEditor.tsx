@@ -26,7 +26,6 @@ import {
 } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Separator } from "./ui/separator";
 import { Switch } from "./ui/switch";
 import {
   Tooltip,
@@ -280,17 +279,15 @@ const CreateRelationDialog = ({
             </Button>
           </div>
         </div>
-        <Separator />
-        <div className="flex flex-col items-center justify-center space-y-3">
+        <div className="flex max-h-[33vh] flex-col items-center justify-between space-y-3 overflow-y-auto overscroll-auto rounded-md border p-4">
           {isArgListEmpty ? (
-            <span className="select-none text-sm text-zinc-500 dark:text-zinc-400">
+            <span className="cursor-default text-sm text-zinc-500 dark:text-zinc-400">
               Currently empty. At least one argument is required.
             </span>
           ) : (
             argumentList
           )}
         </div>
-        <Separator />
         <DialogFooter>
           <Button
             variant="destructive"
