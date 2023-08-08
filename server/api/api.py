@@ -5,10 +5,10 @@ import os
 api_routes = Blueprint("api_routes", __name__)
 
 TYPES = {
-    "String": str,
-    "Integer": int,
-    "Float": float,
-    "Boolean": bool,
+    "String": "String",
+    "Integer": "i64",
+    "Float": "f64",
+    "Boolean": "bool",
 }
 
 
