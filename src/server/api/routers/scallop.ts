@@ -46,19 +46,8 @@ const typeToSchema: Record<string, ZodTypeAny> = {
     }),
 };
 
-function relationToSchema(
-  name: string,
-  args: { name: string; type: string }[]
-) {
-  const schema = args.map((arg) => {
-    const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
-      return {
-        message: `[@relation ${name}]: values for \`${arg.name}\` must be of type \`${arg.type}\``,
-      };
-    };
-    z.setErrorMap(customErrorMap);
-    return typeToSchema[arg.type]!;
-  });
+function relationToSchema(relation: Relation) {
+  const schema = relation.args.map((arg) => typeToSchema[arg.type]!);
   return z.tuple([z.number(), z.tuple(schema as [])]).array();
 }
 
@@ -73,15 +62,16 @@ export const scallopRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       input.inputs = input.inputs.map((relation) => {
+        z.setErrorMap((_issue, ctx) => {
+          return {
+            message: `[@input ${relation.name}]: ${ctx.defaultError}`,
+          };
+        });
         return {
           ...relation,
-          facts: relationToSchema(relation.name, relation.args).parse(
-            relation.facts
-          ),
+          facts: relationToSchema(relation).parse(relation.facts),
         };
       });
-
-      console.log(JSON.stringify(input.inputs));
 
       const endpoint = new URL("api/run-scallop", env.FLASK_SERVER);
       const res = await fetch(endpoint, {
@@ -93,12 +83,15 @@ export const scallopRouter = createTRPCRouter({
         body: JSON.stringify(input),
       });
 
+      z.setErrorMap((_issue, ctx) => {
+        return {
+          message: `[@output]: ${ctx.defaultError}`,
+        };
+      });
+
       const output_rel_schema: Record<string, ZodTypeAny> = {};
       input.outputs.forEach((relation) => {
-        output_rel_schema[relation.name] = relationToSchema(
-          relation.name,
-          relation.args
-        );
+        output_rel_schema[relation.name] = relationToSchema(relation);
       });
 
       const schema = z.object(output_rel_schema);
@@ -108,6 +101,14 @@ export const scallopRouter = createTRPCRouter({
     }),
 });
 
+export type Relation = {
+  name: string;
+  args: {
+    name: string;
+    type: string;
+  }[];
+  facts?: [number, string[]][];
+};
 export type ScallopProgram = z.infer<typeof scallopProgram>;
 export type ScallopInput = z.infer<typeof scallopInput>;
 export type ScallopOutput = z.infer<typeof scallopOutput>;
