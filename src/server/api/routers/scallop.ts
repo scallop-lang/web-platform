@@ -27,39 +27,37 @@ const scallopOutput = z.object({
     .array(),
 });
 
-function relationToZodSchema(
+const typeToSchema: Record<string, ZodTypeAny> = {
+  String: z.coerce.string(),
+  Integer: z.coerce.number().int(),
+  Float: z.coerce.number(),
+  Boolean: z
+    .union([
+      z.literal("true"),
+      z.literal("True"),
+      z.literal("false"),
+      z.literal("False"),
+    ])
+    .transform((val) => {
+      if (val === "true" || val === "True") {
+        return true;
+      }
+      return false;
+    }),
+};
+
+function relationToSchema(
   name: string,
   args: { name: string; type: string }[]
 ) {
-  const schema: ZodTypeAny[] = [];
-  args.forEach((arg) => {
+  const schema = args.map((arg) => {
     const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
       return {
         message: `[@relation ${name}]: values for \`${arg.name}\` must be of type \`${arg.type}\``,
       };
     };
     z.setErrorMap(customErrorMap);
-
-    const schemas: Record<string, ZodTypeAny> = {
-      String: z.coerce.string(),
-      Integer: z.coerce.number().int(),
-      Float: z.coerce.number(),
-      Boolean: z
-        .union([
-          z.literal("true"),
-          z.literal("True"),
-          z.literal("false"),
-          z.literal("False"),
-        ])
-        .transform((val) => {
-          if (val === "true" || val === "True") {
-            return true;
-          }
-          return false;
-        }),
-    };
-
-    schema.push(schemas[arg.type]!);
+    return typeToSchema[arg.type]!;
   });
   return z.tuple([z.number(), z.tuple(schema as [])]).array();
 }
@@ -77,7 +75,7 @@ export const scallopRouter = createTRPCRouter({
       input.inputs = input.inputs.map((relation) => {
         return {
           ...relation,
-          facts: relationToZodSchema(relation.name, relation.args).parse(
+          facts: relationToSchema(relation.name, relation.args).parse(
             relation.facts
           ),
         };
@@ -97,7 +95,7 @@ export const scallopRouter = createTRPCRouter({
 
       const output_rel_schema: Record<string, ZodTypeAny> = {};
       input.outputs.forEach((relation) => {
-        output_rel_schema[relation.name] = relationToZodSchema(
+        output_rel_schema[relation.name] = relationToSchema(
           relation.name,
           relation.args
         );
