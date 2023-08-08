@@ -5,6 +5,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
@@ -311,38 +312,68 @@ const CreateRelationDialog = ({
 };
 
 const RelationSelect = ({
-  relationList,
-  isOutput,
-  setSelectedRelation,
+  inputs,
+  outputs,
+  setActiveRelation,
 }: {
-  relationList: ScallopInput[] | ScallopOutput[];
-  isOutput: boolean;
-  setSelectedRelation: React.Dispatch<React.SetStateAction<string>>;
+  inputs: ScallopInput[];
+  outputs: ScallopOutput[];
+  setActiveRelation: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const isEmpty = relationList.length === 0;
-  const state = isOutput ? "output" : "input";
-  const placeholder = isEmpty
-    ? `Create an ${state} relation first!`
-    : `Select an ${state} table to start editing.`;
+  const parseRelations = (relationList: ScallopInput[] | ScallopOutput[]) => {
+    return relationList.map((relation, index) => {
+      const types = `(${relation.args
+        .map((arg) => `${arg.name}: ${arg.type}`)
+        .join(", ")})`;
 
-  const selectItems = relationList.map((relation, index) => (
+      return (
+        <SelectItem
+          key={index}
+          value={relation.name}
+        >
+          {relation.name + types}
+        </SelectItem>
+      );
+    });
+  };
+
+  const inputItems = parseRelations(inputs);
+  const outputItems = parseRelations(outputs);
+  const noItem = (
     <SelectItem
-      key={index}
-      value={relation.name}
+      disabled
+      value="none"
     >
-      {relation.name}
+      None
     </SelectItem>
-  ));
+  );
+
+  const bothEmpty = inputItems.length === 0 && outputItems.length === 0;
 
   return (
     <Select
-      disabled={isEmpty}
-      onValueChange={(relationName) => setSelectedRelation(relationName)}
+      onValueChange={setActiveRelation}
+      disabled={bothEmpty}
     >
       <SelectTrigger className="grow">
-        <SelectValue placeholder={placeholder}></SelectValue>
+        <SelectValue
+          placeholder={
+            bothEmpty
+              ? "You don't have any relations yet. Create one first!"
+              : "Select a relation table to view its contents."
+          }
+        ></SelectValue>
       </SelectTrigger>
-      <SelectContent>{selectItems}</SelectContent>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Input relations</SelectLabel>
+          {inputItems.length === 0 ? noItem : inputItems}
+        </SelectGroup>
+        <SelectGroup>
+          <SelectLabel>Output relations</SelectLabel>
+          {outputItems.length === 0 ? noItem : outputItems}
+        </SelectGroup>
+      </SelectContent>
     </Select>
   );
 };
@@ -358,7 +389,6 @@ const TableEditor = ({
   onInputsChange: React.Dispatch<React.SetStateAction<ScallopInput[]>>;
   onOutputsChange: React.Dispatch<React.SetStateAction<ScallopOutput[]>>;
 }) => {
-  const [isOutput, setIsOutput] = useState(false);
   const [activeRelation, setActiveRelation] = useState("");
 
   console.log("relation", activeRelation);
@@ -398,33 +428,10 @@ const TableEditor = ({
       <div className="flex items-center justify-between space-x-10">
         <CreateRelationDialog handleRelation={handleRelation} />
         <RelationSelect
-          relationList={isOutput ? outputs : inputs}
-          isOutput={isOutput}
-          setSelectedRelation={setActiveRelation}
+          inputs={inputs}
+          outputs={outputs}
+          setActiveRelation={setActiveRelation}
         />
-        <div className="flex items-center gap-3">
-          <Label
-            className={`text-base transition ${
-              isOutput ? "text-zinc-500 dark:text-zinc-400" : ""
-            }`}
-            htmlFor="io-table"
-          >
-            Input
-          </Label>
-          <Switch
-            checked={isOutput}
-            onCheckedChange={setIsOutput}
-            id="io-table"
-          />
-          <Label
-            className={`text-base transition ${
-              isOutput ? "" : "text-zinc-500 dark:text-zinc-400"
-            }`}
-            htmlFor="io-table"
-          >
-            Output
-          </Label>
-        </div>
       </div>
       <Card className="h-0 grow p-4">
         {inputs[0] ? <Table relation={inputs[0]} /> : <>Empty table!!!</>}
