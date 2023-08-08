@@ -271,7 +271,7 @@ const CreateRelationDialog = ({
           </Label>
           <div className="flex items-center space-x-3">
             <Button
-              onClick={() => addArgument()}
+              onClick={addArgument}
               id="add-argument"
               className="w-full bg-sky-300 text-black hover:bg-sky-400"
             >
@@ -294,14 +294,14 @@ const CreateRelationDialog = ({
         <DialogFooter>
           <Button
             variant="destructive"
-            onClick={() => closeDialog}
+            onClick={closeDialog}
           >
             <Trash className="mr-2 h-5 w-5" />
             <span className="text-base">Delete</span>
           </Button>
           <Button
             disabled={isArgListEmpty || relationName === ""}
-            onClick={() => addRelation()}
+            onClick={addRelation}
             className="bg-sky-300 text-black hover:bg-sky-400"
           >
             <Check className="mr-2 h-5 w-5" />
