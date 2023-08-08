@@ -49,13 +49,9 @@ const DownloadButton = ({ program }: { program: string }) => {
 
 const CodeToolbar = ({ program }: { program: string }) => {
   return (
-    <div className="flex items-center justify-between">
-      <Button
-        className="bg-pink-300 text-black hover:bg-pink-400"
-        onClick={() => alert("will eventually update program state.")}
-      >
-        <PlayCircle className="mr-2 h-5 w-5" />
-        <span className="text-base">Run program</span>
+    <div className="flex justify-between">
+      <Button onClick={() => alert("will eventually update program state.")}>
+        <PlayCircle className="mr-2 h-5 w-5" /> Run program
       </Button>
       <DownloadButton program={program} />
     </div>
