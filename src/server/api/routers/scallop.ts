@@ -1,27 +1,18 @@
 import { z, type ZodTypeAny } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+
+import {
+  SclInputSchema,
+  SclOutputSchema,
+  SclProgramSchema,
+  type ArgumentType,
+  type ScallopInput,
+  type ScallopOutput,
+} from "~/utils/schemas-types";
+
 import { env } from "../../../env.mjs";
 
-export type ScallopProgram = z.infer<typeof scallopProgram>;
-export type ScallopInput = z.infer<typeof scallopInput>;
-export type ScallopOutput = z.infer<typeof scallopOutput>;
-
-const scallopRelation = z.object({
-  name: z.string(),
-  args: z
-    .object({
-      name: z.string(),
-      type: z.string(),
-    })
-    .array(),
-  facts: z.tuple([z.number(), z.string().array()]).array().optional(),
-});
-
-const scallopProgram = z.string();
-const scallopInput = scallopRelation.required();
-const scallopOutput = scallopRelation.omit({ facts: true });
-
-const typeToSchema: Record<string, ZodTypeAny> = {
+const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
   String: z.coerce.string(),
   Integer: z.coerce.number().int(),
   Float: z.coerce.number(),
@@ -33,8 +24,9 @@ const typeToSchema: Record<string, ZodTypeAny> = {
   }),
 };
 
+// generates a Zod schema for the given relation.
 const relationToSchema = (relation: ScallopInput | ScallopOutput) => {
-  const schema = relation.args.map((arg) => typeToSchema[arg.type]!);
+  const schema = relation.args.map((arg) => typeToSchema[arg.type]);
   return z.tuple([z.number(), z.tuple(schema as [])]).array();
 };
 
@@ -42,9 +34,9 @@ export const scallopRouter = createTRPCRouter({
   run: publicProcedure
     .input(
       z.object({
-        program: scallopProgram,
-        inputs: scallopInput.array(),
-        outputs: scallopOutput.array(),
+        program: SclProgramSchema,
+        inputs: SclInputSchema.array(),
+        outputs: SclOutputSchema.array(),
       })
     )
     .query(async ({ input }) => {

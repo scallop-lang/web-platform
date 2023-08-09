@@ -10,10 +10,14 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import {
+  argumentTypes,
+  type Argument,
+  type ArgumentType,
+  type InputRecord,
+  type OutputRecord,
   type ScallopInput,
   type ScallopOutput,
-} from "~/server/api/routers/scallop";
-import capitalize from "~/utils/capitalize";
+} from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import {
@@ -35,94 +39,82 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-interface Argument {
-  id: number;
-  name?: string;
-  type: string;
-}
+// const Table = ({ relation }: { relation: ScallopInput | ScallopOutput }) => {
+//   function addFact(probability: number, values: string[]) {
+//     switch (relation.type) {id
+//       case "input":
+//         const prevFacts = relation.facts;
+//         const values: string[] = [];
 
-interface Relation {
-  id: number;
-  name: string;
-  column: Argument[];
-  row: Record<number, string>[];
-  editable: boolean;
-}
+//         relation.args.forEach((arg) => {
+//           // THESE SHOULD BE CONVERTED TO THE RIGHT TYPE
+//           values.push(""); // empty....
+//         });
+//         const newFact: [number, string[]] = [probability, values];
+//         relation.facts = [...relation.facts, newFact];
+//         break;
+//       case "output":
+//         break;
+//     }
+//   }
 
-const Table = ({ relation }: { relation: ScallopInput | ScallopOutput }) => {
-  function addFact(probability: number, values: string[]) {
-    switch (relation.type) {
-      case "input":
-        const prevFacts = relation.facts;
-        const values: string[] = [];
+//   let tableRows: React.ReactNode[] = [];
 
-        relation.args.forEach((arg) => {
-          // THESE SHOULD BE CONVERTED TO THE RIGHT TYPE
-          values.push(""); // empty....
-        });
-        const newFact: [number, string[]] = [probability, values];
-        relation.facts = [...relation.facts, newFact];
-        break;
-      case "output":
-        break;
-    }
-  }
+//   switch (relation.type) {
+//     case "input":
+//       tableRows = relation.facts.map((fact, index) => {
+//         // tuple array, each element is number, string[]
+//         // row elements = string[], or this is fact[1]...........
+//         return (
+//           <div
+//             className="flex space-x-2"
+//             key={index}
+//           >
+//             {fact[1].map((arg) => (
+//               <Input
+//                 key={arg}
+//                 type="text"
+//                 value={arg}
+//                 className="grow"
+//               />
+//             ))}
+//           </div>
+//         );
+//       });
+//       console.log(tableRows);
+//       break;
+//     case "output":
+//       break;
+//   }
 
-  let tableRows: React.ReactNode[] = [];
+//   console.log(tableRows);
 
-  switch (relation.type) {
-    case "input":
-      tableRows = relation.facts.map((fact, index) => {
-        // tuple array, each element is number, string[]
-        // row elements = string[], or this is fact[1]...........
-        return (
-          <div
-            className="flex space-x-2"
-            key={index}
-          >
-            {fact[1].map((arg) => (
-              <Input
-                key={arg}
-                type="text"
-                value={arg}
-                className="grow"
-              />
-            ))}
-          </div>
-        );
-      });
-      console.log(tableRows);
-      break;
-    case "output":
-      break;
-  }
-
-  console.log(tableRows);
-
-  // that button is supposed to add rows, have it show when you hover over the last row
-  return <div className="flex flex-col space-y-2">{tableRows}</div>;
-};
+//   // that button is supposed to add rows, have it show when you hover over the last row
+//   return <div className="flex flex-col space-y-2">{tableRows}</div>;
+// };
 
 const CreateRelationDialog = ({
-  handleRelation,
+  addRelation,
 }: {
-  handleRelation: (relation: Relation) => void;
+  addRelation: (relation: ScallopInput | ScallopOutput) => void;
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // information about the current relation being created
+  // current state of the relation being created
   const [isOutput, setIsOutput] = useState(false);
   const [relationName, setRelationName] = useState("");
   const [args, setArgs] = useState<Argument[]>([]);
 
   function addArgument() {
     const argsCopy = args.slice();
-    const newArg: Argument = {
-      id: Date.now(),
-      type: "String",
-    };
 
-    setArgs([...argsCopy, newArg]);
+    setArgs([
+      ...argsCopy,
+      {
+        name: undefined,
+        type: "String",
+      },
+    ]);
   }
 
   function removeArgument(index: number) {
@@ -132,20 +124,24 @@ const CreateRelationDialog = ({
     setArgs(argsCopy);
   }
 
-  function addRelation() {
-    const relation: Relation = {
-      id: Date.now(),
-      name: relationName,
-      column: args,
-      row: [],
-      editable: !isOutput,
-    };
+  function createRelation(): ScallopInput | ScallopOutput {
+    if (isOutput) {
+      return {
+        name: relationName,
+        args: args,
+      };
+    }
 
-    handleRelation(relation);
-    closeDialog();
+    // else, return input relation
+    return {
+      name: relationName,
+      args: args,
+      facts: [],
+    };
   }
 
   function closeDialog() {
+    // we should also reset the dialog state
     setIsOutput(false);
     setRelationName("");
     setArgs([]);
@@ -153,9 +149,7 @@ const CreateRelationDialog = ({
     setDialogOpen(false);
   }
 
-  const isArgListEmpty = args.length === 0;
-  const dialogState = isOutput ? "output" : "input";
-
+  const argListEmpty = args.length === 0;
   const argumentList = args.map((argument, index) => (
     <div
       className="flex w-full justify-between space-x-4"
@@ -168,17 +162,21 @@ const CreateRelationDialog = ({
         className="basis-1/2"
       />
       <Select
-        onValueChange={(type) => (argument.type = type)}
+        onValueChange={(type) => (argument.type = type as ArgumentType)}
         defaultValue="String"
       >
         <SelectTrigger className="basis-1/3">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="String">String</SelectItem>
-          <SelectItem value="Integer">Integer</SelectItem>
-          <SelectItem value="Float">Float</SelectItem>
-          <SelectItem value="Tensor">Tensor</SelectItem>
+          {argumentTypes.map((type, index) => (
+            <SelectItem
+              key={index}
+              value={type}
+            >
+              {type}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
       <TooltipProvider delayDuration={400}>
@@ -216,7 +214,9 @@ const CreateRelationDialog = ({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create {dialogState} relation</DialogTitle>
+          <DialogTitle>
+            Create {isOutput ? "output" : "input"} relation
+          </DialogTitle>
           <DialogDescription>
             Name your relation, then add your arguments below. Each argument
             takes an optional name and a datatype.
@@ -224,7 +224,7 @@ const CreateRelationDialog = ({
         </DialogHeader>
         <div className="flex items-center justify-between space-x-10 rounded-md border border-border p-4">
           <div className="grid gap-1">
-            <Label htmlFor="io-switch">{capitalize(dialogState)}</Label>
+            <Label htmlFor="io-switch">{isOutput ? "Output" : "Input"}</Label>
             <p className="text-sm text-muted-foreground">
               {isOutput
                 ? "These tables are readonly and will contain your output relations upon running the program."
@@ -258,7 +258,7 @@ const CreateRelationDialog = ({
             Add new argument
           </Button>
           <div className="flex max-h-[33vh] flex-col items-center justify-between space-y-2 overflow-y-auto rounded-md border border-border p-4">
-            {isArgListEmpty ? (
+            {argListEmpty ? (
               <span className="cursor-default text-sm text-muted-foreground">
                 Currently empty. At least one argument is required.
               </span>
@@ -275,8 +275,11 @@ const CreateRelationDialog = ({
             <Trash className="mr-2 h-4 w-4" /> Delete
           </Button>
           <Button
-            disabled={isArgListEmpty || relationName === ""}
-            onClick={addRelation}
+            disabled={argListEmpty || relationName === ""}
+            onClick={() => {
+              addRelation(createRelation());
+              closeDialog();
+            }}
           >
             <Plus className="mr-2 h-4 w-4" /> Create
           </Button>
@@ -291,29 +294,38 @@ const RelationSelect = ({
   outputs,
   setActiveRelation,
 }: {
-  inputs: ScallopInput[];
-  outputs: ScallopOutput[];
+  inputs: InputRecord;
+  outputs: OutputRecord;
   setActiveRelation: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const parseRelations = (relationList: ScallopInput[] | ScallopOutput[]) => {
-    return relationList.map((relation, index) => {
+  const parseRelations = (record: InputRecord | OutputRecord) => {
+    const selectItems: React.ReactNode[] = [];
+    let index = 0;
+
+    for (const [name, relation] of Object.entries(record)) {
       const types = `(${relation.args
-        .map((arg) => `${arg.name}: ${arg.type}`)
+        .map((arg) => (arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`))
         .join(", ")})`;
 
-      return (
+      selectItems.push(
         <SelectItem
           key={index}
-          value={relation.name}
+          value={name}
         >
-          {relation.name + types}
+          {name + types}
         </SelectItem>
       );
-    });
+
+      index += 1;
+    }
+
+    return selectItems;
   };
 
   const inputItems = parseRelations(inputs);
   const outputItems = parseRelations(outputs);
+  const bothEmpty = inputItems.length === 0 && outputItems.length === 0;
+
   const noItem = (
     <SelectItem
       disabled
@@ -322,8 +334,6 @@ const RelationSelect = ({
       None
     </SelectItem>
   );
-
-  const bothEmpty = inputItems.length === 0 && outputItems.length === 0;
 
   return (
     <Select
@@ -356,52 +366,37 @@ const RelationSelect = ({
 const TableEditor = ({
   inputs,
   outputs,
-  onInputsChange,
-  onOutputsChange,
+  setInputs,
+  setOutputs,
 }: {
-  inputs: ScallopInput[];
-  outputs: ScallopOutput[];
-  onInputsChange: React.Dispatch<React.SetStateAction<ScallopInput[]>>;
-  onOutputsChange: React.Dispatch<React.SetStateAction<ScallopOutput[]>>;
+  inputs: InputRecord;
+  outputs: OutputRecord;
+  setInputs: React.Dispatch<React.SetStateAction<InputRecord>>;
+  setOutputs: React.Dispatch<React.SetStateAction<OutputRecord>>;
 }) => {
   const [activeRelation, setActiveRelation] = useState("");
 
-  console.log("current relation:", activeRelation);
-
-  // TODO: get relation from relation name
-
-  function handleRelation(relation: Relation) {
-    const args: { name: string; type: string }[] = [];
-
-    relation.column.forEach((col) => {
-      args.push({
-        name: col.name ?? "",
-        type: col.type,
-      });
-    });
-
-    const newInput: ScallopInput = {
-      type: "input",
-      name: relation.name,
-      args: args,
-      facts: [],
-    };
-
-    const newOutput: ScallopOutput = {
-      type: "output",
-      name: relation.name,
-      args: args,
-    };
-
-    relation.editable
-      ? onInputsChange([...inputs, newInput])
-      : onOutputsChange([...outputs, newOutput]);
+  // adds newly created relation to inputs or outputs, depending on
+  // what was chosen in the create relation dialog
+  function addRelation(relation: ScallopInput | ScallopOutput) {
+    if ("facts" in relation) {
+      const inputsCopy = { ...inputs };
+      inputsCopy[relation.name] = relation;
+      setInputs(inputsCopy);
+    } else {
+      const outputsCopy = { ...outputs };
+      outputsCopy[relation.name] = relation;
+      setOutputs(outputsCopy);
+    }
   }
+
+  console.log("inputs:", inputs);
+  console.log("outputs:", outputs);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between space-x-10">
-        <CreateRelationDialog handleRelation={handleRelation} />
+        <CreateRelationDialog addRelation={addRelation} />
         <RelationSelect
           inputs={inputs}
           outputs={outputs}
@@ -409,7 +404,7 @@ const TableEditor = ({
         />
       </div>
       <Card className="h-0 grow p-4">
-        {inputs[0] ? <Table relation={inputs[0]} /> : <>Empty table!!!</>}
+        <div>ACTIVE RELATION: {activeRelation}</div>
       </Card>
     </div>
   );
