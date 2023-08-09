@@ -68,16 +68,38 @@ const InputTable = ({ relation }: { relation: ScallopInput }) => {
   }
 
   const rowList = relation.facts.map((fact, i) => {
-    const colList = fact[1].map((entry, j) => (
-      // TODO: render different inputs based on what argument type it is
-      // for example, a switch for booleans, etc.
-      <Input
-        key={j}
-        type="text"
-        defaultValue={entry}
-        className="cursor-pointer hover:bg-secondary focus:bg-background"
-      />
-    ));
+    function getCell({ type, j }: { type: ArgumentType; j: number }) {
+      switch (type) {
+        case "Boolean":
+          return (
+            <Select
+              //onValueChange={(type) => (argument.type = type as ArgumentType)} // no change yet
+              defaultValue="false"
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={"true"}>true</SelectItem>
+                <SelectItem value={"false"}>false</SelectItem>
+              </SelectContent>
+            </Select>
+          );
+        default:
+          return (
+            <Input
+              key={j}
+              type="text"
+              defaultValue={fact[1][j]}
+              className="cursor-pointer hover:bg-secondary focus:bg-background"
+            />
+          );
+      }
+    }
+
+    const colList = relation.args.map((arg, j) =>
+      getCell({ type: arg.type, j: j })
+    );
 
     return (
       <div
