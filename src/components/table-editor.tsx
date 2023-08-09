@@ -1,4 +1,4 @@
-import { Plus, PlusSquare, Trash, X } from "lucide-react";
+import { ListPlus, Plus, PlusSquare, Trash, X } from "lucide-react";
 import React, { useState } from "react";
 import {
   Select,
@@ -39,59 +39,99 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-// const Table = ({ relation }: { relation: ScallopInput | ScallopOutput }) => {
-//   function addFact(probability: number, values: string[]) {
-//     switch (relation.type) {id
-//       case "input":
-//         const prevFacts = relation.facts;
-//         const values: string[] = [];
+const InputTable = ({ relation }: { relation: ScallopInput }) => {
+  // facts can only be added for input relations
+  function addFact() {
+    const values: string[] = [];
 
-//         relation.args.forEach((arg) => {
-//           // THESE SHOULD BE CONVERTED TO THE RIGHT TYPE
-//           values.push(""); // empty....
-//         });
-//         const newFact: [number, string[]] = [probability, values];
-//         relation.facts = [...relation.facts, newFact];
-//         break;
-//       case "output":
-//         break;
-//     }
-//   }
+    // create an entry for each argument
+    relation.args.forEach((arg) => {
+      switch (arg.type) {
+        case "String":
+          values.push("String");
+          break;
+        case "Boolean":
+          values.push("Boolean");
+          break;
+        case "Float":
+          values.push("Float");
+          break;
+        case "Integer":
+          values.push("Integer");
+          break;
+      }
+    });
 
-//   let tableRows: React.ReactNode[] = [];
+    // I don't think this works... we're not updating the original
+    // inputs record so the table will not update
+    relation.facts = [...relation.facts, [1, values]];
+  }
 
-//   switch (relation.type) {
-//     case "input":
-//       tableRows = relation.facts.map((fact, index) => {
-//         // tuple array, each element is number, string[]
-//         // row elements = string[], or this is fact[1]...........
-//         return (
-//           <div
-//             className="flex space-x-2"
-//             key={index}
-//           >
-//             {fact[1].map((arg) => (
-//               <Input
-//                 key={arg}
-//                 type="text"
-//                 value={arg}
-//                 className="grow"
-//               />
-//             ))}
-//           </div>
-//         );
-//       });
-//       console.log(tableRows);
-//       break;
-//     case "output":
-//       break;
-//   }
+  const rowList = relation.facts.map((fact, i) => {
+    const colList = fact[1].map((entry, j) => (
+      // TODO: render different inputs based on what argument type it is
+      // for example, a switch for booleans, etc.
+      <Input
+        key={j}
+        type="text"
+        defaultValue={entry}
+        className="cursor-pointer hover:bg-secondary focus:bg-background"
+      />
+    ));
 
-//   console.log(tableRows);
+    return (
+      <div
+        className="flex space-x-2"
+        key={i}
+      >
+        {colList}
+      </div>
+    );
+  });
 
-//   // that button is supposed to add rows, have it show when you hover over the last row
-//   return <div className="flex flex-col space-y-2">{tableRows}</div>;
-// };
+  const header = relation.args.map((arg, i) => {
+    return (
+      <div
+        className="w-full cursor-default font-mono text-sm font-medium leading-none"
+        key={i}
+      >
+        {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
+      </div>
+    );
+  });
+
+  return (
+    <div className="flex h-full flex-col space-y-4">
+      <div className="flex space-x-2">{header}</div>
+      <div className="flex flex-col space-y-2">{rowList}</div>
+      <Button onClick={addFact}>
+        <ListPlus className="mr-2 h-4 w-4" /> Add row
+      </Button>
+    </div>
+  );
+};
+
+const OutputTable = ({ relation }: { relation: ScallopOutput }) => {
+  const header = relation.args.map((arg, i) => {
+    return (
+      <div
+        className="w-full cursor-default font-mono text-sm font-medium leading-none"
+        key={i}
+      >
+        {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
+      </div>
+    );
+  });
+
+  return (
+    <div className="flex h-full flex-col space-y-5">
+      <div className="flex space-x-2">{header}</div>
+      <div className="flex grow items-center justify-center text-sm text-muted-foreground">
+        No output to display... yet...?
+      </div>
+    </div>
+  );
+};
 
 const CreateRelationDialog = ({
   addRelation,
@@ -292,10 +332,12 @@ const CreateRelationDialog = ({
 const RelationSelect = ({
   inputs,
   outputs,
+  bothEmpty,
   setActiveRelation,
 }: {
   inputs: InputRecord;
   outputs: OutputRecord;
+  bothEmpty: boolean;
   setActiveRelation: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const parseRelations = (record: InputRecord | OutputRecord) => {
@@ -322,9 +364,8 @@ const RelationSelect = ({
     return selectItems;
   };
 
-  const inputItems = parseRelations(inputs);
-  const outputItems = parseRelations(outputs);
-  const bothEmpty = inputItems.length === 0 && outputItems.length === 0;
+  const inputItems = bothEmpty ? [] : parseRelations(inputs);
+  const outputItems = bothEmpty ? [] : parseRelations(outputs);
 
   const noItem = (
     <SelectItem
@@ -342,11 +383,7 @@ const RelationSelect = ({
     >
       <SelectTrigger className="basis-1/2">
         <SelectValue
-          placeholder={
-            bothEmpty
-              ? "You don't have any relations yet. Create one first!"
-              : "Select a relation table to view its contents."
-          }
+          placeholder={bothEmpty ? "Empty" : "Nothing selected yet"}
         ></SelectValue>
       </SelectTrigger>
       <SelectContent>
@@ -390,8 +427,8 @@ const TableEditor = ({
     }
   }
 
-  console.log("inputs:", inputs);
-  console.log("outputs:", outputs);
+  const bothEmpty =
+    Object.keys(inputs).length === 0 && Object.keys(outputs).length === 0;
 
   return (
     <div className="flex flex-col gap-4">
@@ -400,11 +437,26 @@ const TableEditor = ({
         <RelationSelect
           inputs={inputs}
           outputs={outputs}
+          bothEmpty={bothEmpty}
           setActiveRelation={setActiveRelation}
         />
       </div>
       <Card className="h-0 grow p-4">
-        <div>ACTIVE RELATION: {activeRelation}</div>
+        {bothEmpty ? (
+          <div className="flex h-full cursor-default items-center justify-center text-sm text-muted-foreground">
+            You don&apos;t have any relations yet. Create one first!
+          </div>
+        ) : activeRelation ? (
+          inputs[activeRelation] ? (
+            <InputTable relation={inputs[activeRelation]!} />
+          ) : (
+            <OutputTable relation={outputs[activeRelation]!} />
+          )
+        ) : (
+          <div className="flex h-full cursor-default items-center justify-center text-sm text-muted-foreground">
+            Select a relation table to view its contents.
+          </div>
+        )}
       </Card>
     </div>
   );
