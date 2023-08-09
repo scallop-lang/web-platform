@@ -1,10 +1,10 @@
-import CodeMirror from "@uiw/react-codemirror";
-import { Scallop } from 'codemirror-lang-scallop';
-import { oneDarkHighlightStyle } from '@codemirror/theme-one-dark';
 import { syntaxHighlighting } from "@codemirror/language";
+import { oneDarkHighlightStyle } from "@codemirror/theme-one-dark";
+import CodeMirror from "@uiw/react-codemirror";
+import { Scallop } from "codemirror-lang-scallop";
 
 import { FileDown, PlayCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type ScallopProgram } from "~/server/api/routers/scallop";
 import { download } from "../utils/download";
 
@@ -14,6 +14,7 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Skeleton } from "./ui/skeleton";
 
 const DownloadButton = ({ program }: { program: string }) => {
   const [filename, setFilename] = useState("raw");
@@ -73,23 +74,32 @@ const CodeEditor = ({
   program: ScallopProgram;
   onProgramChange: React.Dispatch<React.SetStateAction<ScallopProgram>>;
 }) => {
+  const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+
+  // this is to avoid hydration mismatch due to `resolvedTheme` being
+  // undefined on the server. see pages/input.tsx for more info
+  useEffect(() => setMounted(true), []);
+
+  const resolvedEditor = !mounted ? (
+    <Skeleton className="h-full w-full rounded-md" />
+  ) : (
+    <CodeMirror
+      value={program}
+      height="100%"
+      extensions={[Scallop(), syntaxHighlighting(oneDarkHighlightStyle)]}
+      theme={resolvedTheme === "light" ? "light" : "dark"}
+      autoFocus={true}
+      placeholder={`// write your Scallop program here`}
+      style={{ height: "100%" }}
+      onChange={onProgramChange}
+    />
+  );
 
   return (
     <div className="flex flex-col space-y-4">
       <CodeToolbar program={program} />
-      <Card className="h-0 grow p-4">
-        <CodeMirror
-          value={program}
-          height="100%"
-          extensions={[Scallop(), syntaxHighlighting(oneDarkHighlightStyle)]}
-          theme={resolvedTheme === "light" ? "light" : "dark"}
-          autoFocus={true}
-          placeholder={`// write your Scallop program here`}
-          style={{ height: "100%" }}
-          onChange={onProgramChange}
-        />
-      </Card>
+      <Card className="h-0 grow p-4">{resolvedEditor}</Card>
     </div>
   );
 };
