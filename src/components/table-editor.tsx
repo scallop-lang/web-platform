@@ -70,14 +70,19 @@ const InputTable = ({
       }
     });
 
-    relation.facts = [...relation.facts, [1, values]]; // not the best practice
+    // first add the new fact to the relation itself
+    // for now, probability is hardcoded to be 1
+    relation.facts = [...relation.facts, [1, values]];
+
+    // then update inputs with the new relation
     const inputsCopy = { ...inputs };
     inputsCopy[relation.name] = relation;
+
     setInputs(inputsCopy);
   }
 
   const rowList = relation.facts.map((fact, i) => {
-    function getCell({ type, j }: { type: ArgumentType; j: number }) {
+    function getCell(type: ArgumentType, colIndex: number) {
       switch (type) {
         case "Boolean":
           return (
@@ -94,18 +99,16 @@ const InputTable = ({
         default:
           return (
             <Input
-              key={j}
+              key={colIndex}
               type="text"
-              defaultValue={fact[1][j]}
+              defaultValue={fact[1][colIndex]}
               className="cursor-pointer hover:bg-secondary focus:bg-background"
             />
           );
       }
     }
 
-    const colList = relation.args.map((arg, j) =>
-      getCell({ type: arg.type, j: j })
-    );
+    const colList = relation.args.map((arg, index) => getCell(arg.type, index));
 
     return (
       <div
@@ -117,11 +120,11 @@ const InputTable = ({
     );
   });
 
-  const header = relation.args.map((arg, i) => {
+  const header = relation.args.map((arg, index) => {
     return (
       <div
         className="w-full cursor-default font-mono text-sm font-medium leading-none"
-        key={i}
+        key={index}
       >
         {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
       </div>
@@ -140,11 +143,11 @@ const InputTable = ({
 };
 
 const OutputTable = ({ relation }: { relation: ScallopOutput }) => {
-  const header = relation.args.map((arg, i) => {
+  const header = relation.args.map((arg, index) => {
     return (
       <div
         className="w-full cursor-default font-mono text-sm font-medium leading-none"
-        key={i}
+        key={index}
       >
         {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
       </div>
