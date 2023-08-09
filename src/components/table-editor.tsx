@@ -39,7 +39,15 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-const InputTable = ({ relation }: { relation: ScallopInput }) => {
+const InputTable = ({
+  relation,
+  inputs,
+  setInputs,
+}: {
+  relation: ScallopInput;
+  inputs: InputRecord;
+  setInputs: React.Dispatch<React.SetStateAction<InputRecord>>;
+}) => {
   // facts can only be added for input relations
   function addFact() {
     const values: string[] = [];
@@ -62,9 +70,10 @@ const InputTable = ({ relation }: { relation: ScallopInput }) => {
       }
     });
 
-    // I don't think this works... we're not updating the original
-    // inputs record so the table will not update
-    relation.facts = [...relation.facts, [1, values]];
+    relation.facts = [...relation.facts, [1, values]]; // not the best practice
+    const inputsCopy = { ...inputs };
+    inputsCopy[relation.name] = relation;
+    setInputs(inputsCopy);
   }
 
   const rowList = relation.facts.map((fact, i) => {
@@ -72,10 +81,7 @@ const InputTable = ({ relation }: { relation: ScallopInput }) => {
       switch (type) {
         case "Boolean":
           return (
-            <Select
-              //onValueChange={(type) => (argument.type = type as ArgumentType)} // no change yet
-              defaultValue="false"
-            >
+            <Select defaultValue="false">
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -125,7 +131,7 @@ const InputTable = ({ relation }: { relation: ScallopInput }) => {
   return (
     <div className="flex h-full flex-col space-y-4">
       <div className="flex space-x-2">{header}</div>
-      <div className="flex flex-col space-y-2">{rowList}</div>
+      <div className="flex flex-col space-y-2 overflow-scroll">{rowList}</div>
       <Button onClick={addFact}>
         <ListPlus className="mr-2 h-4 w-4" /> Add row
       </Button>
@@ -470,7 +476,11 @@ const TableEditor = ({
           </div>
         ) : activeRelation ? (
           inputs[activeRelation] ? (
-            <InputTable relation={inputs[activeRelation]!} />
+            <InputTable
+              relation={inputs[activeRelation]!}
+              inputs={inputs}
+              setInputs={setInputs}
+            />
           ) : (
             <OutputTable relation={outputs[activeRelation]!} />
           )
