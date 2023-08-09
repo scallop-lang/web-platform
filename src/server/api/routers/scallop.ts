@@ -83,7 +83,6 @@ export const scallopRouter = createTRPCRouter({
           message: `[@output]: ${ctx.defaultError}`,
         };
       });
-
       const output_rel_schema: Record<string, ZodTypeAny> = {};
       input.outputs.forEach((relation) => {
         output_rel_schema[relation.name] = relationToSchema(relation);

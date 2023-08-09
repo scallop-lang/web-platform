@@ -1,4 +1,8 @@
 import CodeMirror from "@uiw/react-codemirror";
+import { Scallop } from 'codemirror-lang-scallop';
+import { oneDarkHighlightStyle } from '@codemirror/theme-one-dark';
+import { syntaxHighlighting } from "@codemirror/language";
+
 import { FileDown, PlayCircle } from "lucide-react";
 import { useState } from "react";
 import { type ScallopProgram } from "~/server/api/routers/scallop";
@@ -78,6 +82,7 @@ const CodeEditor = ({
         <CodeMirror
           value={program}
           height="100%"
+          extensions={[Scallop(), syntaxHighlighting(oneDarkHighlightStyle)]}
           theme={resolvedTheme === "light" ? "light" : "dark"}
           autoFocus={true}
           placeholder={`// write your Scallop program here`}
