@@ -6,13 +6,19 @@ import { FileDown, PlayCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useTheme } from "next-themes";
-import { type ScallopProgram } from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Skeleton } from "./ui/skeleton";
+
+import { api } from "~/utils/api";
+import type {
+  InputRecord,
+  OutputRecord,
+  ScallopProgram,
+} from "~/utils/schemas-types";
 
 const download = (content: string, filename: string) => {
   const a = document.createElement("a");
@@ -65,10 +71,28 @@ const DownloadButton = ({ program }: { program: string }) => {
   );
 };
 
-const CodeToolbar = ({ program }: { program: string }) => {
+const CodeToolbar = ({
+  inputs,
+  outputs,
+  program,
+}: {
+  inputs: InputRecord;
+  outputs: OutputRecord;
+  program: string;
+}) => {
+  const run = api.scallop.run.useMutation();
+
   return (
     <div className="flex justify-between">
-      <Button onClick={() => alert("will eventually update program state.")}>
+      <Button
+        onClick={() => {
+          run.mutate({
+            program: program,
+            inputs: Object.values(inputs),
+            outputs: Object.values(outputs),
+          });
+        }}
+      >
         <PlayCircle className="mr-2 h-4 w-4" /> Run program
       </Button>
       <DownloadButton program={program} />
@@ -77,9 +101,13 @@ const CodeToolbar = ({ program }: { program: string }) => {
 };
 
 const CodeEditor = ({
+  inputs,
+  outputs,
   program,
   setProgram,
 }: {
+  inputs: InputRecord;
+  outputs: OutputRecord;
   program: ScallopProgram;
   setProgram: React.Dispatch<React.SetStateAction<ScallopProgram>>;
 }) => {
@@ -96,7 +124,10 @@ const CodeEditor = ({
     <CodeMirror
       value={program}
       height="100%"
-      extensions={[Scallop(), syntaxHighlighting(ScallopHighlightStyle(resolvedTheme!))]}
+      extensions={[
+        Scallop(),
+        syntaxHighlighting(ScallopHighlightStyle(resolvedTheme!)),
+      ]}
       theme={resolvedTheme === "light" ? "light" : "dark"}
       autoFocus={true}
       placeholder={`// write your Scallop program here`}
@@ -107,7 +138,11 @@ const CodeEditor = ({
 
   return (
     <div className="flex flex-col space-y-4">
-      <CodeToolbar program={program} />
+      <CodeToolbar
+        inputs={inputs}
+        outputs={outputs}
+        program={program}
+      />
       <Card className="h-0 grow p-4">{resolvedEditor}</Card>
     </div>
   );

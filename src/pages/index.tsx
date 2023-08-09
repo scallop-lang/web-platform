@@ -18,7 +18,6 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Skeleton } from "~/components/ui/skeleton";
 
-import { api } from "~/utils/api";
 import type {
   InputRecord,
   OutputRecord,
@@ -131,19 +130,13 @@ const Playground = () => {
     },
   });
 
-  const { data } = api.scallop.run.useQuery({
-    program: program,
-    inputs: Object.values(inputs),
-    outputs: Object.values(outputs),
-  });
-
-  console.log("data:", data);
-
   return (
     <div className="min-h-screen">
       <Header />
       <main className="grid h-[calc(100vh-65px)] grid-cols-1 gap-5 bg-background p-5 lg:grid-cols-2 lg:gap-8 lg:p-8">
         <CodeEditor
+          inputs={inputs}
+          outputs={outputs}
           program={program}
           setProgram={setProgram}
         />

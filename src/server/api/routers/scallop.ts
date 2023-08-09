@@ -39,7 +39,7 @@ export const scallopRouter = createTRPCRouter({
         outputs: SclOutputSchema.array(),
       })
     )
-    .query(async ({ input }) => {
+    .mutation(async ({ input }) => {
       input.inputs = input.inputs.map((relation) => {
         z.setErrorMap((_issue, ctx) => {
           return {
