@@ -6,9 +6,11 @@ const NameSchema = z.string().regex(new RegExp("^[a-z]\\w*$", "i"))
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions
 const argumentTypes = ["String", "Integer", "Float", "Boolean"] as const;
 
+const ArgTypeSchema = z.enum(argumentTypes);
+
 const ArgSchema = z.object({
   name: NameSchema.optional(),
-  type: z.enum(argumentTypes),
+  type: ArgTypeSchema,
 });
 
 const SclRelationSchema = z.object({
@@ -21,6 +23,7 @@ const SclProgramSchema = z.string().min(1);
 const SclInputSchema = SclRelationSchema.required();
 const SclOutputSchema = SclRelationSchema.omit({ facts: true });
 
+type ArgumentType = z.infer<typeof ArgTypeSchema>;
 type Argument = z.infer<typeof ArgSchema>;
 type ScallopProgram = z.infer<typeof SclProgramSchema>;
 type ScallopInput = z.infer<typeof SclInputSchema>;
@@ -30,6 +33,7 @@ type OutputRecord = Record<string, ScallopOutput>;
 
 export type {
   Argument,
+  ArgumentType,
   InputRecord,
   OutputRecord,
   ScallopInput,
@@ -39,6 +43,7 @@ export type {
 
 export {
   ArgSchema,
+  ArgTypeSchema,
   SclInputSchema,
   SclOutputSchema,
   SclProgramSchema,
