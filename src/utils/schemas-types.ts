@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const NameSchema = z.string().regex(new RegExp("^[a-z]\\w*$", "i"))
+
 // the current Scallop types we support
 const ArgTypeSchema = z.union([
   z.literal("String"),
@@ -13,12 +15,12 @@ const ArgTypeSchema = z.union([
 const argumentTypes = ["String", "Integer", "Float", "Boolean"] as const;
 
 const ArgSchema = z.object({
-  name: z.string().optional(),
+  name: NameSchema.optional(),
   type: ArgTypeSchema,
 });
 
 const SclRelationSchema = z.object({
-  name: z.string(),
+  name: NameSchema,
   args: ArgSchema.array(),
   facts: z.tuple([z.number(), z.string().array()]).array().optional(),
 });
