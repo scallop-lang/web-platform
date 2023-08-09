@@ -2,20 +2,13 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-
-import {
-  type ScallopInput,
-  type ScallopOutput,
-  type ScallopProgram,
-} from "~/server/api/routers/scallop";
-import { api } from "~/utils/api";
 
 import TableEditor from "~/components/table-editor";
 import CodeEditor from "../components/code-editor";
 
 import { Laptop2, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -24,6 +17,13 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Skeleton } from "~/components/ui/skeleton";
+
+import { api } from "~/utils/api";
+import type {
+  InputRecord,
+  OutputRecord,
+  ScallopProgram,
+} from "~/utils/schemas-types";
 
 const Header = () => {
   const [mounted, setMounted] = useState(false);
@@ -108,13 +108,13 @@ const Playground = () => {
   const [program, setProgram] = useState<ScallopProgram>(
     "rel grandparent(a, c) = parent(a, b, true), parent(b, c, true)"
   );
-  const [inputs, setInputs] = useState<ScallopInput[]>([
-    {
-      type: "input",
+
+  const [inputs, setInputs] = useState<InputRecord>({
+    parent: {
       name: "parent",
       args: [
         { name: "a", type: "String" },
-        { name: "b", type: "String" },
+        { type: "String" },
         { name: "c", type: "Boolean" },
       ],
       facts: [
@@ -122,22 +122,19 @@ const Playground = () => {
         [1, ["Bob", "Emily", "true"]],
       ],
     },
-  ]);
-  const [outputs, setOutputs] = useState<ScallopOutput[]>([
-    {
-      type: "output",
+  });
+
+  const [outputs, setOutputs] = useState<OutputRecord>({
+    grandparent: {
       name: "grandparent",
-      args: [
-        { name: "a", type: "String" },
-        { name: "b", type: "String" },
-      ],
+      args: [{ type: "String" }, { name: "b", type: "String" }],
     },
-  ]);
+  });
 
   const { data } = api.scallop.run.useQuery({
     program: program,
-    inputs: inputs,
-    outputs: outputs,
+    inputs: Object.values(inputs),
+    outputs: Object.values(outputs),
   });
 
   console.log("data:", data);
@@ -148,13 +145,13 @@ const Playground = () => {
       <main className="grid h-[calc(100vh-65px)] grid-cols-1 gap-5 bg-background p-5 lg:grid-cols-2 lg:gap-8 lg:p-8">
         <CodeEditor
           program={program}
-          onProgramChange={setProgram}
+          setProgram={setProgram}
         />
         <TableEditor
           inputs={inputs}
           outputs={outputs}
-          onInputsChange={setInputs}
-          onOutputsChange={setOutputs}
+          setInputs={setInputs}
+          setOutputs={setOutputs}
         />
       </main>
     </div>

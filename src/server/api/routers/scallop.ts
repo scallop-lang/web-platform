@@ -1,33 +1,18 @@
 import { z, type ZodTypeAny } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+
+import {
+  SclInputSchema,
+  SclOutputSchema,
+  SclProgramSchema,
+  type ArgumentType,
+  type ScallopInput,
+  type ScallopOutput,
+} from "~/utils/schemas-types";
+
 import { env } from "../../../env.mjs";
 
-const scallopProgram = z.string();
-
-const scallopInput = z.object({
-  type: z.literal("input"),
-  name: z.string(),
-  args: z
-    .object({
-      name: z.string(),
-      type: z.string(),
-    })
-    .array(),
-  facts: z.tuple([z.number(), z.string().array()]).array(),
-});
-
-const scallopOutput = z.object({
-  type: z.literal("output"),
-  name: z.string(),
-  args: z
-    .object({
-      name: z.string(),
-      type: z.string(),
-    })
-    .array(),
-});
-
-const typeToSchema: Record<string, ZodTypeAny> = {
+const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
   String: z.coerce.string(),
   Integer: z.coerce.number().int(),
   Float: z.coerce.number(),
@@ -39,18 +24,19 @@ const typeToSchema: Record<string, ZodTypeAny> = {
   }),
 };
 
-function relationToSchema(relation: ScallopRelation) {
-  const schema = relation.args.map((arg) => typeToSchema[arg.type]!);
+// generates a Zod schema for the given relation.
+const relationToSchema = (relation: ScallopInput | ScallopOutput) => {
+  const schema = relation.args.map((arg) => typeToSchema[arg.type]);
   return z.tuple([z.number(), z.tuple(schema as [])]).array();
-}
+};
 
 export const scallopRouter = createTRPCRouter({
   run: publicProcedure
     .input(
       z.object({
-        program: scallopProgram,
-        inputs: scallopInput.array(),
-        outputs: scallopOutput.array(),
+        program: SclProgramSchema,
+        inputs: SclInputSchema.array(),
+        outputs: SclOutputSchema.array(),
       })
     )
     .query(async ({ input }) => {
@@ -66,7 +52,7 @@ export const scallopRouter = createTRPCRouter({
         };
       });
 
-      console.log(JSON.stringify(input.inputs))
+      console.log("inputs into server:", JSON.stringify(input.inputs));
 
       const endpoint = new URL("api/run-scallop", env.FLASK_SERVER);
       const res = await fetch(endpoint, {
@@ -83,26 +69,15 @@ export const scallopRouter = createTRPCRouter({
           message: `[@output]: ${ctx.defaultError}`,
         };
       });
-      const output_rel_schema: Record<string, ZodTypeAny> = {};
+
+      const outputRelSchema: Record<string, ZodTypeAny> = {};
       input.outputs.forEach((relation) => {
-        output_rel_schema[relation.name] = relationToSchema(relation);
+        outputRelSchema[relation.name] = relationToSchema(relation);
       });
 
-      const schema = z.object(output_rel_schema);
+      const schema = z.object(outputRelSchema);
       const body = schema.parse(await res.json());
 
       return body;
     }),
 });
-
-export type ScallopRelation = {
-  name: string;
-  args: {
-    name: string;
-    type: string;
-  }[];
-  facts?: [number, string[]][];
-};
-export type ScallopProgram = z.infer<typeof scallopProgram>;
-export type ScallopInput = z.infer<typeof scallopInput>;
-export type ScallopOutput = z.infer<typeof scallopOutput>;

@@ -4,16 +4,26 @@ import { Scallop, ScallopHighlightStyle } from "codemirror-lang-scallop";
 
 import { FileDown, PlayCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import { type ScallopProgram } from "~/server/api/routers/scallop";
-import { download } from "../utils/download";
 
 import { useTheme } from "next-themes";
+import { type ScallopProgram } from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Skeleton } from "./ui/skeleton";
+
+const download = (content: string, filename: string) => {
+  const a = document.createElement("a");
+  const url = URL.createObjectURL(new Blob([content], { type: "text/plain" }));
+
+  a.href = url;
+  a.download = filename + ".scl";
+  a.click();
+
+  URL.revokeObjectURL(url);
+};
 
 const DownloadButton = ({ program }: { program: string }) => {
   const [filename, setFilename] = useState("raw");
@@ -68,10 +78,10 @@ const CodeToolbar = ({ program }: { program: string }) => {
 
 const CodeEditor = ({
   program,
-  onProgramChange,
+  setProgram,
 }: {
   program: ScallopProgram;
-  onProgramChange: React.Dispatch<React.SetStateAction<ScallopProgram>>;
+  setProgram: React.Dispatch<React.SetStateAction<ScallopProgram>>;
 }) => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
@@ -91,7 +101,7 @@ const CodeEditor = ({
       autoFocus={true}
       placeholder={`// write your Scallop program here`}
       style={{ height: "100%" }}
-      onChange={onProgramChange}
+      onChange={setProgram}
     />
   );
 
