@@ -8,9 +8,6 @@ dependencies:
   '@codemirror/language':
     specifier: ^6.8.0
     version: 6.8.0
-  '@codemirror/theme-one-dark':
-    specifier: ^6.1.2
-    version: 6.1.2
   '@radix-ui/react-checkbox':
     specifier: ^1.0.4
     version: 1.0.4(@types/react-dom@18.2.4)(@types/react@18.2.6)(react-dom@18.2.0)(react@18.2.0)
@@ -69,8 +66,8 @@ dependencies:
     specifier: ^2.0.0
     version: 2.0.0
   codemirror-lang-scallop:
-    specifier: ^0.1.2
-    version: 0.1.2
+    specifier: ^0.1.3
+    version: 0.1.3
   lucide-react:
     specifier: ^0.263.1
     version: 0.263.1(react@18.2.0)
@@ -1929,8 +1926,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /codemirror-lang-scallop@0.1.2:
-    resolution: {integrity: sha512-HuwwNj6BBqolSAcu0VuavMXJcqN7pbVho84Ied/bd0N+Ek9/nZj4gcFdb/Lk7rjARHPAsoULCUcm2UWhknaGIw==}
+  /codemirror-lang-scallop@0.1.3:
+    resolution: {integrity: sha512-bSpCvTprn8RyYTje4ZaxquXIPL4rcdn/jrWBZO9MKhY0LV60/gWBz/GJQfDFiSRHEYIjxHotPva67zakFVNKcA==}
     dependencies:
       '@codemirror/language': 6.8.0
       '@lezer/highlight': 1.1.6
