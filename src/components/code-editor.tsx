@@ -86,7 +86,7 @@ const CodeEditor = ({
     <CodeMirror
       value={program}
       height="100%"
-      extensions={[Scallop(), syntaxHighlighting(ScallopHighlightStyle(resolvedTheme))]}
+      extensions={[Scallop(), syntaxHighlighting(ScallopHighlightStyle(resolvedTheme!))]}
       theme={resolvedTheme === "light" ? "light" : "dark"}
       autoFocus={true}
       placeholder={`// write your Scallop program here`}
