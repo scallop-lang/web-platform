@@ -1,5 +1,6 @@
 import { type AppType } from "next/app";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
+import ThemeProvider from "~/components/theme-provider";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
@@ -15,7 +16,12 @@ const plexMono = IBM_Plex_Mono({
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
-    <>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="light"
+      enableSystem
+      disableTransitionOnChange
+    >
       <style
         jsx
         global
@@ -27,7 +33,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       <div className={`${inter.variable} ${plexMono.variable} font-sans`}>
         <Component {...pageProps} />
       </div>
-    </>
+    </ThemeProvider>
   );
 };
 

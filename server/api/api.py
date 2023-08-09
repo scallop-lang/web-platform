@@ -4,6 +4,13 @@ import os
 
 api_routes = Blueprint("api_routes", __name__)
 
+TYPES = {
+    "String": "String",
+    "Integer": "i64",
+    "Float": "f64",
+    "Boolean": "bool",
+}
+
 
 @api_routes.route("/api/run-scallop", methods=["POST"])
 def run_scallop():
@@ -31,7 +38,7 @@ def run_scallop():
 
     # Add input relations
     for relation in inputs:
-        ctx.add_relation(relation["name"], (str, str))
+        ctx.add_relation(relation["name"], tuple(TYPES[arg["type"]] for arg in relation["args"]))
         ctx.add_facts(
             relation["name"], [(tag, tuple(tup)) for tag, tup in relation["facts"]]
         )
@@ -40,6 +47,6 @@ def run_scallop():
     ctx.run()
 
     # Extract output relations
-    data = [list(ctx.relation(relation)) for relation in outputs]
-    
+    data = {relation["name"]: list(ctx.relation(relation["name"])) for relation in outputs}
+
     return jsonify(data)

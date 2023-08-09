@@ -1,3 +1,3 @@
 https://github.com/scallop-lang/scallop/releases/download/0.1.9/scallopy-0.1.9-cp310-cp310-manylinux_2_31_x86_64.whl
-Flask==2.3.2
+Flask
 pytest
