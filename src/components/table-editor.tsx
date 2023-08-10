@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { type RelationRecord, type SclRelation } from "~/utils/schemas-types";
+import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
 import CreateRelationDialog from "./create-relation-dialog";
 import { InputTable, OutputTable } from "./tables";
 import { Card } from "./ui/card";

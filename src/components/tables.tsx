@@ -21,7 +21,7 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
     );
   });
 
-  return <Card className="flex p-3">{header}</Card>;
+  return <Card className="flex space-x-2 p-3">{header}</Card>;
 };
 
 const InputTable = ({
