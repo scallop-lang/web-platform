@@ -1,4 +1,6 @@
 import { ListPlus } from "lucide-react";
+import { useState } from "react";
+import { cn } from "~/utils/cn";
 import {
   type ArgumentType,
   type RelationRecord,
@@ -8,6 +10,35 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
+
+const BooleanCell = ({ initialState }: { initialState: boolean }) => {
+  const [checked, setChecked] = useState(initialState);
+
+  return (
+    <div className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2">
+      <p
+        className={cn(
+          "cursor-default text-sm transition",
+          checked ? "text-muted-foreground" : "font-semibold"
+        )}
+      >
+        False
+      </p>
+      <Switch
+        checked={checked}
+        onCheckedChange={setChecked}
+      />
+      <p
+        className={cn(
+          "cursor-default text-sm transition",
+          checked ? "font-semibold" : "text-muted-foreground"
+        )}
+      >
+        True
+      </p>
+    </div>
+  );
+};
 
 const TableHeader = ({ relation }: { relation: SclRelation }) => {
   const header = relation.args.map((arg, index) => {
@@ -68,21 +99,19 @@ const InputTable = ({
 
   const rowList = relation.facts.map((fact, i) => {
     function createCell(type: ArgumentType, colIndex: number) {
+      const initialState = fact[1][colIndex]!;
+
       switch (type) {
         case "Boolean":
           return (
-            <div className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2">
-              <p className="cursor-default text-sm font-semibold">False</p>
-              <Switch />
-              <p className="cursor-default text-sm font-semibold">True</p>
-            </div>
+            <BooleanCell initialState={initialState.toLowerCase() === "true"} />
           );
         default:
           return (
             <Input
               key={colIndex}
               type="text"
-              defaultValue={fact[1][colIndex]}
+              defaultValue={initialState}
               placeholder={type}
               className="cursor-pointer transition hover:bg-secondary focus:bg-background"
             />
