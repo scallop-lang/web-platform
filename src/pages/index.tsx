@@ -113,6 +113,7 @@ const Playground = () => {
         { type: "String" },
         { name: "c", type: "Boolean" },
       ],
+      probability: false,
       facts: [
         [1, ["Alice", "Bob", "true"]],
         [1, ["Bob", "Emily", "true"]],
@@ -125,6 +126,7 @@ const Playground = () => {
       type: "output",
       name: "grandparent",
       args: [{ type: "String" }, { name: "b", type: "String" }],
+      probability: false,
       facts: [],
     },
   });

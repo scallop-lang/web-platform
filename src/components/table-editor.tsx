@@ -198,6 +198,7 @@ const CreateRelationDialog = ({
       type: isOutput ? "output" : "input",
       name: relationName,
       args: args,
+      probability: false, // temporary
       facts: [],
     };
   }

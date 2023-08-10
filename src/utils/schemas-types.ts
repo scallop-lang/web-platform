@@ -17,6 +17,7 @@ const SclRelationSchema = z.object({
   type: z.enum(["input", "output"]),
   name: NameSchema,
   args: ArgSchema.array(),
+  probability: z.boolean(),
   facts: z.tuple([z.number(), z.string().array()]).array(),
 });
 
