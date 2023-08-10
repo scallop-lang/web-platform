@@ -1,4 +1,4 @@
-import { ListPlus, Plus, PlusSquare, Trash, X } from "lucide-react";
+import { ListPlus } from "lucide-react";
 import React, { useState } from "react";
 import {
   Select,
@@ -10,32 +10,15 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import {
-  argumentTypes,
-  type Argument,
   type ArgumentType,
   type RelationRecord,
   type SclRelation,
 } from "~/utils/schemas-types";
+import CreateRelationDialog from "./create-relation-dialog";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
 
 const TableHeader = ({ relation }: { relation: SclRelation }) => {
   const header = relation.args.map((arg, index) => {
@@ -49,7 +32,7 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
     );
   });
 
-  return <div className="flex">{header}</div>;
+  return <Card className="flex p-3">{header}</Card>;
 };
 
 const InputTable = ({
@@ -95,19 +78,19 @@ const InputTable = ({
   }
 
   const rowList = relation.facts.map((fact, i) => {
-    function getCell(type: ArgumentType, colIndex: number) {
+    function createCell(type: ArgumentType, colIndex: number) {
       switch (type) {
         case "Boolean":
           return (
-            <Select defaultValue="false">
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={"true"}>true</SelectItem>
-                <SelectItem value={"false"}>false</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2">
+              <p className="cursor-default font-mono text-sm font-semibold">
+                False
+              </p>
+              <Switch />
+              <p className="cursor-default font-mono text-sm font-semibold">
+                True
+              </p>
+            </div>
           );
         default:
           return (
@@ -116,13 +99,15 @@ const InputTable = ({
               type="text"
               defaultValue={fact[1][colIndex]}
               placeholder={type}
-              className="cursor-pointer hover:bg-secondary focus:bg-background"
+              className="cursor-pointer transition hover:bg-secondary focus:bg-background"
             />
           );
       }
     }
 
-    const colList = relation.args.map((arg, index) => getCell(arg.type, index));
+    const colList = relation.args.map((arg, index) =>
+      createCell(arg.type, index)
+    );
 
     return (
       <div
@@ -136,9 +121,7 @@ const InputTable = ({
 
   return (
     <div className="flex h-full flex-col justify-between space-y-3">
-      <Card className="sticky p-3">
-        <TableHeader relation={relation} />
-      </Card>
+      <TableHeader relation={relation} />
       <Card className="grid grow gap-4 overflow-y-auto p-3">
         <div className="flex flex-col space-y-2">{rowList}</div>
       </Card>
@@ -156,200 +139,10 @@ const OutputTable = ({ relation }: { relation: SclRelation }) => {
   return (
     <div className="flex h-full flex-col space-y-5">
       <TableHeader relation={relation} />
-      <div className="flex grow items-center justify-center text-sm text-muted-foreground">
+      <div className="flex grow cursor-default items-center justify-center text-sm text-muted-foreground">
         No output to display... yet...?
       </div>
     </div>
-  );
-};
-
-const CreateRelationDialog = ({
-  addRelation,
-}: {
-  addRelation: (relation: SclRelation) => void;
-}) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-
-  // current state of the relation being created
-  const [isOutput, setIsOutput] = useState(false);
-  const [relationName, setRelationName] = useState("");
-  const [args, setArgs] = useState<Argument[]>([]);
-
-  function addArgument() {
-    const argsCopy = args.slice();
-
-    setArgs([
-      ...argsCopy,
-      {
-        name: undefined,
-        type: "String",
-      },
-    ]);
-  }
-
-  function removeArgument(index: number) {
-    const argsCopy = args.slice();
-    argsCopy.splice(index, 1);
-
-    setArgs(argsCopy);
-  }
-
-  function createRelation(): SclRelation {
-    return {
-      type: isOutput ? "output" : "input",
-      name: relationName,
-      args: args,
-      probability: false, // temporary
-      facts: [],
-    };
-  }
-
-  function closeDialog() {
-    // we should also reset the dialog state
-    setIsOutput(false);
-    setRelationName("");
-    setArgs([]);
-
-    setDialogOpen(false);
-  }
-
-  const argListEmpty = args.length === 0;
-  const argumentList = args.map((argument, index) => (
-    <div
-      className="flex w-full justify-between space-x-4"
-      key={index}
-    >
-      <Input
-        type="text"
-        onChange={(name) => (argument.name = name.target.value)}
-        placeholder="Name (optional)"
-        className="basis-1/2"
-      />
-      <Select
-        onValueChange={(type) => (argument.type = type as ArgumentType)}
-        defaultValue="String"
-      >
-        <SelectTrigger className="basis-1/3">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {argumentTypes.map((type, index) => (
-            <SelectItem
-              key={index}
-              value={type}
-            >
-              {type}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <TooltipProvider delayDuration={400}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => removeArgument(index)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Delete argument</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
-  ));
-
-  return (
-    <Dialog
-      open={dialogOpen}
-      onOpenChange={(open) => {
-        setDialogOpen(open);
-
-        if (!open) {
-          closeDialog();
-        }
-      }}
-    >
-      <DialogTrigger asChild>
-        <Button>
-          <PlusSquare className="mr-2 h-4 w-4" /> Create relation
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            Create {isOutput ? "output" : "input"} relation
-          </DialogTitle>
-          <DialogDescription>
-            Name your relation, then add your arguments below. Each argument
-            takes an optional name and a datatype.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex items-center justify-between space-x-10 rounded-md border border-border p-4">
-          <div className="grid gap-1">
-            <Label htmlFor="io-switch">{isOutput ? "Output" : "Input"}</Label>
-            <p className="text-sm text-muted-foreground">
-              {isOutput
-                ? "These tables are readonly and will contain your output relations upon running the program."
-                : "These tables are editable in the visual editor and are used as facts in your program."}
-            </p>
-          </div>
-          <Switch
-            id="io-switch"
-            checked={isOutput}
-            onCheckedChange={setIsOutput}
-          />
-        </div>
-        <div className="grid gap-1.5">
-          <Label htmlFor="relation-name">Relation name</Label>
-          <Input
-            type="text"
-            id="relation-name"
-            placeholder="Required"
-            value={relationName}
-            onChange={(e) => setRelationName(e.target.value)}
-          />
-        </div>
-        <div className="grid gap-1.5">
-          <p className="cursor-default text-sm font-medium leading-none">
-            Arguments
-          </p>
-          <Button
-            onClick={addArgument}
-            id="add-argument"
-          >
-            Add new argument
-          </Button>
-          <div className="flex max-h-[33vh] flex-col items-center justify-between space-y-2 overflow-y-auto rounded-md border border-border p-4">
-            {argListEmpty ? (
-              <span className="cursor-default text-sm text-muted-foreground">
-                Currently empty. At least one argument is required.
-              </span>
-            ) : (
-              argumentList
-            )}
-          </div>
-        </div>
-        <DialogFooter>
-          <Button
-            variant="destructive"
-            onClick={closeDialog}
-          >
-            <Trash className="mr-2 h-4 w-4" /> Delete
-          </Button>
-          <Button
-            disabled={argListEmpty || relationName === ""}
-            onClick={() => {
-              addRelation(createRelation());
-              closeDialog();
-            }}
-          >
-            <Plus className="mr-2 h-4 w-4" /> Create
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 };
 
@@ -406,9 +199,7 @@ const RelationSelect = ({
       disabled={bothEmpty}
     >
       <SelectTrigger className="basis-1/2">
-        <SelectValue
-          placeholder={bothEmpty ? "Empty" : "Nothing selected yet"}
-        ></SelectValue>
+        <SelectValue placeholder={bothEmpty ? "Empty" : "Nothing selected"} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
