@@ -13,10 +13,8 @@ import {
   argumentTypes,
   type Argument,
   type ArgumentType,
-  type InputRecord,
-  type OutputRecord,
-  type ScallopInput,
-  type ScallopOutput,
+  type RelationRecord,
+  type SclRelation,
 } from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -44,9 +42,9 @@ const InputTable = ({
   inputs,
   setInputs,
 }: {
-  relation: ScallopInput;
-  inputs: InputRecord;
-  setInputs: React.Dispatch<React.SetStateAction<InputRecord>>;
+  relation: SclRelation;
+  inputs: RelationRecord;
+  setInputs: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
   // facts can only be added for input relations
   function addFact() {
@@ -142,7 +140,7 @@ const InputTable = ({
   );
 };
 
-const OutputTable = ({ relation }: { relation: ScallopOutput }) => {
+const OutputTable = ({ relation }: { relation: SclRelation }) => {
   const header = relation.args.map((arg, index) => {
     return (
       <div
@@ -167,7 +165,7 @@ const OutputTable = ({ relation }: { relation: ScallopOutput }) => {
 const CreateRelationDialog = ({
   addRelation,
 }: {
-  addRelation: (relation: ScallopInput | ScallopOutput) => void;
+  addRelation: (relation: SclRelation) => void;
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -195,18 +193,12 @@ const CreateRelationDialog = ({
     setArgs(argsCopy);
   }
 
-  function createRelation(): ScallopInput | ScallopOutput {
-    if (isOutput) {
-      return {
-        name: relationName,
-        args: args,
-      };
-    }
-
-    // else, return input relation
+  function createRelation(): SclRelation {
     return {
+      type: isOutput ? "output" : "input",
       name: relationName,
       args: args,
+      probability: false, // temporary
       facts: [],
     };
   }
@@ -366,12 +358,12 @@ const RelationSelect = ({
   bothEmpty,
   setActiveRelation,
 }: {
-  inputs: InputRecord;
-  outputs: OutputRecord;
+  inputs: RelationRecord;
+  outputs: RelationRecord;
   bothEmpty: boolean;
   setActiveRelation: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const parseRelations = (record: InputRecord | OutputRecord) => {
+  const parseRelations = (record: RelationRecord) => {
     const selectItems: React.ReactNode[] = [];
     let index = 0;
 
@@ -437,17 +429,17 @@ const TableEditor = ({
   setInputs,
   setOutputs,
 }: {
-  inputs: InputRecord;
-  outputs: OutputRecord;
-  setInputs: React.Dispatch<React.SetStateAction<InputRecord>>;
-  setOutputs: React.Dispatch<React.SetStateAction<OutputRecord>>;
+  inputs: RelationRecord;
+  outputs: RelationRecord;
+  setInputs: React.Dispatch<React.SetStateAction<RelationRecord>>;
+  setOutputs: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
   const [activeRelation, setActiveRelation] = useState("");
 
   // adds newly created relation to inputs or outputs, depending on
   // what was chosen in the create relation dialog
-  function addRelation(relation: ScallopInput | ScallopOutput) {
-    if ("facts" in relation) {
+  function addRelation(relation: SclRelation) {
+    if (relation.type === "input") {
       const inputsCopy = { ...inputs };
       inputsCopy[relation.name] = relation;
       setInputs(inputsCopy);

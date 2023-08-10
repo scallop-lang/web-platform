@@ -14,11 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Skeleton } from "./ui/skeleton";
 
 import { api } from "~/utils/api";
-import type {
-  InputRecord,
-  OutputRecord,
-  ScallopProgram,
-} from "~/utils/schemas-types";
+import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
 
 const download = (content: string, filename: string) => {
   const a = document.createElement("a");
@@ -76,8 +72,8 @@ const CodeToolbar = ({
   outputs,
   program,
 }: {
-  inputs: InputRecord;
-  outputs: OutputRecord;
+  inputs: RelationRecord;
+  outputs: RelationRecord;
   program: string;
 }) => {
   const run = api.scallop.run.useMutation();
@@ -106,10 +102,10 @@ const CodeEditor = ({
   program,
   setProgram,
 }: {
-  inputs: InputRecord;
-  outputs: OutputRecord;
-  program: ScallopProgram;
-  setProgram: React.Dispatch<React.SetStateAction<ScallopProgram>>;
+  inputs: RelationRecord;
+  outputs: RelationRecord;
+  program: SclProgram;
+  setProgram: React.Dispatch<React.SetStateAction<SclProgram>>;
 }) => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();

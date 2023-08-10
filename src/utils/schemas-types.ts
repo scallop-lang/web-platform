@@ -1,51 +1,37 @@
 import { z } from "zod";
 
-const NameSchema = z.string().regex(new RegExp("^[a-z]\\w*$", "i"))
-
 // the current Scallop types we support; exported so that we can iterate over them. also see
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions
 const argumentTypes = ["String", "Integer", "Float", "Boolean"] as const;
 
-const ArgTypeSchema = z.enum(argumentTypes);
+const NameSchema = z.string().regex(new RegExp("^[a-z]\\w*$", "i"));
 
+const ArgTypeSchema = z.enum(argumentTypes);
 const ArgSchema = z.object({
   name: NameSchema.optional(),
   type: ArgTypeSchema,
 });
 
+const SclProgramSchema = z.string().min(1);
 const SclRelationSchema = z.object({
+  type: z.enum(["input", "output"]),
   name: NameSchema,
   args: ArgSchema.array(),
-  facts: z.tuple([z.number(), z.string().array()]).array().optional(),
+  probability: z.boolean(),
+  facts: z.tuple([z.number(), z.string().array()]).array(),
 });
-
-const SclProgramSchema = z.string().min(1);
-const SclInputSchema = SclRelationSchema.required();
-const SclOutputSchema = SclRelationSchema.omit({ facts: true });
 
 type ArgumentType = z.infer<typeof ArgTypeSchema>;
 type Argument = z.infer<typeof ArgSchema>;
-type ScallopProgram = z.infer<typeof SclProgramSchema>;
-type ScallopInput = z.infer<typeof SclInputSchema>;
-type ScallopOutput = z.infer<typeof SclOutputSchema>;
-type InputRecord = Record<string, ScallopInput>;
-type OutputRecord = Record<string, ScallopOutput>;
+type SclProgram = z.infer<typeof SclProgramSchema>;
+type SclRelation = z.infer<typeof SclRelationSchema>;
+type RelationRecord = Record<string, SclRelation>;
 
-export type {
-  Argument,
-  ArgumentType,
-  InputRecord,
-  OutputRecord,
-  ScallopInput,
-  ScallopOutput,
-  ScallopProgram,
-};
+export type { Argument, ArgumentType, RelationRecord, SclProgram, SclRelation };
 
 export {
   ArgSchema,
   ArgTypeSchema,
-  SclInputSchema,
-  SclOutputSchema,
   SclProgramSchema,
   SclRelationSchema,
   argumentTypes,
