@@ -118,20 +118,9 @@ const InputTable = ({
     );
   });
 
-  const header = relation.args.map((arg, index) => {
-    return (
-      <div
-        className="w-full cursor-default font-mono text-sm font-medium leading-none"
-        key={index}
-      >
-        {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
-      </div>
-    );
-  });
-
   return (
     <div className="flex h-full flex-col space-y-4">
-      <div className="flex space-x-2">{header}</div>
+      <TableHeader relation={relation} />
       <div className="flex flex-col space-y-2 overflow-scroll">{rowList}</div>
       <Button onClick={addFact}>
         <ListPlus className="mr-2 h-4 w-4" /> Add row
@@ -140,7 +129,7 @@ const InputTable = ({
   );
 };
 
-const OutputTable = ({ relation }: { relation: SclRelation }) => {
+const TableHeader = ({ relation }: { relation: SclRelation }) => {
   const header = relation.args.map((arg, index) => {
     return (
       <div
@@ -152,9 +141,13 @@ const OutputTable = ({ relation }: { relation: SclRelation }) => {
     );
   });
 
+  return <div className="flex space-x-2">{header}</div>;
+};
+
+const OutputTable = ({ relation }: { relation: SclRelation }) => {
   return (
     <div className="flex h-full flex-col space-y-5">
-      <div className="flex space-x-2">{header}</div>
+      <TableHeader relation={relation} />
       <div className="flex grow items-center justify-center text-sm text-muted-foreground">
         No output to display... yet...?
       </div>
