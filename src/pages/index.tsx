@@ -46,25 +46,28 @@ const Header = () => {
           height={35}
           alt="Scallop logo"
         />
-        <h1 className="cursor-default text-xl font-semibold">
+        <h1 className="w-28 cursor-default text-lg font-semibold leading-none sm:w-full sm:text-xl">
           Scallop Playground
         </h1>
       </div>
-      <div className="flex space-x-7">
-        <Link
-          href="https://scallop-lang.github.io/"
-          target="_blank"
-          className="inline-flex items-center justify-center text-sm font-medium text-primary underline-offset-4 hover:underline"
-        >
-          Website
-        </Link>
-        <Link
-          href="https://github.com/scallop-lang"
-          target="_blank"
-          className="inline-flex items-center justify-center text-sm font-medium text-primary underline-offset-4 hover:underline"
-        >
-          GitHub
-        </Link>
+      <div className="flex items-center space-x-7">
+        <div className="flex flex-col items-end justify-end sm:flex-row sm:space-x-7">
+          <Link
+            href="https://scallop-lang.github.io/"
+            target="_blank"
+            className="inline-flex items-center justify-center text-right text-sm font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Website
+          </Link>
+          <Link
+            href="https://github.com/scallop-lang"
+            target="_blank"
+            className="inline-flex items-center justify-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+          >
+            GitHub
+          </Link>
+        </div>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
