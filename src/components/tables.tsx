@@ -54,7 +54,11 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
     );
   });
 
-  return <Card className="flex space-x-2 overflow-x-auto p-3">{header}</Card>;
+  return (
+    <Card className="flex shrink-0 space-x-2 overflow-x-auto p-3">
+      {header}
+    </Card>
+  );
 };
 
 const InputTable = ({
