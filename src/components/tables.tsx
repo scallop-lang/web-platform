@@ -15,22 +15,24 @@ const BooleanCell = ({ initialState }: { initialState: boolean }) => {
   const [checked, setChecked] = useState(initialState);
 
   return (
-    <div className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2">
+    <div className="flex h-10 w-full justify-between overflow-x-auto rounded-md border border-input bg-background px-3 py-2 @container">
       <p
         className={cn(
-          "cursor-default text-sm transition",
+          "hidden cursor-default text-sm transition @[8rem]:flex",
           checked ? "text-muted-foreground" : "font-semibold"
         )}
       >
         False
       </p>
-      <Switch
-        checked={checked}
-        onCheckedChange={setChecked}
-      />
+      <div className="flex grow items-center justify-center">
+        <Switch
+          checked={checked}
+          onCheckedChange={setChecked}
+        />
+      </div>
       <p
         className={cn(
-          "cursor-default text-sm transition",
+          "hidden cursor-default text-sm transition @[8rem]:flex",
           checked ? "font-semibold" : "text-muted-foreground"
         )}
       >
@@ -52,7 +54,7 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
     );
   });
 
-  return <Card className="flex space-x-2 p-3">{header}</Card>;
+  return <Card className="flex space-x-2 overflow-x-auto p-3">{header}</Card>;
 };
 
 const InputTable = ({
