@@ -2,12 +2,10 @@ import { z, type ZodTypeAny } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import {
-  SclInputSchema,
-  SclOutputSchema,
   SclProgramSchema,
+  SclRelationSchema,
   type ArgumentType,
-  type ScallopInput,
-  type ScallopOutput,
+  type SclRelation,
 } from "~/utils/schemas-types";
 
 import { env } from "../../../env.mjs";
@@ -25,7 +23,7 @@ const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
 };
 
 // generates a Zod schema for the given relation.
-const relationToSchema = (relation: ScallopInput | ScallopOutput) => {
+const relationToSchema = (relation: SclRelation) => {
   const schema = relation.args.map((arg) => typeToSchema[arg.type]);
   return z.tuple([z.number(), z.tuple(schema as [])]).array();
 };
@@ -35,8 +33,8 @@ export const scallopRouter = createTRPCRouter({
     .input(
       z.object({
         program: SclProgramSchema,
-        inputs: SclInputSchema.array(),
-        outputs: SclOutputSchema.array(),
+        inputs: SclRelationSchema.array(),
+        outputs: SclRelationSchema.array(),
       })
     )
     .mutation(async ({ input }) => {

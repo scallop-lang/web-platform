@@ -17,7 +17,7 @@ const SclRelationSchema = z.object({
   type: z.enum(["input", "output"]),
   name: NameSchema,
   args: ArgSchema.array(),
-  facts: z.tuple([z.number().min(0).max(1), z.string().array()]).array(),
+  facts: z.tuple([z.number(), z.string().array()]).array(),
 });
 
 type ArgumentType = z.infer<typeof ArgTypeSchema>;

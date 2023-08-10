@@ -18,11 +18,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Skeleton } from "~/components/ui/skeleton";
 
-import type {
-  InputRecord,
-  OutputRecord,
-  ScallopProgram,
-} from "~/utils/schemas-types";
+import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
 
 const Header = () => {
   const [mounted, setMounted] = useState(false);
@@ -104,12 +100,13 @@ const Header = () => {
 };
 
 const Playground = () => {
-  const [program, setProgram] = useState<ScallopProgram>(
+  const [program, setProgram] = useState<SclProgram>(
     "rel grandparent(a, c) = parent(a, b, true), parent(b, c, true)"
   );
 
-  const [inputs, setInputs] = useState<InputRecord>({
+  const [inputs, setInputs] = useState<RelationRecord>({
     parent: {
+      type: "input",
       name: "parent",
       args: [
         { name: "a", type: "String" },
@@ -123,10 +120,12 @@ const Playground = () => {
     },
   });
 
-  const [outputs, setOutputs] = useState<OutputRecord>({
+  const [outputs, setOutputs] = useState<RelationRecord>({
     grandparent: {
+      type: "output",
       name: "grandparent",
       args: [{ type: "String" }, { name: "b", type: "String" }],
+      facts: [],
     },
   });
 
