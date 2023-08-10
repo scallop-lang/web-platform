@@ -119,9 +119,11 @@ const InputTable = ({
   });
 
   return (
-    <div className="flex h-full flex-col space-y-4">
-      <TableHeader relation={relation} />
-      <div className="flex flex-col space-y-2 overflow-scroll">{rowList}</div>
+    <div className="flex h-full flex-col justify-between space-y-4">
+      <Card className="grid gap-4 overflow-y-auto p-4">
+        <TableHeader relation={relation} />
+        <div className="flex flex-col space-y-2">{rowList}</div>
+      </Card>
       <Button onClick={addFact}>
         <ListPlus className="mr-2 h-4 w-4" /> Add row
       </Button>
