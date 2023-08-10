@@ -10,7 +10,7 @@ import {
 } from "~/components/ui/select";
 import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
 import CreateRelationDialog from "./create-relation-dialog";
-import { InputTable, OutputTable } from "./tables";
+import { Table } from "./table";
 import { Card } from "./ui/card";
 
 const RelationSelect = ({
@@ -130,13 +130,17 @@ const TableEditor = ({
           </div>
         ) : activeRelation ? (
           inputs[activeRelation] ? (
-            <InputTable
+            <Table
               relation={inputs[activeRelation]!}
-              inputs={inputs}
-              setInputs={setInputs}
+              record={inputs}
+              setRecord={setInputs}
             />
           ) : (
-            <OutputTable relation={outputs[activeRelation]!} />
+            <Table 
+              relation={outputs[activeRelation]!} 
+              record={outputs}
+              setRecord={setOutputs}
+            />
           )
         ) : (
           <div className="flex h-full cursor-default items-center justify-center text-sm text-muted-foreground">
