@@ -37,6 +37,21 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
+const TableHeader = ({ relation }: { relation: SclRelation }) => {
+  const header = relation.args.map((arg, index) => {
+    return (
+      <div
+        className="w-full cursor-default font-mono text-sm font-medium leading-none"
+        key={index}
+      >
+        {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
+      </div>
+    );
+  });
+
+  return <div className="flex">{header}</div>;
+};
+
 const InputTable = ({
   relation,
   inputs,
@@ -119,31 +134,21 @@ const InputTable = ({
   });
 
   return (
-    <div className="flex h-full flex-col justify-between space-y-4">
-      <Card className="grid gap-4 overflow-y-auto p-4">
+    <div className="flex h-full flex-col justify-between space-y-3">
+      <Card className="sticky p-3">
         <TableHeader relation={relation} />
+      </Card>
+      <Card className="grid grow gap-4 overflow-y-auto p-3">
         <div className="flex flex-col space-y-2">{rowList}</div>
       </Card>
-      <Button onClick={addFact}>
+      <Button
+        onClick={addFact}
+        className="shrink-0"
+      >
         <ListPlus className="mr-2 h-4 w-4" /> Add row
       </Button>
     </div>
   );
-};
-
-const TableHeader = ({ relation }: { relation: SclRelation }) => {
-  const header = relation.args.map((arg, index) => {
-    return (
-      <div
-        className="w-full cursor-default font-mono text-sm font-medium leading-none"
-        key={index}
-      >
-        {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
-      </div>
-    );
-  });
-
-  return <div className="flex space-x-2">{header}</div>;
 };
 
 const OutputTable = ({ relation }: { relation: SclRelation }) => {
