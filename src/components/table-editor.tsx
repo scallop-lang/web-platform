@@ -69,16 +69,16 @@ const InputTable = ({
     relation.args.forEach((arg) => {
       switch (arg.type) {
         case "String":
-          values.push("String");
+          values.push("");
           break;
         case "Boolean":
-          values.push("Boolean");
+          values.push("");
           break;
         case "Float":
-          values.push("Float");
+          values.push("");
           break;
         case "Integer":
-          values.push("Integer");
+          values.push("");
           break;
       }
     });
@@ -115,6 +115,7 @@ const InputTable = ({
               key={colIndex}
               type="text"
               defaultValue={fact[1][colIndex]}
+              placeholder={type}
               className="cursor-pointer hover:bg-secondary focus:bg-background"
             />
           );
