@@ -13,9 +13,11 @@ import { Switch } from "./ui/switch";
 
 const BooleanCell = ({
   initialState,
+  disabled,
   setState,
 }: {
   initialState: boolean;
+  disabled: boolean;
   setState: (value: boolean) => void;
 }) => {
   const [checked, setChecked] = useState(initialState);
@@ -39,6 +41,7 @@ const BooleanCell = ({
         <Switch
           checked={checked}
           onCheckedChange={checkedChange}
+          disabled={disabled}
         />
       </div>
       <p
@@ -131,6 +134,7 @@ const Table = ({
             <BooleanCell
               initialState={initialState.toLowerCase() === "true"}
               setState={switchBool}
+              disabled={relation.type === "output"}
             />
           );
         default:
