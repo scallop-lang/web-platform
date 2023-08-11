@@ -1,7 +1,7 @@
 import { ListPlus } from "lucide-react";
 import { useState } from "react";
 import { cn } from "~/utils/cn";
-import { type RelationRecord, type SclRelation } from "~/utils/schemas-types";
+import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
@@ -15,10 +15,6 @@ const BooleanCell = ({
   disabled: boolean;
 }) => {
   const [checked, setChecked] = useState(initialState);
-  function checkedChange() {
-    const newChecked = !checked;
-    setChecked(newChecked);
-  }
 
   return (
     <div className="flex h-10 w-full justify-between overflow-x-auto rounded-md border border-input bg-background px-3 py-2 @container">
@@ -33,7 +29,7 @@ const BooleanCell = ({
       <div className="flex grow items-center justify-center">
         <Switch
           checked={checked}
-          onCheckedChange={checkedChange}
+          onCheckedChange={setChecked}
           disabled={disabled}
         />
       </div>
@@ -68,16 +64,20 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
   );
 };
 
+// we would usually store the state of the table in its own component, but
+// we're actually passing down table state via `relation` and `record` props
 const Table = ({
-  relation,
+  relationName,
   record,
   setRecord,
 }: {
-  relation: SclRelation;
+  relationName: string;
   record: RelationRecord;
   setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
-  function addFact() {
+  const relation = record[relationName]!;
+
+  function addFactRow() {
     // create initial state for each argument type in the column
     const initialValues: string[] = relation.args.map((arg) => {
       switch (arg.type) {
@@ -109,10 +109,10 @@ const Table = ({
 
   // for each row, we generate the cells for each column
   const rowList = relation.facts.map((fact, rowIndex) => {
-    const colList = relation.args.map((arg, colIndex) => {
+    const colList = relation.args.map((argument, colIndex) => {
       const initialState = fact[1][colIndex]!;
 
-      switch (arg.type) {
+      switch (argument.type) {
         case "Boolean":
           return (
             <BooleanCell
@@ -127,7 +127,7 @@ const Table = ({
               type="text"
               key={colIndex}
               defaultValue={initialState}
-              placeholder={arg.type}
+              placeholder={argument.type}
               className="cursor-pointer transition hover:bg-secondary focus:bg-background"
               disabled={relation.type === "output"}
             />
@@ -152,7 +152,7 @@ const Table = ({
         <div className="flex flex-col space-y-2">{rowList}</div>
       </Card>
       <Button
-        onClick={addFact}
+        onClick={addFactRow}
         className="shrink-0"
       >
         <ListPlus className="mr-2 h-4 w-4" /> Add row

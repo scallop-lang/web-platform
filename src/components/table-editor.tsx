@@ -17,12 +17,12 @@ const RelationSelect = ({
   inputs,
   outputs,
   bothEmpty,
-  setActiveRelation,
+  setActiveRelationName,
 }: {
   inputs: RelationRecord;
   outputs: RelationRecord;
   bothEmpty: boolean;
-  setActiveRelation: React.Dispatch<React.SetStateAction<string>>;
+  setActiveRelationName: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const parseRelations = (record: RelationRecord) => {
     const selectItems: React.ReactNode[] = [];
@@ -62,7 +62,7 @@ const RelationSelect = ({
 
   return (
     <Select
-      onValueChange={setActiveRelation}
+      onValueChange={setActiveRelationName}
       disabled={bothEmpty}
     >
       <SelectTrigger className="basis-1/2">
@@ -93,7 +93,7 @@ const TableEditor = ({
   setInputs: React.Dispatch<React.SetStateAction<RelationRecord>>;
   setOutputs: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
-  const [activeRelation, setActiveRelation] = useState("");
+  const [activeRelationName, setActiveRelationName] = useState("");
 
   // adds newly created relation to inputs or outputs, depending on
   // what was chosen in the create relation dialog
@@ -120,7 +120,7 @@ const TableEditor = ({
           inputs={inputs}
           outputs={outputs}
           bothEmpty={bothEmpty}
-          setActiveRelation={setActiveRelation}
+          setActiveRelationName={setActiveRelationName}
         />
       </div>
       <Card className="h-0 grow p-4">
@@ -128,16 +128,16 @@ const TableEditor = ({
           <div className="flex h-full cursor-default items-center justify-center text-sm text-muted-foreground">
             You don&apos;t have any relations yet. Create one first!
           </div>
-        ) : activeRelation ? (
-          inputs[activeRelation] ? (
+        ) : activeRelationName ? (
+          inputs[activeRelationName] ? (
             <Table
-              relation={inputs[activeRelation]!}
+              relationName={activeRelationName}
               record={inputs}
               setRecord={setInputs}
             />
           ) : (
-            <Table 
-              relation={outputs[activeRelation]!} 
+            <Table
+              relationName={activeRelationName}
               record={outputs}
               setRecord={setOutputs}
             />
