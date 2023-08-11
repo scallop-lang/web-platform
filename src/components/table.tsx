@@ -1,11 +1,18 @@
-import { ListPlus } from "lucide-react";
+import { ListPlus, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "~/utils/cn";
 import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 const AddRowButton = ({
   relation,
@@ -110,8 +117,16 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
   });
 
   return (
-    <Card className="flex shrink-0 space-x-2 overflow-x-auto p-3">
-      {header}
+    <Card className="flex shrink-0 overflow-x-auto">
+      <div className="my-3 ml-3 mr-2 flex w-full space-x-2">{header}</div>
+      <div className="mr-3 flex w-10 shrink-0 items-center justify-center">
+        <Badge
+          variant="secondary"
+          className="cursor-default font-mono"
+        >
+          {relation.type === "input" ? "I" : "O"}
+        </Badge>
+      </div>
     </Card>
   );
 };
@@ -133,12 +148,30 @@ const Table = ({
 
   // for each row, we generate the cells for each column
   const rowList = relation.facts.map((fact, row) => {
+    function deleteRow() {
+      // since slice() modifies the original row as well, we should
+      // create a copy first and work on that instead
+      const factCopy = relation.facts.slice();
+
+      console.log("before:", factCopy);
+
+      const deleted = factCopy.splice(row, 1);
+
+      console.log("after:", factCopy);
+      console.log("deleted:", deleted[0]);
+
+      const recordCopy = { ...record };
+      recordCopy[relationName]!.facts = factCopy;
+
+      setRecord(recordCopy);
+    }
+
     const colList = relation.args.map((argument, col) => {
       function updateCell(value: string) {
         const recordCopy = { ...record };
         recordCopy[relationName]!.facts[row]![1][col] = value;
 
-        console.log("value added to", `(${row},`, `${col}):`, value);
+        console.log("value changed", `(${row},`, `${col}):`, value);
 
         setRecord(recordCopy);
       }
@@ -177,6 +210,21 @@ const Table = ({
         key={row}
       >
         {colList}
+        <TooltipProvider delayDuration={400}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={deleteRow}
+                className="shrink-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Delete row</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     );
   });
@@ -187,11 +235,15 @@ const Table = ({
       <Card className="grid grow gap-4 overflow-y-auto p-3">
         <div className="flex flex-col space-y-2">{rowList}</div>
       </Card>
-      <AddRowButton
-        relation={relation}
-        record={record}
-        setRecord={setRecord}
-      />
+      {relation.type === "input" ? (
+        <AddRowButton
+          relation={relation}
+          record={record}
+          setRecord={setRecord}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
