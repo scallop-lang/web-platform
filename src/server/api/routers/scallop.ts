@@ -38,7 +38,7 @@ export const scallopRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      input.inputs = input.inputs.map((relation) => {
+      const inputs = input.inputs.map((relation) => {
         z.setErrorMap((_issue, ctx) => {
           return {
             message: `[@input ${relation.name}]: ${ctx.defaultError}`,
@@ -46,11 +46,13 @@ export const scallopRouter = createTRPCRouter({
         });
         return {
           ...relation,
-          facts: relationToSchema(relation).parse(relation.facts),
+          facts: relationToSchema(relation).parse(
+            relation.facts.map((fact) => [fact.tag, fact.tuple])
+          ),
         };
       });
 
-      console.log("inputs into server:", JSON.stringify(input.inputs));
+      console.log("inputs into server:", JSON.stringify(inputs));
 
       const endpoint = new URL("api/run-scallop", env.FLASK_SERVER);
       const res = await fetch(endpoint, {
@@ -59,7 +61,7 @@ export const scallopRouter = createTRPCRouter({
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(input),
+        body: JSON.stringify({...input, inputs}),
       });
 
       z.setErrorMap((_issue, ctx) => {

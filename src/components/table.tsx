@@ -1,8 +1,10 @@
 import { ListPlus, X } from "lucide-react";
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { cn } from "~/utils/cn";
 import type {
   Argument,
+  Fact,
   RelationRecord,
   SclRelation,
 } from "~/utils/schemas-types";
@@ -40,19 +42,17 @@ const AddRowButton = ({
       }
     });
 
-    // create a new fact with the initial values. for now,
-    // probability is hardcoded to be 1
-    const newFact: [number, string[]] = [1, initialValues];
-
-    // although we're only updating one single relation, we need to
-    // copy the whole input or output record, because we can't mutate
-    const recordCopy = { ...record };
-
-    // finally, update facts prop of the relation in the record...
-    recordCopy[relation.name]!.facts.push(newFact);
-
     // set copy of the record as the new state
-    setRecord(recordCopy);
+    setRecord({
+      ...record,
+      [relation.name]: {
+        ...relation,
+        facts: [
+          ...relation.facts,
+          { id: uuidv4(), tag: 1, tuple: initialValues },
+        ],
+      },
+    });
   }
 
   return (
@@ -138,37 +138,41 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
 const TableCell = ({
   relation,
   record,
-  rowIndex,
-  colIndex,
+  argIndex,
   fact,
   argument,
   setRecord,
 }: {
   relation: SclRelation;
   record: RelationRecord;
-  rowIndex: number;
-  colIndex: number;
-  fact: [number, string[]];
+  argIndex: number;
+  fact: Fact;
   argument: Argument;
   setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
   function updateCell(value: string) {
-    const recordCopy = { ...record };
-    recordCopy[relation.name]!.facts[rowIndex]![1][colIndex] = value;
-
-    console.log("value changed", `(${rowIndex},`, `${colIndex}):`, value);
-
-    setRecord(recordCopy);
+    setRecord({
+      ...record,
+      [relation.name]: {
+        ...relation,
+        facts: relation.facts.map((fact_) => {
+          if (fact_.id === fact.id) {
+            fact_.tuple[argIndex] = value;
+          }
+          return fact_;
+        }),
+      },
+    });
   }
 
-  const initialState = fact[1][colIndex]!;
+  const initialState = fact.tuple[argIndex]!;
 
   // for now, the other types will use the same input field
   switch (argument.type) {
     case "Boolean":
       return (
         <BooleanCell
-          key={colIndex}
+          key={argIndex}
           initialState={initialState === "true"}
           updateCell={updateCell}
           disabled={relation.type === "output"}
@@ -178,7 +182,7 @@ const TableCell = ({
       return (
         <Input
           type="text"
-          key={colIndex}
+          key={argIndex}
           defaultValue={initialState}
           onChange={(e) => updateCell(e.target.value)}
           placeholder={argument.type}
@@ -192,41 +196,30 @@ const TableCell = ({
 const TableRow = ({
   relation,
   record,
-  rowIndex,
   fact,
   setRecord,
 }: {
   relation: SclRelation;
   record: RelationRecord;
-  rowIndex: number;
-  fact: [number, string[]];
+  fact: Fact;
   setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
   function deleteRow() {
-    // since slice() modifies the original row as well, we should
-    // create a copy first and work on that instead
-    const factCopy = relation.facts.slice();
-
-    console.log("before:", factCopy);
-
-    const deleted = factCopy.splice(rowIndex, 1);
-
-    console.log("after:", factCopy);
-    console.log("deleted:", deleted[0]);
-
-    const recordCopy = { ...record };
-    recordCopy[relation.name]!.facts = factCopy;
-
-    setRecord(recordCopy);
+    setRecord({
+      ...record,
+      [relation.name]: {
+        ...relation,
+        facts: relation.facts.filter((fact_) => fact_.id !== fact.id),
+      },
+    });
   }
 
-  const colList = relation.args.map((argument, col) => (
+  const colList = relation.args.map((argument, i) => (
     <TableCell
-      key={col}
+      key={i}
       relation={relation}
       record={record}
-      rowIndex={rowIndex}
-      colIndex={col}
+      argIndex={i}
       fact={fact}
       argument={argument}
       setRecord={setRecord}
@@ -236,7 +229,7 @@ const TableRow = ({
   return (
     <div
       className="flex space-x-2"
-      key={rowIndex}
+      key={fact.id}
     >
       {colList}
       <TooltipProvider delayDuration={400}>
@@ -279,7 +272,6 @@ const Table = ({
       key={row}
       relation={relation}
       record={record}
-      rowIndex={row}
       fact={fact}
       setRecord={setRecord}
     />
