@@ -7,6 +7,53 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
 
+const AddRowButton = ({
+  relation,
+  record,
+  setRecord,
+}: {
+  relation: SclRelation;
+  record: RelationRecord;
+  setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
+}) => {
+  function addRow() {
+    // create initial state for each argument type in the column
+    const initialValues: string[] = relation.args.map((arg) => {
+      switch (arg.type) {
+        case "String":
+        case "Float":
+        case "Integer":
+          return "";
+        case "Boolean":
+          return "false";
+      }
+    });
+
+    // create a new fact with the initial values. for now,
+    // probability is hardcoded to be 1
+    const newFact: [number, string[]] = [1, initialValues];
+
+    // although we're only updating one single relation, we need to
+    // copy the whole input or output record, because we can't mutate
+    const recordCopy = { ...record };
+
+    // finally, update facts prop of the relation in the record...
+    recordCopy[relation.name]!.facts.push(newFact);
+
+    // set copy of the record as the new state
+    setRecord(recordCopy);
+  }
+
+  return (
+    <Button
+      onClick={addRow}
+      className="shrink-0"
+    >
+      <ListPlus className="mr-2 h-4 w-4" /> Add row
+    </Button>
+  );
+};
+
 const BooleanCell = ({
   initialState,
   disabled,
@@ -65,7 +112,7 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
 };
 
 // we would usually store the state of the table in its own component, but
-// we're actually passing down table state via `relation` and `record` props
+// we're actually passing down table state via the `record` prop
 const Table = ({
   relationName,
   record,
@@ -77,40 +124,15 @@ const Table = ({
 }) => {
   const relation = record[relationName]!;
 
-  function addFactRow() {
-    // create initial state for each argument type in the column
-    const initialValues: string[] = relation.args.map((arg) => {
-      switch (arg.type) {
-        case "String":
-        case "Float":
-        case "Integer":
-          return "";
-        case "Boolean":
-          return "false";
-      }
-    });
-
-    // create a new fact with the initial values. for now,
-    // probability is hardcoded to be 1
-    const newFact: [number, string[]] = [1, initialValues];
-
-    // although we're only updating one single relation, we need to
-    // copy the whole input or output record, because we can't mutate
-    const recordCopy = { ...record };
-
-    // finally, update facts prop of the relation in the record...
-    recordCopy[relation.name]!.facts.push(newFact);
-
-    // set copy of the record as the new state
-    setRecord(recordCopy);
-  }
-
   console.log(`current ${relation.type} record:`, record);
 
   // for each row, we generate the cells for each column
   const rowList = relation.facts.map((fact, rowIndex) => {
     const colList = relation.args.map((argument, colIndex) => {
       const initialState = fact[1][colIndex]!;
+
+      const cellContent = relation.facts[rowIndex]![1][colIndex]!;
+      console.log("cell content", `(${rowIndex},`, `${colIndex})`, cellContent);
 
       switch (argument.type) {
         case "Boolean":
@@ -151,12 +173,11 @@ const Table = ({
       <Card className="grid grow gap-4 overflow-y-auto p-3">
         <div className="flex flex-col space-y-2">{rowList}</div>
       </Card>
-      <Button
-        onClick={addFactRow}
-        className="shrink-0"
-      >
-        <ListPlus className="mr-2 h-4 w-4" /> Add row
-      </Button>
+      <AddRowButton
+        relation={relation}
+        record={record}
+        setRecord={setRecord}
+      />
     </div>
   );
 };
