@@ -41,7 +41,6 @@
     "superjson": "1.12.2",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.6",
-    "uuid": "^9.0.0",
     "zod": "^3.21.4"
   },
   "devDependencies": {
@@ -60,7 +59,8 @@
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.2.8",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "uuid": "^9.0.0"
   },
   "ct3aMetadata": {
     "initVersion": "7.17.0"
