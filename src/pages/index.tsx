@@ -120,6 +120,11 @@ const Playground = () => {
       facts: [
         [1, ["Alice", "Bob", "true"]],
         [1, ["Bob", "Emily", "true"]],
+        [1, ["Anthony", "Jason", "true"]],
+        [1, ["Steve", "Origami Angel", "true"]],
+        [1, ["Thomas", "Walter", "true"]],
+        [1, ["White", "Ryan", "true"]],
+        [1, ["Aaron", "Rajiv", "true"]],
       ],
     },
   });

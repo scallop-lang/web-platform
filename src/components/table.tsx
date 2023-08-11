@@ -1,7 +1,11 @@
 import { ListPlus, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "~/utils/cn";
-import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
+import type {
+  Argument,
+  RelationRecord,
+  SclRelation,
+} from "~/utils/schemas-types";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -131,6 +135,129 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
   );
 };
 
+const TableCell = ({
+  relation,
+  record,
+  rowIndex,
+  colIndex,
+  fact,
+  argument,
+  setRecord,
+}: {
+  relation: SclRelation;
+  record: RelationRecord;
+  rowIndex: number;
+  colIndex: number;
+  fact: [number, string[]];
+  argument: Argument;
+  setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
+}) => {
+  function updateCell(value: string) {
+    const recordCopy = { ...record };
+    recordCopy[relation.name]!.facts[rowIndex]![1][colIndex] = value;
+
+    console.log("value changed", `(${rowIndex},`, `${colIndex}):`, value);
+
+    setRecord(recordCopy);
+  }
+
+  const initialState = fact[1][colIndex]!;
+
+  // for now, the other types will use the same input field
+  switch (argument.type) {
+    case "Boolean":
+      return (
+        <BooleanCell
+          key={colIndex}
+          initialState={initialState === "true"}
+          updateCell={updateCell}
+          disabled={relation.type === "output"}
+        />
+      );
+    default:
+      return (
+        <Input
+          type="text"
+          key={colIndex}
+          defaultValue={initialState}
+          onChange={(e) => updateCell(e.target.value)}
+          placeholder={argument.type}
+          className="cursor-pointer transition hover:bg-secondary focus:bg-background"
+          disabled={relation.type === "output"}
+        />
+      );
+  }
+};
+
+const TableRow = ({
+  relation,
+  record,
+  rowIndex,
+  fact,
+  setRecord,
+}: {
+  relation: SclRelation;
+  record: RelationRecord;
+  rowIndex: number;
+  fact: [number, string[]];
+  setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
+}) => {
+  function deleteRow() {
+    // since slice() modifies the original row as well, we should
+    // create a copy first and work on that instead
+    const factCopy = relation.facts.slice();
+
+    console.log("before:", factCopy);
+
+    const deleted = factCopy.splice(rowIndex, 1);
+
+    console.log("after:", factCopy);
+    console.log("deleted:", deleted[0]);
+
+    const recordCopy = { ...record };
+    recordCopy[relation.name]!.facts = factCopy;
+
+    setRecord(recordCopy);
+  }
+
+  const colList = relation.args.map((argument, col) => (
+    <TableCell
+      key={col}
+      relation={relation}
+      record={record}
+      rowIndex={rowIndex}
+      colIndex={col}
+      fact={fact}
+      argument={argument}
+      setRecord={setRecord}
+    />
+  ));
+
+  return (
+    <div
+      className="flex space-x-2"
+      key={rowIndex}
+    >
+      {colList}
+      <TooltipProvider delayDuration={400}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={deleteRow}
+              className="shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Delete row</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+  );
+};
+
 // we would usually store the state of the table in its own component, but
 // we're actually passing down table state via the `record` prop
 const Table = ({
@@ -147,87 +274,16 @@ const Table = ({
   console.log(`current ${relation.type} record:`, record);
 
   // for each row, we generate the cells for each column
-  const rowList = relation.facts.map((fact, row) => {
-    function deleteRow() {
-      // since slice() modifies the original row as well, we should
-      // create a copy first and work on that instead
-      const factCopy = relation.facts.slice();
-
-      console.log("before:", factCopy);
-
-      const deleted = factCopy.splice(row, 1);
-
-      console.log("after:", factCopy);
-      console.log("deleted:", deleted[0]);
-
-      const recordCopy = { ...record };
-      recordCopy[relationName]!.facts = factCopy;
-
-      setRecord(recordCopy);
-    }
-
-    const colList = relation.args.map((argument, col) => {
-      function updateCell(value: string) {
-        const recordCopy = { ...record };
-        recordCopy[relationName]!.facts[row]![1][col] = value;
-
-        console.log("value changed", `(${row},`, `${col}):`, value);
-
-        setRecord(recordCopy);
-      }
-
-      const initialState = fact[1][col]!;
-
-      // for now, the other types will use the same input field
-      switch (argument.type) {
-        case "Boolean":
-          return (
-            <BooleanCell
-              key={col}
-              initialState={initialState === "true"}
-              updateCell={updateCell}
-              disabled={relation.type === "output"}
-            />
-          );
-        default:
-          return (
-            <Input
-              type="text"
-              key={col}
-              defaultValue={initialState}
-              onChange={(e) => updateCell(e.target.value)}
-              placeholder={argument.type}
-              className="cursor-pointer transition hover:bg-secondary focus:bg-background"
-              disabled={relation.type === "output"}
-            />
-          );
-      }
-    });
-
-    return (
-      <div
-        className="flex space-x-2"
-        key={row}
-      >
-        {colList}
-        <TooltipProvider delayDuration={400}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={deleteRow}
-                className="shrink-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Delete row</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-    );
-  });
+  const rowList = relation.facts.map((fact, row) => (
+    <TableRow
+      key={row}
+      relation={relation}
+      record={record}
+      rowIndex={row}
+      fact={fact}
+      setRecord={setRecord}
+    />
+  ));
 
   return (
     <div className="flex h-full flex-col justify-between space-y-3">
