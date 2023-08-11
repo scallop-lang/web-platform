@@ -57,9 +57,11 @@ const AddRowButton = ({
 const BooleanCell = ({
   initialState,
   disabled,
+  updateCell,
 }: {
   initialState: boolean;
   disabled: boolean;
+  updateCell: (value: string) => void;
 }) => {
   const [checked, setChecked] = useState(initialState);
 
@@ -76,7 +78,10 @@ const BooleanCell = ({
       <div className="flex grow items-center justify-center">
         <Switch
           checked={checked}
-          onCheckedChange={setChecked}
+          onCheckedChange={(value) => {
+            setChecked(value);
+            updateCell(value.toString());
+          }}
           disabled={disabled}
         />
       </div>
@@ -127,19 +132,27 @@ const Table = ({
   console.log(`current ${relation.type} record:`, record);
 
   // for each row, we generate the cells for each column
-  const rowList = relation.facts.map((fact, rowIndex) => {
-    const colList = relation.args.map((argument, colIndex) => {
-      const initialState = fact[1][colIndex]!;
+  const rowList = relation.facts.map((fact, row) => {
+    const colList = relation.args.map((argument, col) => {
+      function updateCell(value: string) {
+        const recordCopy = { ...record };
+        recordCopy[relationName]!.facts[row]![1][col] = value;
 
-      const cellContent = relation.facts[rowIndex]![1][colIndex]!;
-      console.log("cell content", `(${rowIndex},`, `${colIndex})`, cellContent);
+        console.log("value added to", `(${row},`, `${col}):`, value);
 
+        setRecord(recordCopy);
+      }
+
+      const initialState = fact[1][col]!;
+
+      // for now, the other types will use the same input field
       switch (argument.type) {
         case "Boolean":
           return (
             <BooleanCell
-              key={colIndex}
+              key={col}
               initialState={initialState === "true"}
+              updateCell={updateCell}
               disabled={relation.type === "output"}
             />
           );
@@ -147,8 +160,9 @@ const Table = ({
           return (
             <Input
               type="text"
-              key={colIndex}
+              key={col}
               defaultValue={initialState}
+              onChange={(e) => updateCell(e.target.value)}
               placeholder={argument.type}
               className="cursor-pointer transition hover:bg-secondary focus:bg-background"
               disabled={relation.type === "output"}
@@ -160,7 +174,7 @@ const Table = ({
     return (
       <div
         className="flex space-x-2"
-        key={rowIndex}
+        key={row}
       >
         {colList}
       </div>
