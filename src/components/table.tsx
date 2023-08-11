@@ -84,38 +84,38 @@ const Table = ({
   record: RelationRecord;
   setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
-  // facts can only be added for input relations
   function addFact() {
-    const values: string[] = [];
-
-    // create an entry for each argument
-    relation.args.forEach((arg) => {
+    // create initial state for each argument type in the column
+    const initialValues: string[] = relation.args.map((arg) => {
       switch (arg.type) {
         case "String":
-          values.push("");
-          break;
-        case "Boolean":
-          values.push("");
-          break;
         case "Float":
-          values.push("");
-          break;
         case "Integer":
-          values.push("");
-          break;
+          return "";
+        case "Boolean":
+          return "false";
       }
     });
 
-    // first add the new fact to the relation itself
-    // for now, probability is hardcoded to be 1
-    relation.facts = [...relation.facts, [1, values]];
+    // create a new fact with the initial values. for now,
+    // probability is hardcoded to be 1
+    const newFact: [number, string[]] = [1, initialValues];
 
-    // then update inputs with the new relation
+    // although we're only updating one single relation, we need to
+    // copy the whole input or output record, because we can't mutate
     const recordCopy = { ...record };
-    recordCopy[relation.name] = relation;
 
+    // we also need to create a copy of the relation's facts
+    const factsCopy = relation.facts.slice();
+
+    // finally, update facts prop of the relation in the record...
+    recordCopy[relation.name]!.facts = [...factsCopy, newFact];
+
+    // set copy of the record as the new state
     setRecord(recordCopy);
   }
+
+  console.log(`current ${relation.type} record:`, record);
 
   function editCell(factIndex: number, colIndex: number, value: string) {
     relation.facts[factIndex]![1][colIndex] = value;
@@ -132,6 +132,7 @@ const Table = ({
         case "Boolean":
           return (
             <BooleanCell
+              key={colIndex}
               initialState={initialState.toLowerCase() === "true"}
               setState={switchBool}
               disabled={relation.type === "output"}
