@@ -155,11 +155,11 @@ const TableCell = ({
       ...record,
       [relation.name]: {
         ...relation,
-        facts: relation.facts.map((fact_) => {
-          if (fact_.id === fact.id) {
-            fact_.tuple[argIndex] = value;
+        facts: relation.facts.map((f) => {
+          if (f.id === fact.id) {
+            f.tuple[argIndex] = value;
           }
-          return fact_;
+          return f;
         }),
       },
     });
@@ -186,7 +186,7 @@ const TableCell = ({
           defaultValue={initialState}
           onChange={(e) => updateCell(e.target.value)}
           placeholder={argument.type}
-          className="cursor-pointer transition hover:bg-secondary focus:bg-background"
+          className="cursor-pointer transition hover:bg-secondary focus:bg-background focus:cursor-text"
           disabled={relation.type === "output"}
         />
       );
@@ -209,7 +209,7 @@ const TableRow = ({
       ...record,
       [relation.name]: {
         ...relation,
-        facts: relation.facts.filter((fact_) => fact_.id !== fact.id),
+        facts: relation.facts.filter((f) => f.id !== fact.id),
       },
     });
   }
