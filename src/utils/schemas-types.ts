@@ -15,8 +15,8 @@ const ArgSchema = z.object({
 const FactSchema = z.object({
   id: z.string(),
   tag: z.number(),
-  tuple: z.string().array()
-})
+  tuple: z.string().array(),
+});
 
 const SclProgramSchema = z.string().min(1);
 const SclRelationSchema = z.object({
@@ -24,7 +24,7 @@ const SclRelationSchema = z.object({
   name: NameSchema,
   args: ArgSchema.array(),
   probability: z.boolean(),
-  facts: FactSchema.array()
+  facts: FactSchema.array(),
 });
 
 type ArgumentType = z.infer<typeof ArgTypeSchema>;
@@ -34,7 +34,14 @@ type SclProgram = z.infer<typeof SclProgramSchema>;
 type SclRelation = z.infer<typeof SclRelationSchema>;
 type RelationRecord = Record<string, SclRelation>;
 
-export type { Argument, ArgumentType, Fact, RelationRecord, SclProgram, SclRelation };
+export type {
+  Argument,
+  ArgumentType,
+  Fact,
+  RelationRecord,
+  SclProgram,
+  SclRelation,
+};
 
 export {
   ArgSchema,

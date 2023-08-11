@@ -61,7 +61,7 @@ export const scallopRouter = createTRPCRouter({
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({...input, inputs}),
+        body: JSON.stringify({ ...input, inputs }),
       });
 
       z.setErrorMap((_issue, ctx) => {
