@@ -1,11 +1,7 @@
 import { ListPlus } from "lucide-react";
 import { useState } from "react";
 import { cn } from "~/utils/cn";
-import {
-  type ArgumentType,
-  type RelationRecord,
-  type SclRelation,
-} from "~/utils/schemas-types";
+import { type RelationRecord, type SclRelation } from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
@@ -14,17 +10,14 @@ import { Switch } from "./ui/switch";
 const BooleanCell = ({
   initialState,
   disabled,
-  setState,
 }: {
   initialState: boolean;
   disabled: boolean;
-  setState: (value: boolean) => void;
 }) => {
   const [checked, setChecked] = useState(initialState);
   function checkedChange() {
     const newChecked = !checked;
     setChecked(newChecked);
-    setState(newChecked);
   }
 
   return (
@@ -105,11 +98,8 @@ const Table = ({
     // copy the whole input or output record, because we can't mutate
     const recordCopy = { ...record };
 
-    // we also need to create a copy of the relation's facts
-    const factsCopy = relation.facts.slice();
-
     // finally, update facts prop of the relation in the record...
-    recordCopy[relation.name]!.facts = [...factsCopy, newFact];
+    recordCopy[relation.name]!.facts.push(newFact);
 
     // set copy of the record as the new state
     setRecord(recordCopy);
@@ -117,50 +107,38 @@ const Table = ({
 
   console.log(`current ${relation.type} record:`, record);
 
-  function editCell(factIndex: number, colIndex: number, value: string) {
-    relation.facts[factIndex]![1][colIndex] = value;
-  }
-
-  const rowList = relation.facts.map((fact, i) => {
-    function createCell(type: ArgumentType, colIndex: number) {
+  // for each row, we generate the cells for each column
+  const rowList = relation.facts.map((fact, rowIndex) => {
+    const colList = relation.args.map((arg, colIndex) => {
       const initialState = fact[1][colIndex]!;
-      function switchBool(value: boolean) {
-        fact[1][colIndex] = value.toString();
-      }
 
-      switch (type) {
+      switch (arg.type) {
         case "Boolean":
           return (
             <BooleanCell
               key={colIndex}
-              initialState={initialState.toLowerCase() === "true"}
-              setState={switchBool}
+              initialState={initialState === "true"}
               disabled={relation.type === "output"}
             />
           );
         default:
           return (
             <Input
-              key={colIndex}
               type="text"
+              key={colIndex}
               defaultValue={initialState}
-              onChange={(e) => editCell(i, colIndex, e.target.value)}
-              placeholder={type}
+              placeholder={arg.type}
               className="cursor-pointer transition hover:bg-secondary focus:bg-background"
               disabled={relation.type === "output"}
             />
           );
       }
-    }
-
-    const colList = relation.args.map((arg, index) =>
-      createCell(arg.type, index)
-    );
+    });
 
     return (
       <div
         className="flex space-x-2"
-        key={i}
+        key={rowIndex}
       >
         {colList}
       </div>
