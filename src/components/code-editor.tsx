@@ -105,8 +105,6 @@ const CodeEditor = ({
       }
 
       setOutputs(outputsCopy);
-
-      console.log("outputs updated!");
     },
   });
 

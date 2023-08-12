@@ -68,11 +68,11 @@ const AddRowButton = ({
 
 const BooleanCell = ({
   initialState,
-  disabled,
+  relationType,
   updateCell,
 }: {
   initialState: boolean;
-  disabled: boolean;
+  relationType: "input" | "output";
   updateCell: (value: string) => void;
 }) => {
   const [checked, setChecked] = useState(initialState);
@@ -88,14 +88,20 @@ const BooleanCell = ({
         False
       </p>
       <div className="flex grow items-center justify-center">
-        <Switch
-          checked={checked}
-          onCheckedChange={(value) => {
-            setChecked(value);
-            updateCell(value.toString());
-          }}
-          disabled={disabled}
-        />
+        {relationType === "input" ? (
+          <Switch
+            checked={checked}
+            onCheckedChange={(value) => {
+              setChecked(value);
+              updateCell(value.toString());
+            }}
+          />
+        ) : (
+          <Switch
+            checked={checked}
+            className="cursor-default"
+          />
+        )}
       </div>
       <p
         className={cn(
@@ -182,7 +188,7 @@ const TableCell = ({
           key={argIndex}
           initialState={initialState === "true"}
           updateCell={updateCell}
-          disabled={relation.type === "output"}
+          relationType={relation.type}
         />
       );
     default:
@@ -193,8 +199,13 @@ const TableCell = ({
           defaultValue={initialState}
           onChange={(e) => updateCell(e.target.value)}
           placeholder={argument.type}
-          className="cursor-pointer transition hover:bg-secondary focus:cursor-text focus:bg-background"
-          disabled={relation.type === "output"}
+          className={cn(
+            "transition hover:bg-secondary focus:bg-background",
+            relation.type === "input"
+              ? "cursor-pointer focus:cursor-text"
+              : "cursor-default"
+          )}
+          readOnly={relation.type === "output"}
         />
       );
   }
@@ -311,3 +322,4 @@ const Table = ({
 };
 
 export { Table };
+
