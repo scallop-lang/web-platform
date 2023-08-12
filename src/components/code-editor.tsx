@@ -1,6 +1,7 @@
-import { syntaxHighlighting } from "@codemirror/language";
+import { syntaxHighlighting, syntaxTree } from "@codemirror/language";
 import CodeMirror from "@uiw/react-codemirror";
 import { Scallop, ScallopHighlightStyle } from "codemirror-lang-scallop";
+import { linter, lintGutter, type Diagnostic } from "@codemirror/lint";
 
 import { FileDown, Loader, PlayCircle } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -17,6 +18,23 @@ import { v4 as uuid } from "uuid";
 import { api } from "~/utils/api";
 import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
 import { useToast } from "./ui/use-toast";
+
+const syntaxLinter = linter(view => {
+  const diagnostics: Diagnostic[] = []
+  syntaxTree(view.state).iterate({
+    enter: (node) => {
+      if (node.type.isError) {
+        diagnostics.push({
+          from: node.from,
+          to: node.to,
+          severity: "error",
+          message: "Syntax error",
+        });
+      }
+    },
+  });
+  return diagnostics;
+});
 
 const download = (content: string, filename: string) => {
   const a = document.createElement("a");
@@ -131,6 +149,8 @@ const CodeEditor = ({
       extensions={[
         Scallop(),
         syntaxHighlighting(ScallopHighlightStyle(resolvedTheme!)),
+        lintGutter(),
+        syntaxLinter,
       ]}
       theme={resolvedTheme === "light" ? "light" : "dark"}
       autoFocus={true}
