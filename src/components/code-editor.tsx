@@ -43,7 +43,7 @@ const DownloadButton = ({ program }: { program: string }) => {
         className="grid gap-3"
         sideOffset={10}
       >
-        <p className="text-sm text-muted-foreground">
+        <p className="cursor-default text-sm text-muted-foreground">
           Download a single Scallop (.scl) file that contains both your program
           code and all relation table content.
         </p>
@@ -109,8 +109,8 @@ const CodeEditor = ({
       setOutputs(outputsCopy);
 
       toast({
-        title: "Execution completed",
-        description: "Please check your output relations",
+        title: "Execution successfully completed!",
+        description: "Please check your output relations.",
       });
     },
     onError: (error) => {

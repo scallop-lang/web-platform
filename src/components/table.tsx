@@ -119,7 +119,7 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
   const header = relation.args.map((arg, index) => {
     return (
       <div
-        className="w-full cursor-default font-mono text-sm font-medium leading-none"
+        className="w-full cursor-default font-mono text-sm font-semibold leading-none"
         key={index}
       >
         {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
@@ -322,4 +322,3 @@ const Table = ({
 };
 
 export { Table };
-
