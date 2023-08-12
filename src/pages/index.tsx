@@ -123,7 +123,7 @@ const Playground = () => {
         { id: "2", tag: 1, tuple: ["Anthony", "Jason", "true"] },
         { id: "3", tag: 1, tuple: ["Steve", "Origami Angel", "true"] },
         { id: "4", tag: 1, tuple: ["Thomas", "Walter", "true"] },
-        { id: "5", tag: 1, tuple: ["White", "Ryan", "true"] },
+        { id: "5", tag: 1, tuple: ["Charles", "Ryan", "true"] },
         { id: "6", tag: 1, tuple: ["Aaron", "Rajiv", "true"] },
       ],
     },

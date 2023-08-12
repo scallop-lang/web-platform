@@ -122,15 +122,26 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
 
   return (
     <Card className="flex shrink-0 overflow-x-auto">
-      <div className="my-3 ml-3 mr-2 flex w-full space-x-2">{header}</div>
-      <div className="mr-3 flex w-10 shrink-0 items-center justify-center">
-        <Badge
-          variant="secondary"
-          className="cursor-default font-mono"
-        >
-          {relation.type === "input" ? "I" : "O"}
-        </Badge>
+      <div
+        className={cn(
+          "my-3 ml-3 flex w-full space-x-2",
+          relation.type === "input" ? "mr-2" : "mr-3"
+        )}
+      >
+        {header}
       </div>
+      {relation.type === "input" ? (
+        <div className="mr-3 flex w-10 shrink-0 items-center justify-center">
+          <Badge
+            variant="secondary"
+            className="cursor-default font-mono"
+          >
+            I
+          </Badge>
+        </div>
+      ) : (
+        <></>
+      )}
     </Card>
   );
 };
@@ -232,21 +243,25 @@ const TableRow = ({
       key={fact.id}
     >
       {colList}
-      <TooltipProvider delayDuration={400}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={deleteRow}
-              className="shrink-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Delete row</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      {relation.type === "input" ? (
+        <TooltipProvider delayDuration={400}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={deleteRow}
+                className="shrink-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Delete row</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
