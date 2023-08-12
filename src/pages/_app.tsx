@@ -1,6 +1,7 @@
 import { type AppType } from "next/app";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
 import ThemeProvider from "~/components/theme-provider";
+import { Toaster } from "~/components/ui/toaster";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
@@ -32,6 +33,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       `}</style>
       <div className={`${inter.variable} ${plexMono.variable} font-sans`}>
         <Component {...pageProps} />
+        <Toaster />
       </div>
     </ThemeProvider>
   );

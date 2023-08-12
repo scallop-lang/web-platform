@@ -2,7 +2,7 @@ import { syntaxHighlighting } from "@codemirror/language";
 import CodeMirror from "@uiw/react-codemirror";
 import { Scallop, ScallopHighlightStyle } from "codemirror-lang-scallop";
 
-import { FileDown, PlayCircle } from "lucide-react";
+import { FileDown, Loader, PlayCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useTheme } from "next-themes";
@@ -16,6 +16,7 @@ import { Skeleton } from "./ui/skeleton";
 import { v4 as uuid } from "uuid";
 import { api } from "~/utils/api";
 import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
+import { useToast } from "./ui/use-toast";
 
 const download = (content: string, filename: string) => {
   const a = document.createElement("a");
@@ -83,6 +84,7 @@ const CodeEditor = ({
 }) => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+  const { toast } = useToast();
 
   // this is to avoid hydration mismatch due to `resolvedTheme` being
   // undefined on the server. see pages/input.tsx for more info
@@ -105,6 +107,18 @@ const CodeEditor = ({
       }
 
       setOutputs(outputsCopy);
+
+      toast({
+        title: "Execution completed",
+        description: "Please check your output relations",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "An error occurred",
+        description: `Something went wrong while running your program. Error message: ${error.message}`,
+      });
     },
   });
 
@@ -136,9 +150,23 @@ const CodeEditor = ({
               inputs: Object.values(inputs),
               outputs: Object.values(outputs),
             });
+
+            toast({
+              title: "Running your program",
+              description: "Please hold tight...",
+            });
           }}
+          disabled={run.isLoading}
         >
-          <PlayCircle className="mr-2 h-4 w-4" /> Run program
+          {run.isLoading ? (
+            <>
+              <Loader className="mr-2 h-4 w-4" /> Running...
+            </>
+          ) : (
+            <>
+              <PlayCircle className="mr-2 h-4 w-4" /> Run program
+            </>
+          )}
         </Button>
         <DownloadButton program={program} />
       </div>
