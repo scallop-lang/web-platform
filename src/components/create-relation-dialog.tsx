@@ -1,4 +1,4 @@
-import { Plus, PlusSquare, Trash, X } from "lucide-react";
+import { PlusSquare, Table2, Trash, X } from "lucide-react";
 import { useState } from "react";
 import {
   argumentTypes,
@@ -143,7 +143,7 @@ const CreateRelationDialog = ({
     >
       <DialogTrigger asChild>
         <Button>
-          <PlusSquare className="mr-2 h-4 w-4" /> Create relation
+          <Table2 className="mr-2 h-4 w-4" /> Create relation
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -215,7 +215,7 @@ const CreateRelationDialog = ({
               closeDialog();
             }}
           >
-            <Plus className="mr-2 h-4 w-4" /> Create
+            <PlusSquare className="mr-2 h-4 w-4" /> Create
           </Button>
         </DialogFooter>
       </DialogContent>

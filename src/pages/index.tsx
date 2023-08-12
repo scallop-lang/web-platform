@@ -14,6 +14,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -67,33 +69,36 @@ const Header = () => {
             GitHub
           </Link>
         </div>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               size="icon"
               variant="outline"
               aria-haspopup
-              aria-label="Toggle light or dark mode"
             >
               {resolvedIcon}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setTheme("light")}>
-              <div className="flex w-full items-center justify-between">
-                Light <Sun className="h-4 w-4" />
-              </div>
+            <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => setTheme("light")}
+              className="justify-between"
+            >
+              Light <Sun className="h-4 w-4" />
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("dark")}>
-              <div className="flex w-full items-center justify-between">
-                Dark <Moon className="h-4 w-4" />
-              </div>
+            <DropdownMenuItem
+              onClick={() => setTheme("dark")}
+              className="justify-between"
+            >
+              Dark <Moon className="h-4 w-4" />
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("system")}>
-              <div className="flex w-full items-center justify-between">
-                System <Laptop2 className="h-4 w-4" />
-              </div>
+            <DropdownMenuItem
+              onClick={() => setTheme("system")}
+              className="justify-between"
+            >
+              System <Laptop2 className="h-4 w-4" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,4 +1,4 @@
-import { ListPlus, X } from "lucide-react";
+import { ListPlus, ListX, MoreVertical, Settings2 } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
 import { cn } from "~/utils/cn";
@@ -8,17 +8,18 @@ import type {
   RelationRecord,
   SclRelation,
 } from "~/utils/schemas-types";
-import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
 
 const AddRowButton = ({
   relation,
@@ -132,12 +133,7 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
       </div>
       {relation.type === "input" ? (
         <div className="mr-3 flex w-10 shrink-0 items-center justify-center">
-          <Badge
-            variant="secondary"
-            className="cursor-default font-mono"
-          >
-            I
-          </Badge>
+          <Settings2 className="h-4 w-4" />
         </div>
       ) : (
         <></>
@@ -244,21 +240,26 @@ const TableRow = ({
     >
       {colList}
       {relation.type === "input" ? (
-        <TooltipProvider delayDuration={400}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={deleteRow}
-                className="shrink-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Delete row</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={deleteRow}
+              className="shrink-0"
+              aria-haspopup
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Edit row</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={deleteRow}>
+              <ListX className="mr-2 h-4 w-4" /> Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : (
         <></>
       )}
