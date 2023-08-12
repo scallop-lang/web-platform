@@ -13,6 +13,7 @@ import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Skeleton } from "./ui/skeleton";
 
+import { v4 as uuid } from "uuid";
 import { api } from "~/utils/api";
 import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
 
@@ -67,45 +68,18 @@ const DownloadButton = ({ program }: { program: string }) => {
   );
 };
 
-const CodeToolbar = ({
-  inputs,
-  outputs,
-  program,
-}: {
-  inputs: RelationRecord;
-  outputs: RelationRecord;
-  program: string;
-}) => {
-  const run = api.scallop.run.useMutation();
-
-  return (
-    <div className="flex justify-between">
-      <Button
-        onClick={() => {
-          run.mutate({
-            program: program,
-            inputs: Object.values(inputs),
-            outputs: Object.values(outputs),
-          });
-        }}
-      >
-        <PlayCircle className="mr-2 h-4 w-4" /> Run program
-      </Button>
-      <DownloadButton program={program} />
-    </div>
-  );
-};
-
 const CodeEditor = ({
   inputs,
   outputs,
   program,
   setProgram,
+  setOutputs,
 }: {
   inputs: RelationRecord;
   outputs: RelationRecord;
   program: SclProgram;
   setProgram: React.Dispatch<React.SetStateAction<SclProgram>>;
+  setOutputs: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
@@ -113,6 +87,26 @@ const CodeEditor = ({
   // this is to avoid hydration mismatch due to `resolvedTheme` being
   // undefined on the server. see pages/input.tsx for more info
   useEffect(() => setMounted(true), []);
+
+  const run = api.scallop.run.useMutation({
+    onSuccess: (data) => {
+      const outputsCopy = structuredClone(outputs);
+
+      for (const [relationName, facts] of Object.entries(data)) {
+        for (const [tag, tuple] of facts) {
+          outputsCopy[relationName]!.facts.push({
+            id: uuid(),
+            tag: tag,
+            tuple: tuple,
+          });
+        }
+      }
+
+      setOutputs(outputsCopy);
+
+      console.log("outputs updated!");
+    },
+  });
 
   const resolvedEditor = !mounted ? (
     <Skeleton className="h-full w-full rounded-md" />
@@ -134,11 +128,20 @@ const CodeEditor = ({
 
   return (
     <div className="flex flex-col space-y-4">
-      <CodeToolbar
-        inputs={inputs}
-        outputs={outputs}
-        program={program}
-      />
+      <div className="flex justify-between">
+        <Button
+          onClick={() => {
+            run.mutate({
+              program: program,
+              inputs: Object.values(inputs),
+              outputs: Object.values(outputs),
+            });
+          }}
+        >
+          <PlayCircle className="mr-2 h-4 w-4" /> Run program
+        </Button>
+        <DownloadButton program={program} />
+      </div>
       <Card className="h-0 grow p-4">{resolvedEditor}</Card>
     </div>
   );

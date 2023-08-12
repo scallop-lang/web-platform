@@ -148,6 +148,7 @@ const Playground = () => {
           outputs={outputs}
           program={program}
           setProgram={setProgram}
+          setOutputs={setOutputs}
         />
         <TableEditor
           inputs={inputs}

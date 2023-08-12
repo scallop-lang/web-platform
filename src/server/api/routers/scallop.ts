@@ -44,6 +44,7 @@ export const scallopRouter = createTRPCRouter({
             message: `[@input ${relation.name}]: ${ctx.defaultError}`,
           };
         });
+
         return {
           ...relation,
           facts: relationToSchema(relation).parse(
@@ -51,8 +52,6 @@ export const scallopRouter = createTRPCRouter({
           ),
         };
       });
-
-      console.log("inputs into server:", JSON.stringify(inputs));
 
       const endpoint = new URL("api/run-scallop", env.FLASK_SERVER);
       const res = await fetch(endpoint, {
@@ -76,7 +75,9 @@ export const scallopRouter = createTRPCRouter({
       });
 
       const schema = z.object(outputRelSchema);
-      const body = schema.parse(await res.json());
+      const body: Record<string, [number, string[]][]> = schema.parse(
+        await res.json()
+      );
 
       return body;
     }),

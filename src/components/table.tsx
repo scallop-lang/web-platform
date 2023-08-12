@@ -1,6 +1,6 @@
 import { ListPlus, X } from "lucide-react";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuid } from "uuid";
 import { cn } from "~/utils/cn";
 import type {
   Argument,
@@ -49,7 +49,7 @@ const AddRowButton = ({
         ...relation,
         facts: [
           ...relation.facts,
-          { id: uuidv4(), tag: 1, tuple: initialValues },
+          { id: uuid(), tag: 1, tuple: initialValues },
         ],
       },
     });
@@ -186,7 +186,7 @@ const TableCell = ({
           defaultValue={initialState}
           onChange={(e) => updateCell(e.target.value)}
           placeholder={argument.type}
-          className="cursor-pointer transition hover:bg-secondary focus:bg-background focus:cursor-text"
+          className="cursor-pointer transition hover:bg-secondary focus:cursor-text focus:bg-background"
           disabled={relation.type === "output"}
         />
       );
@@ -263,8 +263,6 @@ const Table = ({
   setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
   const relation = record[relationName]!;
-
-  console.log(`current ${relation.type} record:`, record);
 
   // for each row, we generate the cells for each column
   const rowList = relation.facts.map((fact, row) => (
