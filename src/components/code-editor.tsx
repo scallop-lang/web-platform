@@ -93,6 +93,8 @@ const CodeEditor = ({
       const outputsCopy = structuredClone(outputs);
 
       for (const [relationName, facts] of Object.entries(data)) {
+        outputsCopy[relationName]!.facts = [];
+
         for (const [tag, tuple] of facts) {
           outputsCopy[relationName]!.facts.push({
             id: uuid(),
