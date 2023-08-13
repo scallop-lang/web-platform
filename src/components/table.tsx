@@ -111,13 +111,16 @@ const BooleanCell = ({
 };
 
 const TableHeader = ({ relation }: { relation: SclRelation }) => {
-  const header = relation.args.map((arg) => {
+  const header = relation.args.map((argument) => {
+    const name = argument.name;
+    const type = argument.type;
+
     return (
       <div
         className="w-full cursor-default font-mono text-sm font-semibold leading-none"
-        key={arg.id}
+        key={argument.id}
       >
-        {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
+        {name ? `${name}: ${type}` : `${type}`}
       </div>
     );
   });
@@ -261,9 +264,9 @@ const Table = ({
   const relation = record[relationName]!;
 
   // for each row, we generate the cells for each column
-  const rowList = relation.facts.map((fact, row) => (
+  const rowList = relation.facts.map((fact) => (
     <TableRow
-      key={row}
+      key={fact.id}
       relation={relation}
       record={record}
       rowFact={fact}
