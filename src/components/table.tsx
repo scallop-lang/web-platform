@@ -1,4 +1,4 @@
-import { ListPlus, ListX, MoreVertical, Settings2 } from "lucide-react";
+import { ListPlus, ListX, MoreVertical, Settings2, Tag } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from "~/utils/cn";
@@ -129,9 +129,12 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
 
   return (
     <Card className="flex shrink-0 overflow-x-auto">
+      <div className="ml-3 flex w-20 shrink-0 items-center justify-center">
+        <Tag className="h-4 w-4" />
+      </div>
       <div
         className={cn(
-          "my-3 ml-3 flex w-full space-x-2",
+          "my-3 ml-2 flex w-full space-x-2",
           isInput ? "mr-2" : "mr-3"
         )}
       >
@@ -179,7 +182,7 @@ const ProbabilityInput = ({
       }
       placeholder="Prob."
       className={cn(
-        "w-[72px] font-mono transition hover:bg-secondary focus:bg-background",
+        "w-20 text-center font-mono italic transition hover:bg-secondary focus:bg-background",
         isInput ? "cursor-pointer focus:cursor-text" : "cursor-default"
       )}
       readOnly={!isInput}
