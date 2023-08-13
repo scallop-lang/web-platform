@@ -1,5 +1,6 @@
 import { PlusSquare, Table2, Trash, X } from "lucide-react";
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import {
   argumentTypes,
   type Argument,
@@ -48,9 +49,11 @@ const CreateRelationDialog = ({
   function addArgument() {
     const argsCopy = args.slice();
 
+    // let's just choose String as the default type
     setArgs([
       ...argsCopy,
       {
+        id: uuidv4(),
         name: undefined,
         type: "String",
       },
@@ -60,7 +63,6 @@ const CreateRelationDialog = ({
   function removeArgument(index: number) {
     const argsCopy = args.slice();
     argsCopy.splice(index, 1);
-
     setArgs(argsCopy);
   }
 
@@ -83,11 +85,20 @@ const CreateRelationDialog = ({
     setDialogOpen(false);
   }
 
+  const argumentTypesList = argumentTypes.map((type) => (
+    <SelectItem
+      key={uuidv4()}
+      value={type}
+    >
+      {type}
+    </SelectItem>
+  ));
+
   const argListEmpty = args.length === 0;
   const argumentList = args.map((argument, index) => (
     <div
       className="flex w-full justify-between space-x-4"
-      key={index}
+      key={argument.id}
     >
       <Input
         type="text"
@@ -102,16 +113,7 @@ const CreateRelationDialog = ({
         <SelectTrigger className="basis-1/3">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
-          {argumentTypes.map((type, index) => (
-            <SelectItem
-              key={index}
-              value={type}
-            >
-              {type}
-            </SelectItem>
-          ))}
-        </SelectContent>
+        <SelectContent>{argumentTypesList}</SelectContent>
       </Select>
       <TooltipProvider delayDuration={400}>
         <Tooltip>
