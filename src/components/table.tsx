@@ -1,13 +1,8 @@
 import { ListPlus, ListX, MoreVertical, Settings2 } from "lucide-react";
 import { useState } from "react";
-import { v4 as uuid } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { cn } from "~/utils/cn";
-import type {
-  Argument,
-  Fact,
-  RelationRecord,
-  SclRelation,
-} from "~/utils/schemas-types";
+import type { Fact, RelationRecord, SclRelation } from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import {
@@ -50,7 +45,7 @@ const AddRowButton = ({
         ...relation,
         facts: [
           ...relation.facts,
-          { id: uuid(), tag: 1, tuple: initialValues },
+          { id: uuidv4(), tag: 1, tuple: initialValues },
         ],
       },
     });
@@ -116,13 +111,16 @@ const BooleanCell = ({
 };
 
 const TableHeader = ({ relation }: { relation: SclRelation }) => {
-  const header = relation.args.map((arg, index) => {
+  const header = relation.args.map((argument) => {
+    const name = argument.name;
+    const type = argument.type;
+
     return (
       <div
         className="w-full cursor-default font-mono text-sm font-semibold leading-none"
-        key={index}
+        key={argument.id}
       >
-        {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
+        {name ? `${name}: ${type}` : `${type}`}
       </div>
     );
   });
@@ -148,77 +146,15 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
   );
 };
 
-const TableCell = ({
-  relation,
-  record,
-  argIndex,
-  fact,
-  argument,
-  setRecord,
-}: {
-  relation: SclRelation;
-  record: RelationRecord;
-  argIndex: number;
-  fact: Fact;
-  argument: Argument;
-  setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
-}) => {
-  function updateCell(value: string) {
-    setRecord({
-      ...record,
-      [relation.name]: {
-        ...relation,
-        facts: relation.facts.map((f) => {
-          if (f.id === fact.id) {
-            f.tuple[argIndex] = value;
-          }
-          return f;
-        }),
-      },
-    });
-  }
-
-  const initialState = fact.tuple[argIndex]!;
-  const isInput = relation.type === "input";
-
-  // for now, the other types will use the same input field
-  switch (argument.type) {
-    case "Boolean":
-      return (
-        <BooleanCell
-          key={argIndex}
-          initialState={initialState === "true"}
-          updateCell={updateCell}
-          relationType={relation.type}
-        />
-      );
-    default:
-      return (
-        <Input
-          type="text"
-          key={argIndex}
-          defaultValue={initialState}
-          onChange={(e) => updateCell(e.target.value)}
-          placeholder={argument.type}
-          className={cn(
-            "transition hover:bg-secondary focus:bg-background",
-            isInput ? "cursor-pointer focus:cursor-text" : "cursor-default"
-          )}
-          readOnly={!isInput}
-        />
-      );
-  }
-};
-
 const TableRow = ({
   relation,
   record,
-  fact,
+  rowFact,
   setRecord,
 }: {
   relation: SclRelation;
   record: RelationRecord;
-  fact: Fact;
+  rowFact: Fact;
   setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
   function deleteRow() {
@@ -226,27 +162,66 @@ const TableRow = ({
       ...record,
       [relation.name]: {
         ...relation,
-        facts: relation.facts.filter((f) => f.id !== fact.id),
+        facts: relation.facts.filter((f) => f.id !== rowFact.id),
       },
     });
   }
 
-  const colList = relation.args.map((argument, i) => (
-    <TableCell
-      key={i}
-      relation={relation}
-      record={record}
-      argIndex={i}
-      fact={fact}
-      argument={argument}
-      setRecord={setRecord}
-    />
-  ));
+  const colList = relation.args.map((argument, argIndex) => {
+    function updateCell(value: string) {
+      setRecord({
+        ...record,
+        [relation.name]: {
+          ...relation,
+          facts: relation.facts.map((fact) => {
+            if (fact.id === rowFact.id) {
+              fact.tuple[argIndex] = value;
+            }
+            return fact;
+          }),
+        },
+      });
+    }
+
+    const initialState = rowFact.tuple[argIndex]!;
+    const isInput = relation.type === "input";
+
+    // for now, the other types will use the same input field.
+    //
+    // we only need to differentiate between table cell siblings (the row). this
+    // means using the same argument.id across a column is fine (not siblings)!
+    switch (argument.type) {
+      case "Boolean":
+        return (
+          <BooleanCell
+            key={argument.id}
+            initialState={initialState === "true"}
+            updateCell={updateCell}
+            relationType={relation.type}
+          />
+        );
+      default:
+        return (
+          <Input
+            key={argument.id}
+            type="text"
+            defaultValue={initialState}
+            onChange={(e) => updateCell(e.target.value)}
+            placeholder={argument.type}
+            className={cn(
+              "transition hover:bg-secondary focus:bg-background",
+              isInput ? "cursor-pointer focus:cursor-text" : "cursor-default"
+            )}
+            readOnly={!isInput}
+          />
+        );
+    }
+  });
 
   return (
     <div
       className="flex space-x-2"
-      key={fact.id}
+      key={rowFact.id}
     >
       {colList}
       {relation.type === "input" ? (
@@ -289,12 +264,12 @@ const Table = ({
   const relation = record[relationName]!;
 
   // for each row, we generate the cells for each column
-  const rowList = relation.facts.map((fact, row) => (
+  const rowList = relation.facts.map((fact) => (
     <TableRow
-      key={row}
+      key={fact.id}
       relation={relation}
       record={record}
-      fact={fact}
+      rowFact={fact}
       setRecord={setRecord}
     />
   ));

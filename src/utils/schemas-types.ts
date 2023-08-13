@@ -8,6 +8,7 @@ const NameSchema = z.string().regex(new RegExp("^[a-z]\\w*$", "i"));
 
 const ArgTypeSchema = z.enum(argumentTypes);
 const ArgSchema = z.object({
+  id: z.string(),
   name: NameSchema.optional(),
   type: ArgTypeSchema,
 });
