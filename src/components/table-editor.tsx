@@ -99,11 +99,11 @@ const TableEditor = ({
   // what was chosen in the create relation dialog
   function addRelation(relation: SclRelation) {
     if (relation.type === "input") {
-      const inputsCopy = { ...inputs };
+      const inputsCopy = structuredClone(inputs);
       inputsCopy[relation.name] = relation;
       setInputs(inputsCopy);
     } else {
-      const outputsCopy = { ...outputs };
+      const outputsCopy = structuredClone(outputs);
       outputsCopy[relation.name] = relation;
       setOutputs(outputsCopy);
     }

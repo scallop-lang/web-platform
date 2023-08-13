@@ -15,7 +15,7 @@ const plexMono = IBM_Plex_Mono({
   preload: false,
 });
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+const App: AppType = ({ Component, pageProps }) => {
   return (
     <ThemeProvider
       attribute="class"
@@ -39,4 +39,4 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   );
 };
 
-export default api.withTRPC(MyApp);
+export default api.withTRPC(App);

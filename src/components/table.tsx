@@ -127,23 +127,23 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
     );
   });
 
+  const isInput = relation.type === "input";
+
   return (
     <Card className="flex shrink-0 overflow-x-auto">
       <div
         className={cn(
           "my-3 ml-3 flex w-full space-x-2",
-          relation.type === "input" ? "mr-2" : "mr-3"
+          isInput ? "mr-2" : "mr-3"
         )}
       >
         {header}
       </div>
-      {relation.type === "input" ? (
+      {isInput ? (
         <div className="mr-3 flex w-10 shrink-0 items-center justify-center">
           <Settings2 className="h-4 w-4" />
         </div>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </Card>
   );
 };
@@ -179,6 +179,7 @@ const TableCell = ({
   }
 
   const initialState = fact.tuple[argIndex]!;
+  const isInput = relation.type === "input";
 
   // for now, the other types will use the same input field
   switch (argument.type) {
@@ -201,11 +202,9 @@ const TableCell = ({
           placeholder={argument.type}
           className={cn(
             "transition hover:bg-secondary focus:bg-background",
-            relation.type === "input"
-              ? "cursor-pointer focus:cursor-text"
-              : "cursor-default"
+            isInput ? "cursor-pointer focus:cursor-text" : "cursor-default"
           )}
-          readOnly={relation.type === "output"}
+          readOnly={!isInput}
         />
       );
   }
@@ -271,9 +270,7 @@ const TableRow = ({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </div>
   );
 };
@@ -314,9 +311,7 @@ const Table = ({
           record={record}
           setRecord={setRecord}
         />
-      ) : (
-        <></>
-      )}
+      ) : null}
     </div>
   );
 };
