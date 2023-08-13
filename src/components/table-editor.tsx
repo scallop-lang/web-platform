@@ -26,23 +26,21 @@ const RelationSelect = ({
 }) => {
   const parseRelations = (record: RelationRecord) => {
     const selectItems: React.ReactNode[] = [];
-    let index = 0;
 
     for (const [name, relation] of Object.entries(record)) {
       const types = `(${relation.args
         .map((arg) => (arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`))
         .join(", ")})`;
 
+      // we use the relation name as the key, because it is unique
       selectItems.push(
         <SelectItem
-          key={index}
+          key={name}
           value={name}
         >
           {name + types}
         </SelectItem>
       );
-
-      index += 1;
     }
 
     return selectItems;
