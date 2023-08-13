@@ -146,7 +146,48 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
   );
 };
 
-const TableRow = ({
+const ProbabilityInput = ({
+  relation,
+  record,
+  rowFact,
+  setRecord,
+}: {
+  relation: SclRelation;
+  record: RelationRecord;
+  rowFact: Fact;
+  setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
+}) => {
+  const isInput = relation.type === "input";
+
+  return (
+    <Input
+      type="text"
+      defaultValue={rowFact.tag}
+      onChange={(e) =>
+        setRecord({
+          ...record,
+          [relation.name]: {
+            ...relation,
+            facts: relation.facts.map((fact) => {
+              if (fact.id === rowFact.id) {
+                fact.tag = parseFloat(e.target.value);
+              }
+              return fact;
+            }),
+          },
+        })
+      }
+      placeholder="Prob."
+      className={cn(
+        "w-[72px] font-mono transition hover:bg-secondary focus:bg-background",
+        isInput ? "cursor-pointer focus:cursor-text" : "cursor-default"
+      )}
+      readOnly={!isInput}
+    />
+  );
+};
+
+const RowDropdown = ({
   relation,
   record,
   rowFact,
@@ -162,12 +203,47 @@ const TableRow = ({
       ...record,
       [relation.name]: {
         ...relation,
-        facts: relation.facts.filter((f) => f.id !== rowFact.id),
+        facts: relation.facts.filter((fact) => fact.id !== rowFact.id),
       },
     });
   }
 
-  const colList = relation.args.map((argument, argIndex) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={deleteRow}
+          className="shrink-0"
+          aria-haspopup
+        >
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Edit row</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={deleteRow}>
+          <ListX className="mr-2 h-4 w-4" /> Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+const TableRow = ({
+  relation,
+  record,
+  rowFact,
+  setRecord,
+}: {
+  relation: SclRelation;
+  record: RelationRecord;
+  rowFact: Fact;
+  setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
+}) => {
+  const colList = relation.args.map((argument, index) => {
     function updateCell(value: string) {
       setRecord({
         ...record,
@@ -175,7 +251,7 @@ const TableRow = ({
           ...relation,
           facts: relation.facts.map((fact) => {
             if (fact.id === rowFact.id) {
-              fact.tuple[argIndex] = value;
+              fact.tuple[index] = value;
             }
             return fact;
           }),
@@ -183,7 +259,7 @@ const TableRow = ({
       });
     }
 
-    const initialState = rowFact.tuple[argIndex]!;
+    const initialState = rowFact.tuple[index]!;
     const isInput = relation.type === "input";
 
     // for now, the other types will use the same input field.
@@ -223,28 +299,20 @@ const TableRow = ({
       className="flex space-x-2"
       key={rowFact.id}
     >
+      <ProbabilityInput
+        relation={relation}
+        record={record}
+        rowFact={rowFact}
+        setRecord={setRecord}
+      />
       {colList}
       {relation.type === "input" ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={deleteRow}
-              className="shrink-0"
-              aria-haspopup
-            >
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Edit row</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={deleteRow}>
-              <ListX className="mr-2 h-4 w-4" /> Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <RowDropdown
+          relation={relation}
+          record={record}
+          rowFact={rowFact}
+          setRecord={setRecord}
+        />
       ) : null}
     </div>
   );
