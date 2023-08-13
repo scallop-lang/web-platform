@@ -116,11 +116,11 @@ const BooleanCell = ({
 };
 
 const TableHeader = ({ relation }: { relation: SclRelation }) => {
-  const header = relation.args.map((arg, index) => {
+  const header = relation.args.map((arg) => {
     return (
       <div
         className="w-full cursor-default font-mono text-sm font-semibold leading-none"
-        key={index}
+        key={arg.id}
       >
         {arg.name ? `${arg.name}: ${arg.type}` : `${arg.type}`}
       </div>
