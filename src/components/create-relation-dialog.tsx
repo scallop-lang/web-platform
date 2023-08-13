@@ -79,12 +79,11 @@ const CreateRelationDialog = ({
   }
 
   // when the dialog closes, we should also reset the dialog state
-  function closeDialog() {
+  function resetDialogState() {
     setIsOutput(false);
+    setHasProbability(false);
     setRelationName("");
     setArgs([]);
-
-    setDialogOpen(false);
   }
 
   const argumentTypesList = argumentTypes.map((type) => (
@@ -141,7 +140,7 @@ const CreateRelationDialog = ({
         setDialogOpen(open);
 
         if (!open) {
-          closeDialog();
+          resetDialogState();
         }
       }}
     >
@@ -241,7 +240,7 @@ const CreateRelationDialog = ({
         <DialogFooter>
           <Button
             variant="destructive"
-            onClick={closeDialog}
+            onClick={() => alert("delete relation! WIP")}
           >
             <Trash className="mr-2 h-4 w-4" /> Delete
           </Button>
@@ -249,7 +248,8 @@ const CreateRelationDialog = ({
             disabled={argListEmpty || relationName === ""}
             onClick={() => {
               addRelation(createRelation());
-              closeDialog();
+              resetDialogState();
+              setDialogOpen(false);
             }}
           >
             <PlusSquare className="mr-2 h-4 w-4" /> Create
