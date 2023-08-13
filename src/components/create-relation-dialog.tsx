@@ -1,6 +1,7 @@
 import { PlusSquare, Table2, Trash, X } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { cn } from "~/utils/cn";
 import {
   argumentTypes,
   type Argument,
@@ -43,6 +44,7 @@ const CreateRelationDialog = ({
 
   // current state of the relation being created
   const [isOutput, setIsOutput] = useState(false);
+  const [hasProbability, setHasProbability] = useState(false);
   const [relationName, setRelationName] = useState("");
   const [args, setArgs] = useState<Argument[]>([]);
 
@@ -71,7 +73,7 @@ const CreateRelationDialog = ({
       type: isOutput ? "output" : "input",
       name: relationName,
       args: args,
-      probability: false,
+      probability: hasProbability,
       facts: [],
     };
   }
@@ -148,59 +150,92 @@ const CreateRelationDialog = ({
           <Table2 className="mr-2 h-4 w-4" /> Create relation
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>
             Create {isOutput ? "output" : "input"} relation
           </DialogTitle>
           <DialogDescription>
-            Name your relation, then add your arguments below. Each argument
-            takes an optional name and a datatype.
+            Name your relation, then add your arguments below. Arguments take an
+            optional name and a datatype.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex items-center justify-between space-x-10 rounded-md border border-border p-4">
-          <div className="grid gap-1">
-            <Label htmlFor="io-switch">{isOutput ? "Output" : "Input"}</Label>
-            <p className="text-sm text-muted-foreground">
-              {isOutput
-                ? "These tables are readonly and will contain your output relations upon running the program."
-                : "These tables are editable in the visual editor and are used as facts in your program."}
-            </p>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-col justify-between space-y-3">
+            <div className="grid gap-2">
+              <Label htmlFor="relation-name">Relation name</Label>
+              <Input
+                type="text"
+                id="relation-name"
+                placeholder="Required"
+                value={relationName}
+                onChange={(e) => setRelationName(e.target.value)}
+              />
+              <p className="cursor-default text-sm text-muted-foreground">
+                Make sure the name also exists in your program.
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <p className="cursor-default text-sm font-medium leading-none">
+                Configuration
+              </p>
+              <div className="flex items-center justify-between space-x-8 rounded-md border border-border p-3">
+                <div className="grid gap-1">
+                  <Label htmlFor="io-switch">
+                    {isOutput ? "Output" : "Input"}
+                  </Label>
+                  <p className="cursor-default text-sm text-muted-foreground">
+                    {isOutput
+                      ? "Read-only tables that will display your output relations upon running."
+                      : "Editable tables that are considered facts in your program."}
+                  </p>
+                </div>
+                <Switch
+                  id="io-switch"
+                  checked={isOutput}
+                  onCheckedChange={setIsOutput}
+                />
+              </div>
+              <div className="flex items-center justify-between space-x-8 rounded-md border border-border p-3">
+                <div className="grid gap-1">
+                  <Label htmlFor="probability">Probability</Label>
+                  <p className="cursor-default text-sm text-muted-foreground">
+                    Turn on to specify fact probability. When off, all fact
+                    tuples are assumed to have a probability of 1.
+                  </p>
+                </div>
+                <Switch
+                  id="probability"
+                  checked={hasProbability}
+                  onCheckedChange={setHasProbability}
+                />
+              </div>
+            </div>
           </div>
-          <Switch
-            id="io-switch"
-            checked={isOutput}
-            onCheckedChange={setIsOutput}
-          />
-        </div>
-        <div className="grid gap-1.5">
-          <Label htmlFor="relation-name">Relation name</Label>
-          <Input
-            type="text"
-            id="relation-name"
-            placeholder="Required"
-            value={relationName}
-            onChange={(e) => setRelationName(e.target.value)}
-          />
-        </div>
-        <div className="grid gap-1.5">
-          <p className="cursor-default text-sm font-medium leading-none">
-            Arguments
-          </p>
-          <Button
-            onClick={addArgument}
-            id="add-argument"
-          >
-            Add new argument
-          </Button>
-          <div className="flex max-h-[33vh] flex-col items-center justify-between space-y-2 overflow-y-auto rounded-md border border-border p-4">
-            {argListEmpty ? (
-              <span className="cursor-default text-sm text-muted-foreground">
-                Currently empty. At least one argument is required.
-              </span>
-            ) : (
-              argumentList
-            )}
+          <div className="flex flex-col justify-between space-y-2">
+            <p className="cursor-default text-sm font-medium leading-none">
+              Argument list
+            </p>
+            <div
+              className={cn(
+                "flex h-72 flex-col space-y-2 overflow-y-auto rounded-md border border-border p-3",
+                argListEmpty ? "justify-center" : "justify-start"
+              )}
+            >
+              {argListEmpty ? (
+                <span className="cursor-default text-center text-sm text-muted-foreground">
+                  Currently empty. At least one argument is required.
+                </span>
+              ) : (
+                argumentList
+              )}
+            </div>
+            <Button
+              onClick={addArgument}
+              id="add-argument"
+            >
+              Add new argument
+            </Button>
           </div>
         </div>
         <DialogFooter>
