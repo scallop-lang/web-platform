@@ -71,13 +71,13 @@ const CreateRelationDialog = ({
       type: isOutput ? "output" : "input",
       name: relationName,
       args: args,
-      probability: false, // temporary
+      probability: false,
       facts: [],
     };
   }
 
+  // when the dialog closes, we should also reset the dialog state
   function closeDialog() {
-    // we should also reset the dialog state
     setIsOutput(false);
     setRelationName("");
     setArgs([]);
