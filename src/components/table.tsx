@@ -1,6 +1,6 @@
 import { ListPlus, ListX, MoreVertical, Settings2 } from "lucide-react";
 import { useState } from "react";
-import { v4 as uuid } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { cn } from "~/utils/cn";
 import type {
   Argument,
@@ -50,7 +50,7 @@ const AddRowButton = ({
         ...relation,
         facts: [
           ...relation.facts,
-          { id: uuid(), tag: 1, tuple: initialValues },
+          { id: uuidv4(), tag: 1, tuple: initialValues },
         ],
       },
     });

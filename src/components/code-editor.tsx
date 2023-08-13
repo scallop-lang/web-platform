@@ -1,10 +1,10 @@
+import { lintGutter } from "@codemirror/lint";
 import CodeMirror from "@uiw/react-codemirror";
 import {
   Scallop,
   ScallopHighlighter,
   ScallopLinter,
 } from "codemirror-lang-scallop";
-import { lintGutter } from "@codemirror/lint";
 
 import { FileDown, Loader, PlayCircle } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -17,7 +17,7 @@ import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Skeleton } from "./ui/skeleton";
 
-import { v4 as uuid } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
 import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
 import { useToast } from "./ui/use-toast";
@@ -103,7 +103,7 @@ const CodeEditor = ({
 
         for (const [tag, tuple] of facts) {
           outputsCopy[relationName]!.facts.push({
-            id: uuid(),
+            id: uuidv4(),
             tag: tag,
             tuple: tuple,
           });
