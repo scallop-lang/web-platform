@@ -186,7 +186,6 @@ const TableCell = ({
     case "Boolean":
       return (
         <BooleanCell
-          key={argIndex}
           initialState={initialState === "true"}
           updateCell={updateCell}
           relationType={relation.type}
@@ -196,7 +195,6 @@ const TableCell = ({
       return (
         <Input
           type="text"
-          key={argIndex}
           defaultValue={initialState}
           onChange={(e) => updateCell(e.target.value)}
           placeholder={argument.type}
@@ -231,12 +229,14 @@ const TableRow = ({
     });
   }
 
-  const colList = relation.args.map((argument, i) => (
+  const colList = relation.args.map((argument, argIndex) => (
+    // we only need to differentiate between table cell siblings (the row). this
+    // means using the same argument.id across a column is fine!
     <TableCell
-      key={i}
+      key={argument.id}
       relation={relation}
       record={record}
-      argIndex={i}
+      argIndex={argIndex}
       fact={fact}
       argument={argument}
       setRecord={setRecord}
