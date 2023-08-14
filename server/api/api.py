@@ -1,6 +1,5 @@
-from flask import Blueprint, request, current_app, jsonify
+from flask import Blueprint, request, jsonify
 import scallopy
-import os
 
 api_routes = Blueprint("api_routes", __name__)
 
@@ -22,19 +21,9 @@ def run_scallop():
         request_data["outputs"],
     )
 
-    # Write logic program to scl file
-    tmp_path = current_app.config["TMP_PATH"]
-    if not os.path.exists(tmp_path):
-        os.makedirs(tmp_path)
-    scallop_file = os.path.join(tmp_path, "program.scl")
-    with open(scallop_file, "w") as f:
-        f.write(program)
-
     # Initialize Scallop context
-    ctx = scallopy.ScallopContext(
-        provenance="topkproofs"
-    )  # should allow user to change provenance
-    ctx.import_file(scallop_file)
+    ctx = scallopy.ScallopContext(provenance="topkproofs") # should allow user to change provenance
+    ctx.add_program(program)
 
     # Add input relations
     for relation in inputs:
