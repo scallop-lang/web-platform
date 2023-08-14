@@ -129,7 +129,7 @@ const InputCell = ({
 }) => {
   function isValidType(value: string, argument: Argument) {
     const argumentType = argument.type;
-    if (argumentType === "Integer" || argumentType === "Float") { 
+    if (argumentType === "Integer" || argumentType === "Float") {
       // check integer/float case
       if (isNaN(+value)) {
         return false;
