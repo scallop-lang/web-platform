@@ -1,8 +1,14 @@
 import { ListPlus, ListX, MoreVertical, Settings2, Tag } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { number } from "zod";
 import { cn } from "~/utils/cn";
-import type { Fact, RelationRecord, SclRelation } from "~/utils/schemas-types";
+import type {
+  Argument,
+  Fact,
+  RelationRecord,
+  SclRelation,
+} from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import {
@@ -107,6 +113,64 @@ const BooleanCell = ({
         True
       </p>
     </div>
+  );
+};
+
+const InputCell = ({
+  initialState,
+  relationType,
+  argument,
+  updateCell,
+}: {
+  initialState: string;
+  relationType: "input" | "output";
+  argument: Argument;
+  updateCell: (value: string) => void;
+}) => {
+  function isValidType(value: string, argument: Argument) {
+    const argumentType = argument.type;
+    if (argumentType === "Integer" || argumentType === "Float") {
+      // check integer/float case
+      if (isNaN(+value)) {
+        return false;
+      } // invalid number
+      if (argumentType === "Integer" && !Number.isInteger(+value)) {
+        return false;
+      } // invalid Integer
+    }
+    return true;
+  }
+
+  function validateUpdate(value: string) {
+    const isValid = isValidType(value, argument);
+    setValid(isValid);
+    if (!isValid) {
+      return;
+    }
+    updateCell(value);
+  }
+
+  const [valid, setValid] = useState<boolean>(
+    isValidType(initialState, argument)
+  );
+  const isInput = relationType === "input";
+
+  return (
+    <Input
+      key={argument.id}
+      type="text"
+      defaultValue={initialState}
+      onChange={(e) => validateUpdate(e.target.value)}
+      placeholder={argument.type}
+      className={cn(
+        "transition hover:bg-secondary focus:bg-background",
+        isInput ? "cursor-pointer focus:cursor-text" : "cursor-default",
+        valid
+          ? ""
+          : "bg-red-100 hover:bg-red-50 focus:bg-red-100 focus-visible:ring-red-500"
+      )}
+      readOnly={!isInput}
+    />
   );
 };
 
@@ -263,7 +327,6 @@ const TableRow = ({
     }
 
     const initialState = rowFact.tuple[index]!;
-    const isInput = relation.type === "input";
 
     // for now, the other types will use the same input field.
     //
@@ -281,17 +344,12 @@ const TableRow = ({
         );
       default:
         return (
-          <Input
+          <InputCell
             key={argument.id}
-            type="text"
-            defaultValue={initialState}
-            onChange={(e) => updateCell(e.target.value)}
-            placeholder={argument.type}
-            className={cn(
-              "transition hover:bg-secondary focus:bg-background",
-              isInput ? "cursor-pointer focus:cursor-text" : "cursor-default"
-            )}
-            readOnly={!isInput}
+            initialState={initialState}
+            argument={argument}
+            updateCell={updateCell}
+            relationType={relation.type}
           />
         );
     }
