@@ -127,21 +127,22 @@ const InputCell = ({
   argument: Argument;
   updateCell: (value: string) => void;
 }) => {
-  function isValidType(value: string, argument: string) {
-    // this needs to not be hard-coded for types in the future
-    if (argument === "Integer" || argument === "Float") {
+  function isValidType(value: string, argument: Argument) {
+    const argumentType = argument.type;
+    if (argumentType === "Integer" || argumentType === "Float") { 
+      // check integer/float case
       if (isNaN(+value)) {
         return false;
       } // invalid number
-      if (argument === "Integer" && !Number.isInteger(+value)) {
+      if (argumentType === "Integer" && !Number.isInteger(+value)) {
         return false;
       } // invalid Integer
     }
     return true;
   }
 
-  function ValidateUpdate(value: string) {
-    const isValid = isValidType(value, argument.type);
+  function validateUpdate(value: string) {
+    const isValid = isValidType(value, argument);
     setValid(isValid);
     if (!isValid) {
       return;
@@ -150,7 +151,7 @@ const InputCell = ({
   }
 
   const [valid, setValid] = useState<boolean>(
-    isValidType(initialState, argument.type)
+    isValidType(initialState, argument)
   );
   const isInput = relationType === "input";
 
@@ -159,7 +160,7 @@ const InputCell = ({
       key={argument.id}
       type="text"
       defaultValue={initialState}
-      onChange={(e) => ValidateUpdate(e.target.value)}
+      onChange={(e) => validateUpdate(e.target.value)}
       placeholder={argument.type}
       className={cn(
         "transition hover:bg-secondary focus:bg-background",
