@@ -74,7 +74,7 @@ const BooleanCell = ({
 }: {
   initialState: boolean;
   relationType: "input" | "output";
-  updateCell: (value: string, argument: string) => void;
+  updateCell: (value: string) => void;
 }) => {
   const [checked, setChecked] = useState(initialState);
 
@@ -94,7 +94,7 @@ const BooleanCell = ({
             checked={checked}
             onCheckedChange={(value) => {
               setChecked(value);
-              updateCell(value.toString(), "Boolean");
+              updateCell(value.toString());
             }}
           />
         ) : (
