@@ -1,7 +1,6 @@
 import { ListPlus, ListX, MoreVertical, Settings2, Tag } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { number } from "zod";
 import { cn } from "~/utils/cn";
 import type {
   Argument,

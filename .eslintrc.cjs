@@ -28,6 +28,15 @@ const config = {
       "error",
       { allowSingleExtends: true },
     ],
+
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        checksVoidReturn: {
+          attributes: false,
+        },
+      },
+    ],
   },
 };
 

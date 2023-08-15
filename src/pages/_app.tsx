@@ -12,7 +12,6 @@ const plexMono = IBM_Plex_Mono({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-plex-mono",
-  preload: false,
 });
 
 const App: AppType = ({ Component, pageProps }) => {
@@ -27,8 +26,12 @@ const App: AppType = ({ Component, pageProps }) => {
         jsx
         global
       >{`
-        html {
+        :root {
           font-family: ${inter.style.fontFamily};
+        }
+
+        .font-mono {
+          font-family: ${plexMono.style.fontFamily};
         }
       `}</style>
       <div className={`${inter.variable} ${plexMono.variable} font-sans`}>
