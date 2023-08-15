@@ -39,42 +39,6 @@ const parseType = (type: ArgumentType) => {
   }
 };
 
-const processRelations = (raw: string[], record: RelationRecord) => {
-  for (const [, relation] of Object.entries(record)) {
-    // first declare type definition
-    raw.push(
-      `type ${relation.name}(${relation.args
-        .map(({ type, name }) => {
-          return name ? `${name}: ${parseType(type)}` : parseType(type);
-        })
-        .join(", ")})`
-    );
-
-    // then parse facts
-    raw.push(`rel ${relation.name} = {`);
-    relation.facts.forEach(({ tag, tuple }, factIndex) => {
-      let fact = `  ${tag}::(${tuple
-        .map((value, argIndex) => {
-          const type = relation.args[argIndex]!.type;
-
-          // only String types require quotes around them
-          return type === "String" ? `"${value}"` : value;
-        })
-        .join(", ")})`;
-
-      // only add comma if it's not the last fact
-      if (factIndex !== relation.facts.length - 1) {
-        fact += ",";
-      }
-
-      raw.push(fact);
-    });
-
-    raw.push("}");
-    raw.push("");
-  }
-};
-
 const copyToClipboard = async (content: string) => {
   try {
     await navigator.clipboard.writeText(content);
@@ -102,9 +66,44 @@ const RawFileComponent = ({
     "// your input relations",
   ];
 
-  processRelations(rawArray, inputs);
+  for (const relation of Object.values(inputs)) {
+    // first declare type definition
+    rawArray.push(
+      `type ${relation.name}(${relation.args
+        .map(({ type, name }) => {
+          return name ? `${name}: ${parseType(type)}` : parseType(type);
+        })
+        .join(", ")})`
+    );
+
+    // then parse facts
+    rawArray.push(`rel ${relation.name} = {`);
+    relation.facts.forEach(({ tag, tuple }, factIndex) => {
+      let fact = `  ${tag}::(${tuple
+        .map((value, argIndex) => {
+          const type = relation.args[argIndex]!.type;
+
+          // only String types require quotes around them
+          return type === "String" ? `"${value}"` : value;
+        })
+        .join(", ")})`;
+
+      // only add comma if it's not the last fact
+      if (factIndex !== relation.facts.length - 1) {
+        fact += ",";
+      }
+
+      rawArray.push(fact);
+    });
+
+    rawArray.push("}");
+    rawArray.push("");
+  }
+
   rawArray.push("// your output relations");
-  processRelations(rawArray, outputs);
+  for (const name of Object.keys(outputs)) {
+    rawArray.push(`query ${name}`);
+  }
 
   const rawFile = rawArray.join("\n");
 
