@@ -3,7 +3,7 @@ import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { number } from "zod";
 import { cn } from "~/utils/cn";
-import { isValidType } from "~/utils/isValidType";
+import { isValidType } from "~/utils/isvalidtype";
 import type {
   Argument,
   Fact,
