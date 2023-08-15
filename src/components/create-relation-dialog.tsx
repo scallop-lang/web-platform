@@ -87,7 +87,10 @@ const CreateRelationDialog = ({
   // validate dialog
   function isValidString(value: string) {
     return !(
-      (value === "" || /[^a-zA-Z]/.test(value) || inputs[value]) ??
+      (value === "" || 
+        (/^[0-9]/.test(value)) ||
+        (!/^[A-Za-z0-9]*$/.test(value)) ||
+        inputs[value]) ??
       outputs[value]
     );
   }
