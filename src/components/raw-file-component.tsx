@@ -1,6 +1,6 @@
-import { FileCode2, FileDown } from "lucide-react";
+import { Check, Clipboard, FileCode2, FileDown } from "lucide-react";
 import { useState } from "react";
-import { type RelationRecord } from "~/utils/schemas-types";
+import { type ArgumentType, type RelationRecord } from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -26,6 +26,63 @@ const download = (content: string, filename: string) => {
   URL.revokeObjectURL(url);
 };
 
+const parseType = (type: ArgumentType) => {
+  switch (type) {
+    case "Boolean":
+      return "bool";
+    case "Float":
+      return "f32";
+    case "Integer":
+      return "i32";
+    default:
+      return type;
+  }
+};
+
+const processRelations = (raw: string[], record: RelationRecord) => {
+  for (const [, relation] of Object.entries(record)) {
+    // first declare type definition
+    raw.push(
+      `type ${relation.name}(${relation.args
+        .map(({ type, name }) => {
+          return name ? `${name}: ${parseType(type)}` : parseType(type);
+        })
+        .join(", ")})`
+    );
+
+    // then parse facts
+    raw.push(`rel ${relation.name} = {`);
+    relation.facts.forEach(({ tag, tuple }, factIndex) => {
+      let fact = `  ${tag}::(${tuple
+        .map((value, argIndex) => {
+          const type = relation.args[argIndex]!.type;
+
+          // only String types require quotes around them
+          return type === "String" ? `"${value}"` : value;
+        })
+        .join(", ")})`;
+
+      // only add comma if it's not the last fact
+      if (factIndex !== relation.facts.length - 1) {
+        fact += ",";
+      }
+
+      raw.push(fact);
+    });
+
+    raw.push("}");
+    raw.push("");
+  }
+};
+
+const copyToClipboard = async (content: string) => {
+  try {
+    await navigator.clipboard.writeText(content);
+  } catch (err) {
+    console.error("Failed to copy:", err);
+  }
+};
+
 const RawFileComponent = ({
   program,
   inputs,
@@ -36,9 +93,29 @@ const RawFileComponent = ({
   outputs: RelationRecord;
 }) => {
   const [filename, setFilename] = useState("raw");
+  const [copied, setCopied] = useState(false);
+
+  const rawArray = [
+    "// your Scallop code",
+    program,
+    "",
+    "// your input relations",
+  ];
+
+  processRelations(rawArray, inputs);
+  rawArray.push("// your output relations");
+  processRelations(rawArray, outputs);
+
+  const rawFile = rawArray.join("\n");
 
   return (
-    <Dialog>
+    <Dialog
+      onOpenChange={(open) => {
+        if (!open) {
+          setCopied(false);
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">
           <FileCode2 className="mr-2 h-4 w-4" /> View raw file
@@ -48,19 +125,36 @@ const RawFileComponent = ({
         <DialogHeader>
           <DialogTitle>View raw file</DialogTitle>
           <DialogDescription>
-            The Scallop code below contains both your program code and all
-            relation table content. Feel free to download a copy of the Scallop
-            (.scl) file.
+            The raw Scallop (.scl) file contains both the program code
+            you&apos;ve written, and all defined relation table content. To
+            learn more about Scallop syntax, visit our documentation.
           </DialogDescription>
         </DialogHeader>
-        <div className="rounded-lg bg-muted p-4">
-          <code className="cursor-default font-mono text-sm">{program}</code>
-        </div>
+        <pre className="max-h-[60vh] overflow-y-auto rounded-lg bg-muted p-4 font-mono text-sm">
+          <code>{rawFile}</code>
+        </pre>
         <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => {
+              void copyToClipboard(rawFile);
+              setCopied(true);
+            }}
+          >
+            {copied ? (
+              <>
+                <Check className="mr-2 h-4 w-4" /> Copied!
+              </>
+            ) : (
+              <>
+                <Clipboard className="mr-2 h-4 w-4" /> Copy to clipboard
+              </>
+            )}
+          </Button>
           <Popover modal={true}>
             <PopoverTrigger asChild>
-              <Button variant="outline">
-                <FileDown className="mr-2 h-4 w-4" /> Download raw file
+              <Button>
+                <FileDown className="mr-2 h-4 w-4" /> Download file
               </Button>
             </PopoverTrigger>
             <PopoverContent
@@ -68,7 +162,7 @@ const RawFileComponent = ({
               sideOffset={10}
             >
               <div className="mb-2 grid gap-2">
-                <Label htmlFor="filename">Name your file</Label>
+                <Label htmlFor="filename">Filename</Label>
                 <Input
                   type="text"
                   placeholder="Filename (required)"
