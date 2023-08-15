@@ -11,6 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 const download = (content: string, filename: string) => {
   const a = document.createElement("a");
@@ -25,8 +28,8 @@ const download = (content: string, filename: string) => {
 
 const RawFileComponent = ({
   program,
-  inputs: input,
-  outputs: output,
+  inputs,
+  outputs,
 }: {
   program: string;
   inputs: RelationRecord;
@@ -54,9 +57,35 @@ const RawFileComponent = ({
           <code className="cursor-default font-mono text-sm">{program}</code>
         </div>
         <DialogFooter>
-          <Button onClick={() => download(program, filename)}>
-            <FileDown className="mr-2 h-4 w-4" /> Download a copy
-          </Button>
+          <Popover modal={true}>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <FileDown className="mr-2 h-4 w-4" /> Download raw file
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="grid gap-3"
+              sideOffset={10}
+            >
+              <div className="mb-2 grid gap-2">
+                <Label htmlFor="filename">Name your file</Label>
+                <Input
+                  type="text"
+                  placeholder="Filename (required)"
+                  id="filename"
+                  value={filename}
+                  onChange={(e) => setFilename(e.target.value)}
+                />
+              </div>
+              <Button
+                disabled={filename.length === 0}
+                onClick={() => download(program, filename)}
+                className="transition"
+              >
+                Download
+              </Button>
+            </PopoverContent>
+          </Popover>
         </DialogFooter>
       </DialogContent>
     </Dialog>

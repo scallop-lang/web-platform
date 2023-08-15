@@ -12,7 +12,6 @@ const plexMono = IBM_Plex_Mono({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-plex-mono",
-  preload: false,
 });
 
 const App: AppType = ({ Component, pageProps }) => {
