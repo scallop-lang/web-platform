@@ -7,6 +7,7 @@ import {
   type Argument,
   type ArgumentType,
   type SclRelation,
+  type RelationRecord,
 } from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import {
@@ -36,14 +37,19 @@ import {
 } from "./ui/tooltip";
 
 const CreateRelationDialog = ({
+  inputs,
+  outputs,
   addRelation,
 }: {
+  inputs: RelationRecord;
+  outputs: RelationRecord;
   addRelation: (relation: SclRelation) => void;
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // current state of the relation being created
   const [isOutput, setIsOutput] = useState(false);
+  const [isValidName, setIsValidName] = useState(false);
   const [hasProbability, setHasProbability] = useState(false);
   const [relationName, setRelationName] = useState("");
   const [args, setArgs] = useState<Argument[]>([]);
@@ -76,6 +82,19 @@ const CreateRelationDialog = ({
       probability: hasProbability,
       facts: [],
     };
+  }
+
+  // validate dialog
+  function isValidString(value: string) {
+    return !(
+      (value === "" || /[^a-zA-Z]/.test(value) || inputs[value]) ??
+      outputs[value]
+    );
+  }
+
+  function updateRelationName(value: string) {
+    setRelationName(value);
+    setIsValidName(isValidString(value));
   }
 
   // when the dialog closes, we should also reset the dialog state
@@ -168,7 +187,12 @@ const CreateRelationDialog = ({
                 id="relation-name"
                 placeholder="Required"
                 value={relationName}
-                onChange={(e) => setRelationName(e.target.value)}
+                onChange={(e) => updateRelationName(e.target.value)}
+                className={cn(
+                  isValidName
+                    ? ""
+                    : "bg-red-100 hover:bg-red-50 focus:bg-red-100 focus-visible:ring-red-500"
+                )}
               />
               <p className="cursor-default text-sm text-muted-foreground">
                 Make sure the name also exists in your program.
@@ -245,7 +269,7 @@ const CreateRelationDialog = ({
             <Trash className="mr-2 h-4 w-4" /> Delete
           </Button>
           <Button
-            disabled={argListEmpty || relationName === ""}
+            disabled={!isValidName || argListEmpty}
             onClick={() => {
               addRelation(createRelation());
               resetDialogState();
