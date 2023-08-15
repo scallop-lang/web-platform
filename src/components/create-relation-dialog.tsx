@@ -2,6 +2,7 @@ import { PlusSquare, Table2, Trash, X } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from "~/utils/cn";
+import { isValidType } from "~/utils/isValidType";
 import {
   argumentTypes,
   type Argument,
@@ -35,6 +36,37 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+
+const StringArg: Argument = {
+  type: "String",
+  id: "",
+  name: "",
+};
+
+const ArgumentNameCell = ({ argument }: { argument: Argument }) => {
+  const [isValidName, setIsValidName] = useState(true);
+
+  function changeCell(value: string) {
+    const valid = isValidType(value, StringArg);
+    setIsValidName(valid);
+    if (valid) {
+      argument.name = value;
+    }
+  }
+  return (
+    <Input
+      type="text"
+      onChange={(name) => changeCell(name.target.value)}
+      placeholder="Name (optional)"
+      className={cn(
+        isValidName
+          ? ""
+          : "bg-red-100 hover:bg-red-50 focus:bg-red-100 focus-visible:ring-red-500",
+        "basis-1/2"
+      )}
+    />
+  );
+};
 
 const CreateRelationDialog = ({
   inputs,
@@ -86,12 +118,11 @@ const CreateRelationDialog = ({
 
   // validate dialog
   function isValidString(value: string) {
-    return !(
-      (value === "" || 
-        (/^[0-9]/.test(value)) ||
-        (!/^[A-Za-z0-9]*$/.test(value)) ||
-        inputs[value]) ??
-      outputs[value]
+    return (
+      value != "" &&
+      isValidType(value, StringArg) &&
+      !inputs[value] &&
+      !outputs[value]
     );
   }
 
@@ -104,6 +135,7 @@ const CreateRelationDialog = ({
   function resetDialogState() {
     setIsOutput(false);
     setHasProbability(false);
+    setIsValidName(false);
     setRelationName("");
     setArgs([]);
   }
@@ -123,12 +155,7 @@ const CreateRelationDialog = ({
       className="flex w-full justify-between space-x-4"
       key={argument.id}
     >
-      <Input
-        type="text"
-        onChange={(name) => (argument.name = name.target.value)}
-        placeholder="Name (optional)"
-        className="basis-1/2"
-      />
+      <ArgumentNameCell argument={argument} />
       <Select
         onValueChange={(type) => (argument.type = type as ArgumentType)}
         defaultValue="String"

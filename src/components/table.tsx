@@ -3,6 +3,7 @@ import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { number } from "zod";
 import { cn } from "~/utils/cn";
+import { isValidType } from "~/utils/isValidType";
 import type {
   Argument,
   Fact,
@@ -127,22 +128,12 @@ const InputCell = ({
   argument: Argument;
   updateCell: (value: string) => void;
 }) => {
-  function isValidType(value: string, argument: Argument) {
-    const argumentType = argument.type;
-    if (argumentType === "Integer" || argumentType === "Float") {
-      // check integer/float case
-      if (isNaN(+value)) {
-        return false;
-      } // invalid number
-      if (argumentType === "Integer" && !Number.isInteger(+value)) {
-        return false;
-      } // invalid Integer
-    }
-    return true;
-  }
-
   function validateUpdate(value: string) {
-    const isValid = isValidType(value, argument);
+    let isValid = isValidType(value, argument);
+    if (argument.type === "String") {
+      isValid = true;
+      // any reasonable string should work
+    }
     setValid(isValid);
     if (!isValid) {
       return;
@@ -150,9 +141,7 @@ const InputCell = ({
     updateCell(value);
   }
 
-  const [valid, setValid] = useState<boolean>(
-    isValidType(initialState, argument)
-  );
+  const [valid, setValid] = useState<boolean>(true);
   const isInput = relationType === "input";
 
   return (
