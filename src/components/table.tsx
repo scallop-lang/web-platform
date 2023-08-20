@@ -166,7 +166,7 @@ const InputCell = ({
         isInput ? "cursor-pointer focus:cursor-text" : "cursor-default",
         valid
           ? ""
-          : "bg-red-100 hover:bg-red-50 focus:bg-red-100 focus-visible:ring-red-500"
+          : "border-red-300 bg-red-100 hover:bg-red-50 focus:bg-red-100 focus-visible:ring-red-500"
       )}
       readOnly={!isInput}
     />
@@ -192,13 +192,16 @@ const TableHeader = ({ relation }: { relation: SclRelation }) => {
 
   return (
     <Card className="flex shrink-0 overflow-x-auto">
-      <div className="ml-3 flex w-20 shrink-0 items-center justify-center">
-        <Tag className="h-4 w-4" />
-      </div>
+      {relation.probability ? (
+        <div className="ml-3 flex w-20 shrink-0 items-center justify-center">
+          <Tag className="h-4 w-4" />
+        </div>
+      ) : null}
       <div
         className={cn(
-          "my-3 ml-2 flex w-full space-x-2",
-          isInput ? "mr-2" : "mr-3"
+          "my-3 flex w-full space-x-2",
+          isInput ? "mr-2" : "mr-3",
+          relation.probability ? "ml-2" : "ml-3"
         )}
       >
         {header}
@@ -359,12 +362,14 @@ const TableRow = ({
       className="flex space-x-2"
       key={rowFact.id}
     >
-      <ProbabilityInput
-        relation={relation}
-        record={record}
-        rowFact={rowFact}
-        setRecord={setRecord}
-      />
+      {relation.probability ? (
+        <ProbabilityInput
+          relation={relation}
+          record={record}
+          rowFact={rowFact}
+          setRecord={setRecord}
+        />
+      ) : null}
       {colList}
       {relation.type === "input" ? (
         <RowDropdown

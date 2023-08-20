@@ -142,7 +142,7 @@ const Playground = () => {
         { id: "0", type: "String" },
         { id: "1", name: "b", type: "String" },
       ],
-      probability: false,
+      probability: true,
       facts: [],
     },
   });
