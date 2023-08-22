@@ -1,5 +1,5 @@
 import { PlusSquare, Table2, Trash, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from "~/utils/cn";
 import { isValidType } from "~/utils/isvalidtype";
@@ -149,38 +149,81 @@ const CreateRelationDialog = ({
     </SelectItem>
   ));
 
+  const ArgumentList = (function ArgumentList({args}:{args: Argument[]}){
+    return(
+      args.map((argument, index) => (
+        <div
+          className="flex w-full justify-between space-x-4"
+          key={argument.id}
+        >
+          <Input
+            type="text"
+            defaultValue={argument.name}
+            onChange={(name) => (argument.name = name.target.value)}
+            placeholder="Name (optional)"
+            className="basis-1/2"
+          />
+          <Select
+            onValueChange={(type) => (argument.type = type as ArgumentType)}
+            defaultValue="String"
+          >
+            <SelectTrigger className="basis-1/3">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>{argumentTypesList}</SelectContent>
+          </Select>
+          <TooltipProvider delayDuration={400}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => removeArgument(index)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Delete argument</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      ))
+    );
+  });
+
+  const ArgumentWindow = function ArgumentWindow({args}:{args: Argument[]}){
+    const argListEmpty = args.length === 0;
+    return(
+      <div className="flex flex-col justify-between space-y-2">
+        <p className="cursor-default text-sm font-medium leading-none">
+          Argument list
+        </p>
+        <div
+          className={cn(
+            "flex h-72 flex-col space-y-2 overflow-y-auto rounded-md border border-border p-3",
+            argListEmpty ? "justify-center" : "justify-start"
+          )}
+        >
+          {argListEmpty ? (
+            <span className="cursor-default text-center text-sm text-muted-foreground">
+              Currently empty. At least one argument is required.
+            </span>
+          ) : (
+            <ArgumentList args={args}/>
+          )}
+          </div>
+        <Button
+          onClick={addArgument}
+          id="add-argument"
+        >
+          Add new argument
+        </Button>
+      </div>
+    );
+  };
+
+  const ArgumentBox = useMemo(() => ArgumentWindow({args}), [args]);
   const argListEmpty = args.length === 0;
-  const argumentList = args.map((argument, index) => (
-    <div
-      className="flex w-full justify-between space-x-4"
-      key={argument.id}
-    >
-      <ArgumentNameCell argument={argument} />
-      <Select
-        onValueChange={(type) => (argument.type = type as ArgumentType)}
-        defaultValue="String"
-      >
-        <SelectTrigger className="basis-1/3">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>{argumentTypesList}</SelectContent>
-      </Select>
-      <TooltipProvider delayDuration={400}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => removeArgument(index)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Delete argument</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
-  ));
 
   return (
     <Dialog
@@ -265,31 +308,7 @@ const CreateRelationDialog = ({
               </div>
             </div>
           </div>
-          <div className="flex flex-col justify-between space-y-2">
-            <p className="cursor-default text-sm font-medium leading-none">
-              Argument list
-            </p>
-            <div
-              className={cn(
-                "flex h-72 flex-col space-y-2 overflow-y-auto rounded-md border border-border p-3",
-                argListEmpty ? "justify-center" : "justify-start"
-              )}
-            >
-              {argListEmpty ? (
-                <span className="cursor-default text-center text-sm text-muted-foreground">
-                  Currently empty. At least one argument is required.
-                </span>
-              ) : (
-                argumentList
-              )}
-            </div>
-            <Button
-              onClick={addArgument}
-              id="add-argument"
-            >
-              Add new argument
-            </Button>
-          </div>
+          {ArgumentBox}
         </div>
         <DialogFooter>
           <Button
