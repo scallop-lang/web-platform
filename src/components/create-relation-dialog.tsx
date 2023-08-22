@@ -2,11 +2,13 @@ import { PlusSquare, Table2, Trash, X } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from "~/utils/cn";
+import { isValidType } from "~/utils/isvalidtype";
 import {
   argumentTypes,
   type Argument,
   type ArgumentType,
   type SclRelation,
+  type RelationRecord,
 } from "~/utils/schemas-types";
 import { Button } from "./ui/button";
 import {
@@ -35,15 +37,51 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
+const StringArg: Argument = {
+  type: "String",
+  id: "",
+  name: "",
+};
+
+const ArgumentNameCell = ({ argument }: { argument: Argument }) => {
+  const [isValidName, setIsValidName] = useState(true);
+
+  function changeCell(value: string) {
+    const valid = isValidType(value, StringArg);
+    setIsValidName(valid);
+    if (valid) {
+      argument.name = value;
+    }
+  }
+  return (
+    <Input
+      type="text"
+      onChange={(name) => changeCell(name.target.value)}
+      placeholder="Name (optional)"
+      className={cn(
+        isValidName
+          ? ""
+          : "bg-red-100 hover:bg-red-50 focus:bg-red-100 focus-visible:ring-red-500",
+        "basis-1/2"
+      )}
+    />
+  );
+};
+
 const CreateRelationDialog = ({
+  inputs,
+  outputs,
   addRelation,
 }: {
+  inputs: RelationRecord;
+  outputs: RelationRecord;
   addRelation: (relation: SclRelation) => void;
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // current state of the relation being created
   const [isOutput, setIsOutput] = useState(false);
+  const [isValidName, setIsValidName] = useState(false);
   const [hasProbability, setHasProbability] = useState(false);
   const [relationName, setRelationName] = useState("");
   const [args, setArgs] = useState<Argument[]>([]);
@@ -78,10 +116,26 @@ const CreateRelationDialog = ({
     };
   }
 
+  // validate dialog
+  function isValidString(value: string) {
+    return (
+      value != "" &&
+      isValidType(value, StringArg) &&
+      !inputs[value] &&
+      !outputs[value]
+    );
+  }
+
+  function updateRelationName(value: string) {
+    setRelationName(value);
+    setIsValidName(isValidString(value));
+  }
+
   // when the dialog closes, we should also reset the dialog state
   function resetDialogState() {
     setIsOutput(false);
     setHasProbability(false);
+    setIsValidName(false);
     setRelationName("");
     setArgs([]);
   }
@@ -101,12 +155,7 @@ const CreateRelationDialog = ({
       className="flex w-full justify-between space-x-4"
       key={argument.id}
     >
-      <Input
-        type="text"
-        onChange={(name) => (argument.name = name.target.value)}
-        placeholder="Name (optional)"
-        className="basis-1/2"
-      />
+      <ArgumentNameCell argument={argument} />
       <Select
         onValueChange={(type) => (argument.type = type as ArgumentType)}
         defaultValue="String"
@@ -168,7 +217,12 @@ const CreateRelationDialog = ({
                 id="relation-name"
                 placeholder="Required"
                 value={relationName}
-                onChange={(e) => setRelationName(e.target.value)}
+                onChange={(e) => updateRelationName(e.target.value)}
+                className={cn(
+                  isValidName
+                    ? ""
+                    : "bg-red-100 hover:bg-red-50 focus:bg-red-100 focus-visible:ring-red-500"
+                )}
               />
               <p className="cursor-default text-sm text-muted-foreground">
                 Make sure the name also exists in your program.
@@ -245,7 +299,7 @@ const CreateRelationDialog = ({
             <Trash className="mr-2 h-4 w-4" /> Delete
           </Button>
           <Button
-            disabled={argListEmpty || relationName === ""}
+            disabled={!isValidName || argListEmpty}
             onClick={() => {
               addRelation(createRelation());
               resetDialogState();

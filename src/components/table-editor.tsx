@@ -113,7 +113,11 @@ const TableEditor = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between space-x-10">
-        <CreateRelationDialog addRelation={addRelation} />
+        <CreateRelationDialog 
+          inputs={inputs}
+          outputs={outputs}
+          addRelation={addRelation} 
+        />
         <RelationSelect
           inputs={inputs}
           outputs={outputs}
