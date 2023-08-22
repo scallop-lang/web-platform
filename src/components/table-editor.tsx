@@ -1,4 +1,3 @@
-import { Table2, Wrench } from "lucide-react";
 import React, { useState } from "react";
 import {
   Select,
@@ -10,9 +9,8 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
-import RelationDialog from "./relation-dialog";
+import CreateRelationDialog from "./create-relation-dialog";
 import { Table } from "./table";
-import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 
 const RelationSelect = ({
@@ -115,36 +113,17 @@ const TableEditor = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between space-x-10">
-        <RelationDialog
+        <CreateRelationDialog
           inputs={inputs}
           outputs={outputs}
           addRelation={addRelation}
-        >
-          <Button>
-            <Table2 className="mr-2 h-4 w-4" /> Create relation
-          </Button>
-        </RelationDialog>
-        <div className="flex space-x-2">
-          <RelationSelect
-            inputs={inputs}
-            outputs={outputs}
-            bothEmpty={bothEmpty}
-            setActiveRelationName={setActiveRelationName}
-          />
-          <RelationDialog
-            inputs={inputs}
-            outputs={outputs}
-            addRelation={addRelation}
-          >
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={activeRelationName === ""}
-            >
-              <Wrench className="h-4 w-4" />
-            </Button>
-          </RelationDialog>
-        </div>
+        />
+        <RelationSelect
+          inputs={inputs}
+          outputs={outputs}
+          bothEmpty={bothEmpty}
+          setActiveRelationName={setActiveRelationName}
+        />
       </div>
       <Card className="h-0 grow p-4">
         {bothEmpty ? (

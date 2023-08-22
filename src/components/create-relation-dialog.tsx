@@ -1,4 +1,4 @@
-import { PlusSquare, Trash, X } from "lucide-react";
+import { PlusSquare, Table2, Trash, X } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from "~/utils/cn";
@@ -68,15 +68,13 @@ const ArgumentNameCell = ({ argument }: { argument: Argument }) => {
   );
 };
 
-const RelationDialog = ({
+const CreateRelationDialog = ({
   inputs,
   outputs,
-  children,
   addRelation,
 }: {
   inputs: RelationRecord;
   outputs: RelationRecord;
-  children: React.ReactNode;
   addRelation: (relation: SclRelation) => void;
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -195,7 +193,11 @@ const RelationDialog = ({
         }
       }}
     >
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger asChild>
+        <Button>
+          <Table2 className="mr-2 h-4 w-4" /> Create relation
+        </Button>
+      </DialogTrigger>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>
@@ -312,4 +314,4 @@ const RelationDialog = ({
   );
 };
 
-export default RelationDialog;
+export default CreateRelationDialog;
