@@ -1,3 +1,4 @@
+import { Table2, Wrench } from "lucide-react";
 import React, { useState } from "react";
 import {
   Select,
@@ -9,8 +10,9 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
-import CreateRelationDialog from "./create-relation-dialog";
+import RelationDialog from "./relation-dialog";
 import { Table } from "./table";
+import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 
 const RelationSelect = ({
@@ -63,7 +65,7 @@ const RelationSelect = ({
       onValueChange={setActiveRelationName}
       disabled={bothEmpty}
     >
-      <SelectTrigger className="basis-1/2">
+      <SelectTrigger className="w-96">
         <SelectValue placeholder={bothEmpty ? "Empty" : "Nothing selected"} />
       </SelectTrigger>
       <SelectContent>
@@ -113,17 +115,36 @@ const TableEditor = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between space-x-10">
-        <CreateRelationDialog 
+        <RelationDialog
           inputs={inputs}
           outputs={outputs}
-          addRelation={addRelation} 
-        />
-        <RelationSelect
-          inputs={inputs}
-          outputs={outputs}
-          bothEmpty={bothEmpty}
-          setActiveRelationName={setActiveRelationName}
-        />
+          addRelation={addRelation}
+        >
+          <Button>
+            <Table2 className="mr-2 h-4 w-4" /> Create relation
+          </Button>
+        </RelationDialog>
+        <div className="flex space-x-2">
+          <RelationSelect
+            inputs={inputs}
+            outputs={outputs}
+            bothEmpty={bothEmpty}
+            setActiveRelationName={setActiveRelationName}
+          />
+          <RelationDialog
+            inputs={inputs}
+            outputs={outputs}
+            addRelation={addRelation}
+          >
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={activeRelationName === ""}
+            >
+              <Wrench className="h-4 w-4" />
+            </Button>
+          </RelationDialog>
+        </div>
       </div>
       <Card className="h-0 grow p-4">
         {bothEmpty ? (
