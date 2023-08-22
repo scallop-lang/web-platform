@@ -149,51 +149,40 @@ const CreateRelationDialog = ({
     </SelectItem>
   ));
 
-  const ArgumentList = (function ArgumentList({args}:{args: Argument[]}){
-    return(
-      args.map((argument, index) => (
-        <div
-          className="flex w-full justify-between space-x-4"
-          key={argument.id}
-        >
-          <Input
-            type="text"
-            defaultValue={argument.name}
-            onChange={(name) => (argument.name = name.target.value)}
-            placeholder="Name (optional)"
-            className="basis-1/2"
-          />
-          <Select
-            onValueChange={(type) => (argument.type = type as ArgumentType)}
-            defaultValue="String"
-          >
-            <SelectTrigger className="basis-1/3">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>{argumentTypesList}</SelectContent>
-          </Select>
-          <TooltipProvider delayDuration={400}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => removeArgument(index)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Delete argument</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      ))
-    );
-  });
-
-  const ArgumentWindow = function ArgumentWindow({args}:{args: Argument[]}){
+  const ArgumentWindow = function ArgumentWindow({ args }: { args: Argument[] }) {
     const argListEmpty = args.length === 0;
-    return(
+    const argumentList = args.map((argument, index) => (
+      <div
+        className="flex w-full justify-between space-x-4"
+        key={argument.id}
+      >
+        <ArgumentNameCell argument={argument} />
+        <Select
+          onValueChange={(type) => (argument.type = type as ArgumentType)}
+          defaultValue="String"
+        >
+          <SelectTrigger className="basis-1/3">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>{argumentTypesList}</SelectContent>
+        </Select>
+        <TooltipProvider delayDuration={400}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => removeArgument(index)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Delete argument</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    ));
+    return (
       <div className="flex flex-col justify-between space-y-2">
         <p className="cursor-default text-sm font-medium leading-none">
           Argument list
@@ -209,9 +198,9 @@ const CreateRelationDialog = ({
               Currently empty. At least one argument is required.
             </span>
           ) : (
-            <ArgumentList args={args}/>
+            argumentList
           )}
-          </div>
+        </div>
         <Button
           onClick={addArgument}
           id="add-argument"
@@ -222,7 +211,7 @@ const CreateRelationDialog = ({
     );
   };
 
-  const ArgumentBox = useMemo(() => ArgumentWindow({args}), [args]);
+  const ArgumentBox = useMemo(() => ArgumentWindow({ args }), [args]);
   const argListEmpty = args.length === 0;
 
   return (
