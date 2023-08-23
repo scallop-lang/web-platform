@@ -17,11 +17,13 @@ const RelationSelect = ({
   inputs,
   outputs,
   bothEmpty,
+  activeRelationName,
   setActiveRelationName,
 }: {
   inputs: RelationRecord;
   outputs: RelationRecord;
   bothEmpty: boolean;
+  activeRelationName: string,
   setActiveRelationName: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const parseRelations = (record: RelationRecord) => {
@@ -60,6 +62,7 @@ const RelationSelect = ({
 
   return (
     <Select
+      value={activeRelationName}
       onValueChange={setActiveRelationName}
       disabled={bothEmpty}
     >
@@ -105,6 +108,7 @@ const TableEditor = ({
       outputsCopy[relation.name] = relation;
       setOutputs(outputsCopy);
     }
+    setActiveRelationName(relation.name);
   }
 
   const bothEmpty =
@@ -122,6 +126,7 @@ const TableEditor = ({
           inputs={inputs}
           outputs={outputs}
           bothEmpty={bothEmpty}
+          activeRelationName={activeRelationName}
           setActiveRelationName={setActiveRelationName}
         />
       </div>
