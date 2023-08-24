@@ -36,12 +36,12 @@ export const scallopRouter = createTRPCRouter({
         if (res.status >= 500) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: json.error
+            message: json.error,
           });
         } else {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: json.error
+            message: json.error,
           });
         }
       }
@@ -52,16 +52,13 @@ export const scallopRouter = createTRPCRouter({
       });
 
       const schema = z.object(outputRelSchema);
-      const body: Record<string, [number, string[]][]> = schema.parse(
-        json,
-        {
-          errorMap: (_issue, ctx) => {
-            return {
-              message: `[@output]: ${ctx.defaultError}`,
-            };
-          }
-        }
-      );
+      const body: Record<string, [number, string[]][]> = schema.parse(json, {
+        errorMap: (_issue, ctx) => {
+          return {
+            message: `[@output]: ${ctx.defaultError}`,
+          };
+        },
+      });
 
       return body;
     }),

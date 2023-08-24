@@ -16,7 +16,7 @@ const ArgSchema = z.object({
 const FactSchema = z.object({
   id: z.string(),
   tag: z.number(),
-  tuple: z.any().array(),
+  tuple: z.coerce.string().array(),
 });
 
 const SclProgramSchema = z.string().min(1);
@@ -63,7 +63,7 @@ const SclRelationInputSchema = SclRelationSchema.transform((relation) => {
           return {
             message: `[@rel ${relation.name}]: ${ctx.defaultError}`,
           };
-        }
+        },
       }
     ),
   };
