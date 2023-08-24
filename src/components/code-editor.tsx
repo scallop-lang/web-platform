@@ -67,8 +67,8 @@ const CodeEditor = ({
     onError: (error) => {
       toast({
         variant: "destructive",
-        title: "An error occurred",
-        description: `Something went wrong while running your program. Error message: ${error.message}`,
+        title: "An error occurred when running your program",
+        description: error.message,
       });
     },
   });

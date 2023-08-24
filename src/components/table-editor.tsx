@@ -62,7 +62,7 @@ const RelationSelect = ({
 
   return (
     <Select
-      value={activeRelationName}
+      value={activeRelationName ? activeRelationName : undefined}
       onValueChange={setActiveRelationName}
       disabled={bothEmpty}
     >

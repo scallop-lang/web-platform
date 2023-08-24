@@ -4,18 +4,19 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
   SclProgramSchema,
   SclRelationSchema,
-  SclRelationTransform,
+  SclRelationInputSchema,
   relationToSchema,
 } from "~/utils/schemas-types";
 
 import { env } from "../../../env.mjs";
+import { TRPCError } from "@trpc/server";
 
 export const scallopRouter = createTRPCRouter({
   run: publicProcedure
     .input(
       z.object({
         program: SclProgramSchema,
-        inputs: SclRelationTransform.array(),
+        inputs: SclRelationInputSchema.array(),
         outputs: SclRelationSchema.array(),
       })
     )
@@ -29,6 +30,21 @@ export const scallopRouter = createTRPCRouter({
         },
         body: JSON.stringify(input),
       });
+      const json = await res.json();
+
+      if (!res.ok) {
+        if (res.status >= 500) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: json.error
+          });
+        } else {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: json.error
+          });
+        }
+      }
 
       const outputRelSchema: Record<string, ZodTypeAny> = {};
       input.outputs.forEach((relation) => {
@@ -37,7 +53,7 @@ export const scallopRouter = createTRPCRouter({
 
       const schema = z.object(outputRelSchema);
       const body: Record<string, [number, string[]][]> = schema.parse(
-        await res.json(),
+        json,
         {
           errorMap: (_issue, ctx) => {
             return {

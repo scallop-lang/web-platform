@@ -26,7 +26,7 @@ const SclRelationSchema = z.object({
   args: ArgSchema.array(),
   probability: z.boolean(),
   facts: FactSchema.array(),
-})
+});
 
 type ArgumentType = z.infer<typeof ArgTypeSchema>;
 type Argument = z.infer<typeof ArgSchema>;
@@ -53,7 +53,7 @@ const relationToSchema = (relation: SclRelation) => {
   return z.tuple([z.number(), z.tuple(schema as [])]).array();
 };
 
-const SclRelationTransform = SclRelationSchema.transform((relation) => {
+const SclRelationInputSchema = SclRelationSchema.transform((relation) => {
   return {
     ...relation,
     facts: relationToSchema(relation).parse(
@@ -61,7 +61,7 @@ const SclRelationTransform = SclRelationSchema.transform((relation) => {
       {
         errorMap: (_issue, ctx) => {
           return {
-            message: `[@input ${relation.name}]: ${ctx.defaultError}`,
+            message: `[@rel ${relation.name}]: ${ctx.defaultError}`,
           };
         }
       }
@@ -83,7 +83,7 @@ export {
   ArgTypeSchema,
   SclProgramSchema,
   SclRelationSchema,
-  SclRelationTransform,
+  SclRelationInputSchema,
   argumentTypes,
   relationToSchema,
 };
