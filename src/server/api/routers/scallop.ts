@@ -30,9 +30,13 @@ export const scallopRouter = createTRPCRouter({
         },
         body: JSON.stringify(input),
       });
-      const json = await res.json();
 
       if (!res.ok) {
+        const json = z
+          .object({
+            error: z.string(),
+          })
+          .parse(await res.json());
         if (res.status >= 500) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
@@ -52,13 +56,16 @@ export const scallopRouter = createTRPCRouter({
       });
 
       const schema = z.object(outputRelSchema);
-      const body: Record<string, [number, string[]][]> = schema.parse(json, {
-        errorMap: (_issue, ctx) => {
-          return {
-            message: `[@output]: ${ctx.defaultError}`,
-          };
-        },
-      });
+      const body: Record<string, [number, string[]][]> = schema.parse(
+        await res.json(),
+        {
+          errorMap: (_issue, ctx) => {
+            return {
+              message: `[@output]: ${ctx.defaultError}`,
+            };
+          },
+        }
+      );
 
       return body;
     }),
