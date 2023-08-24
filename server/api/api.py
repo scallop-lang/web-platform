@@ -21,6 +21,11 @@ class Args:
         self.openai_gpt_temperature = 0
 
 
+@api_routes.errorhandler(Exception) 
+def handle_error(e):
+    return jsonify({'error': str(e)}), 400
+
+
 @api_routes.route("/api/run-scallop", methods=["POST"])
 def run_scallop():
     # Process request

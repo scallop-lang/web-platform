@@ -171,6 +171,7 @@ const CreateRelationDialog = ({
             <Button
               size="icon"
               variant="ghost"
+              className="basis-8"
               onClick={() => removeArgument(index)}
             >
               <X className="h-4 w-4" />
