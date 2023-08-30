@@ -1,5 +1,14 @@
 import Head from "next/head";
-import Playground from "~/components/playground";
+import Link from "next/link";
+import Header from "~/components/header";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 
 const App = () => {
   return (
@@ -17,7 +26,30 @@ const App = () => {
           href="/favicon.png"
         />
       </Head>
-      <Playground />
+      <div className="min-h-screen">
+        <Header />
+        <main className="h-[calc(100vh-65px)] bg-background p-5 lg:p-8">
+          <div className="flex flex-col">
+            <h3>Your projects</h3>
+            <Card className="w-[350px]">
+              <CardHeader>
+                <CardTitle>Create new project</CardTitle>
+                <CardDescription>
+                  Start an empty project, or take a look at the demos below.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild>
+                  <Link href="/new">Create</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="flex flex-col">
+            <h3>AAAI demos</h3>
+          </div>
+        </main>
+      </div>
     </>
   );
 };

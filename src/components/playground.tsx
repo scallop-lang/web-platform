@@ -5,44 +5,9 @@ import Header from "./header";
 import TableEditor from "./table-editor";
 
 const Playground = () => {
-  const [program, setProgram] = useState<SclProgram>(
-    "rel grandparent(a, c) = parent(a, b, true), parent(b, c, true)"
-  );
-
-  const [inputs, setInputs] = useState<RelationRecord>({
-    parent: {
-      type: "input",
-      name: "parent",
-      args: [
-        { id: "0", name: "a", type: "String" },
-        { id: "1", type: "String" },
-        { id: "2", name: "c", type: "Boolean" },
-      ],
-      probability: false,
-      facts: [
-        { id: "0", tag: 1, tuple: ["Alice", "Bob", "true"] },
-        { id: "1", tag: 1, tuple: ["Bob", "Emily", "true"] },
-        { id: "2", tag: 1, tuple: ["Anthony", "Jason", "true"] },
-        { id: "3", tag: 1, tuple: ["Steve", "Origami Angel", "true"] },
-        { id: "4", tag: 1, tuple: ["Thomas", "Walter", "true"] },
-        { id: "5", tag: 1, tuple: ["Charles", "Ryan", "true"] },
-        { id: "6", tag: 1, tuple: ["Aaron", "Rajiv", "true"] },
-      ],
-    },
-  });
-
-  const [outputs, setOutputs] = useState<RelationRecord>({
-    grandparent: {
-      type: "output",
-      name: "grandparent",
-      args: [
-        { id: "0", type: "String" },
-        { id: "1", name: "b", type: "String" },
-      ],
-      probability: true,
-      facts: [],
-    },
-  });
+  const [program, setProgram] = useState<SclProgram>("");
+  const [inputs, setInputs] = useState<RelationRecord>({});
+  const [outputs, setOutputs] = useState<RelationRecord>({});
 
   return (
     <div className="min-h-screen">

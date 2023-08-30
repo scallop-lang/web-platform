@@ -1,6 +1,7 @@
-import { Laptop2, Link, Moon, Sun } from "lucide-react";
+import { Laptop2, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import {
