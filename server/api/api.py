@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 import scallopy
+import scallopy_ext
 
 api_routes = Blueprint("api_routes", __name__)
 
@@ -9,6 +10,20 @@ TYPES = {
     "Float": "f64",
     "Boolean": "bool",
 }
+
+
+class Args:
+    def __init__(self):
+        self.cuda = False
+        self.gpu = None
+        self.num_allowed_openai_request = 100
+        self.openai_gpt_model = "gpt-4"
+        self.openai_gpt_temperature = 0
+
+
+@api_routes.errorhandler(Exception) 
+def handle_error(e):
+    return jsonify({'error': str(e)}), 400
 
 
 @api_routes.route("/api/run-scallop", methods=["POST"])
@@ -22,7 +37,9 @@ def run_scallop():
     )
 
     # Initialize Scallop context
+    scallopy_ext.config.configure(Args())
     ctx = scallopy.ScallopContext(provenance="topkproofs") # should allow user to change provenance
+    scallopy_ext.extlib.load_extlib(ctx)
     ctx.add_program(program)
 
     # Add input relations

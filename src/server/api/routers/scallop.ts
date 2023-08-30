@@ -4,55 +4,23 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
   SclProgramSchema,
   SclRelationSchema,
-  type ArgumentType,
-  type SclRelation,
+  SclRelationInputSchema,
+  relationToSchema,
 } from "~/utils/schemas-types";
 
 import { env } from "../../../env.mjs";
-
-const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
-  String: z.coerce.string(),
-  Integer: z.coerce.number().int(),
-  Float: z.coerce.number(),
-  Boolean: z.enum(["true", "True", "false", "False"]).transform((val) => {
-    if (val === "true" || val === "True") {
-      return true;
-    }
-    return false;
-  }),
-};
-
-// generates a Zod schema for the given relation.
-const relationToSchema = (relation: SclRelation) => {
-  const schema = relation.args.map((arg) => typeToSchema[arg.type]);
-  return z.tuple([z.number(), z.tuple(schema as [])]).array();
-};
+import { TRPCError } from "@trpc/server";
 
 export const scallopRouter = createTRPCRouter({
   run: publicProcedure
     .input(
       z.object({
         program: SclProgramSchema,
-        inputs: SclRelationSchema.array(),
+        inputs: SclRelationInputSchema.array(),
         outputs: SclRelationSchema.array(),
       })
     )
     .mutation(async ({ input }) => {
-      const inputs = input.inputs.map((relation) => {
-        z.setErrorMap((_issue, ctx) => {
-          return {
-            message: `[@input ${relation.name}]: ${ctx.defaultError}`,
-          };
-        });
-
-        return {
-          ...relation,
-          facts: relationToSchema(relation).parse(
-            relation.facts.map((fact) => [fact.tag, fact.tuple])
-          ),
-        };
-      });
-
       const endpoint = new URL("api/run-scallop", env.FLASK_SERVER);
       const res = await fetch(endpoint, {
         method: "POST",
@@ -60,14 +28,27 @@ export const scallopRouter = createTRPCRouter({
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...input, inputs }),
+        body: JSON.stringify(input),
       });
 
-      z.setErrorMap((_issue, ctx) => {
-        return {
-          message: `[@output]: ${ctx.defaultError}`,
-        };
-      });
+      if (!res.ok) {
+        const json = z
+          .object({
+            error: z.string(),
+          })
+          .parse(await res.json());
+        if (res.status >= 500) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: json.error,
+          });
+        } else {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: json.error,
+          });
+        }
+      }
 
       const outputRelSchema: Record<string, ZodTypeAny> = {};
       input.outputs.forEach((relation) => {
@@ -76,7 +57,14 @@ export const scallopRouter = createTRPCRouter({
 
       const schema = z.object(outputRelSchema);
       const body: Record<string, [number, string[]][]> = schema.parse(
-        await res.json()
+        await res.json(),
+        {
+          errorMap: (_issue, ctx) => {
+            return {
+              message: `[@output]: ${ctx.defaultError}`,
+            };
+          },
+        }
       );
 
       return body;

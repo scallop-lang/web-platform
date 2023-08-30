@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z, type ZodTypeAny } from "zod";
 
 // the current Scallop types we support; exported so that we can iterate over them. also see
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions
@@ -16,7 +16,7 @@ const ArgSchema = z.object({
 const FactSchema = z.object({
   id: z.string(),
   tag: z.number(),
-  tuple: z.string().array(),
+  tuple: z.coerce.string().array(),
 });
 
 const SclProgramSchema = z.string().min(1);
@@ -35,6 +35,40 @@ type SclProgram = z.infer<typeof SclProgramSchema>;
 type SclRelation = z.infer<typeof SclRelationSchema>;
 type RelationRecord = Record<string, SclRelation>;
 
+const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
+  String: z.coerce.string(),
+  Integer: z.coerce.number().int(),
+  Float: z.coerce.number(),
+  Boolean: z.enum(["true", "True", "false", "False"]).transform((val) => {
+    if (val === "true" || val === "True") {
+      return true;
+    }
+    return false;
+  }),
+};
+
+// generates a Zod schema for the given relation.
+const relationToSchema = (relation: SclRelation) => {
+  const schema = relation.args.map((arg) => typeToSchema[arg.type]);
+  return z.tuple([z.number(), z.tuple(schema as [])]).array();
+};
+
+const SclRelationInputSchema = SclRelationSchema.transform((relation) => {
+  return {
+    ...relation,
+    facts: relationToSchema(relation).parse(
+      relation.facts.map((fact) => [fact.tag, fact.tuple]),
+      {
+        errorMap: (_issue, ctx) => {
+          return {
+            message: `[@rel ${relation.name}]: ${ctx.defaultError}`,
+          };
+        },
+      }
+    ),
+  };
+});
+
 export type {
   Argument,
   ArgumentType,
@@ -49,5 +83,7 @@ export {
   ArgTypeSchema,
   SclProgramSchema,
   SclRelationSchema,
+  SclRelationInputSchema,
   argumentTypes,
+  relationToSchema,
 };
