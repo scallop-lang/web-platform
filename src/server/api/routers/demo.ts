@@ -17,7 +17,7 @@ export const demoRouter = createTRPCRouter({
     .input(
       z
         .object({
-          title: z.string().length(255),
+          title: z.string().max(255),
           description: z.string().optional(),
           program: SclProgramSchema,
           inputs: SclRelationInputSchema.array(),
@@ -26,8 +26,8 @@ export const demoRouter = createTRPCRouter({
         .transform((demo) => {
           return {
             ...demo,
-            inputs: demo.inputs.toString(),
-            outputs: demo.outputs.toString(),
+            inputs: JSON.stringify(demo.inputs),
+            outputs: JSON.stringify(demo.outputs),
           };
         })
     )

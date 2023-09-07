@@ -14,8 +14,8 @@ model Demo {
   updatedAt   DateTime @updatedAt
   title       String   @db.VarChar(255)
   description String?
-  program     String
-  inputs      String
-  outputs     String
+  program     String   @db.Text
+  inputs      String   @db.Text
+  outputs     String   @db.Text
   published   Boolean  @default(false)
 }

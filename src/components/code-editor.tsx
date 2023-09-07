@@ -41,7 +41,7 @@ const CodeEditor = ({
   // undefined on the server. see pages/input.tsx for more info
   useEffect(() => setMounted(true), []);
 
-  const save = api.demo.create.useMutation();
+  const save = api.demo.create.useMutation({});
 
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
