@@ -33,6 +33,7 @@ type Argument = z.infer<typeof ArgSchema>;
 type Fact = z.infer<typeof FactSchema>;
 type SclProgram = z.infer<typeof SclProgramSchema>;
 type SclRelation = z.infer<typeof SclRelationSchema>;
+type SclRelationInput = z.infer<typeof SclRelationInputSchema>;
 type RelationRecord = Record<string, SclRelation>;
 
 const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
@@ -69,6 +70,22 @@ const SclRelationInputSchema = SclRelationSchema.transform((relation) => {
   };
 });
 
+const ProjectSchema = z
+  .object({
+    title: z.string().max(255),
+    description: z.string().optional(),
+    program: SclProgramSchema,
+    inputs: SclRelationInputSchema.array(),
+    outputs: SclRelationSchema.array(),
+  })
+  .transform((project) => {
+    return {
+      ...project,
+      inputs: JSON.stringify(project.inputs),
+      outputs: JSON.stringify(project.outputs),
+    };
+  });
+
 export type {
   Argument,
   ArgumentType,
@@ -76,6 +93,7 @@ export type {
   RelationRecord,
   SclProgram,
   SclRelation,
+  SclRelationInput,
 };
 
 export {
@@ -84,6 +102,7 @@ export {
   SclProgramSchema,
   SclRelationSchema,
   SclRelationInputSchema,
+  ProjectSchema,
   argumentTypes,
   relationToSchema,
 };
