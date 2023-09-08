@@ -2,9 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import {
-  SclProgramSchema,
-  SclRelationSchema,
-  SclRelationInputSchema,
+  ProjectSchema,
   type SclRelation,
   type SclRelationInput,
 } from "~/utils/schemas-types";
@@ -13,23 +11,7 @@ import { TRPCError } from "@trpc/server";
 
 export const projectRouter = createTRPCRouter({
   create: publicProcedure
-    .input(
-      z
-        .object({
-          title: z.string().max(255),
-          description: z.string().optional(),
-          program: SclProgramSchema,
-          inputs: SclRelationInputSchema.array(),
-          outputs: SclRelationSchema.array(),
-        })
-        .transform((project) => {
-          return {
-            ...project,
-            inputs: JSON.stringify(project.inputs),
-            outputs: JSON.stringify(project.outputs),
-          };
-        })
-    )
+    .input(ProjectSchema)
     .mutation(async ({ ctx, input }) => {
       const project = await ctx.prisma.project.create({
         data: input,
@@ -59,5 +41,17 @@ export const projectRouter = createTRPCRouter({
         inputs: JSON.parse(project.inputs) as SclRelationInput,
         outputs: JSON.parse(project.outputs) as SclRelation,
       };
+    }),
+
+  updateProjectById: publicProcedure
+    .input(z.object({ id: z.string(), project: ProjectSchema }))
+    .mutation(async ({ ctx, input }) => {
+      const project = await ctx.prisma.project.update({
+        where: {
+          id: input.id,
+        },
+        data: input.project,
+      });
+      return project;
     }),
 });

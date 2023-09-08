@@ -70,6 +70,22 @@ const SclRelationInputSchema = SclRelationSchema.transform((relation) => {
   };
 });
 
+const ProjectSchema = z
+  .object({
+    title: z.string().max(255),
+    description: z.string().optional(),
+    program: SclProgramSchema,
+    inputs: SclRelationInputSchema.array(),
+    outputs: SclRelationSchema.array(),
+  })
+  .transform((project) => {
+    return {
+      ...project,
+      inputs: JSON.stringify(project.inputs),
+      outputs: JSON.stringify(project.outputs),
+    };
+  });
+
 export type {
   Argument,
   ArgumentType,
@@ -86,6 +102,7 @@ export {
   SclProgramSchema,
   SclRelationSchema,
   SclRelationInputSchema,
+  ProjectSchema,
   argumentTypes,
   relationToSchema,
 };
