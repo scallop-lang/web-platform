@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Demo {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(cuid())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   title       String   @db.VarChar(255)

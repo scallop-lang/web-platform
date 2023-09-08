@@ -1,18 +1,15 @@
-import { z, type ZodTypeAny } from "zod";
+import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import {
   SclProgramSchema,
   SclRelationSchema,
   SclRelationInputSchema,
-  relationToSchema,
+  type SclRelation,
+  type SclRelationInput,
 } from "~/utils/schemas-types";
 
-import { env } from "../../../env.mjs";
 import { TRPCError } from "@trpc/server";
-import { Prisma } from "@prisma/client";
-
-// help
 
 export const demoRouter = createTRPCRouter({
   create: publicProcedure
@@ -38,5 +35,21 @@ export const demoRouter = createTRPCRouter({
         data: input,
       });
       return demo;
+    }),
+
+  getDemoById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const demo = await ctx.prisma.demo.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!demo) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return {
+        ...demo,
+        inputs: JSON.parse(demo.inputs) as SclRelationInput,
+        outputs: JSON.parse(demo.outputs) as SclRelation,
+      };
     }),
 });
