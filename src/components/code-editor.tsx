@@ -41,7 +41,10 @@ const CodeEditor = ({
   // undefined on the server. see pages/input.tsx for more info
   useEffect(() => setMounted(true), []);
 
-  const get = api.demo.getDemoById.useQuery({ id: "2" });
+  const create = api.project.create.useMutation();
+  const get = api.project.getProjectById.useQuery({
+    id: "clm9yv5500000j0dkf4aqjo08",
+  });
 
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
@@ -101,6 +104,13 @@ const CodeEditor = ({
         <Button
           onClick={() => {
             run.mutate({
+              program: program,
+              inputs: Object.values(inputs),
+              outputs: Object.values(outputs),
+            });
+
+            create.mutate({
+              title: "Test",
               program: program,
               inputs: Object.values(inputs),
               outputs: Object.values(outputs),

@@ -11,7 +11,7 @@ import {
 
 import { TRPCError } from "@trpc/server";
 
-export const demoRouter = createTRPCRouter({
+export const projectRouter = createTRPCRouter({
   create: publicProcedure
     .input(
       z
@@ -22,34 +22,34 @@ export const demoRouter = createTRPCRouter({
           inputs: SclRelationInputSchema.array(),
           outputs: SclRelationSchema.array(),
         })
-        .transform((demo) => {
+        .transform((project) => {
           return {
-            ...demo,
-            inputs: JSON.stringify(demo.inputs),
-            outputs: JSON.stringify(demo.outputs),
+            ...project,
+            inputs: JSON.stringify(project.inputs),
+            outputs: JSON.stringify(project.outputs),
           };
         })
     )
     .mutation(async ({ ctx, input }) => {
-      const demo = await ctx.prisma.demo.create({
+      const project = await ctx.prisma.project.create({
         data: input,
       });
-      return demo;
+      return project;
     }),
 
-  getDemoById: publicProcedure
+  getProjectById: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const demo = await ctx.prisma.demo.findUnique({
+      const project = await ctx.prisma.project.findUnique({
         where: { id: input.id },
       });
 
-      if (!demo) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!project) throw new TRPCError({ code: "NOT_FOUND" });
 
       return {
-        ...demo,
-        inputs: JSON.parse(demo.inputs) as SclRelationInput,
-        outputs: JSON.parse(demo.outputs) as SclRelation,
+        ...project,
+        inputs: JSON.parse(project.inputs) as SclRelationInput,
+        outputs: JSON.parse(project.outputs) as SclRelation,
       };
     }),
 });
