@@ -1,4 +1,4 @@
-import { Laptop2, LogIn, Moon, Sun, User } from "lucide-react";
+import { Laptop2, LayoutDashboard, LogIn, Moon, Sun, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
@@ -74,7 +74,16 @@ const AvatarDropdown = () => {
           </DropdownMenuPortal>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem>
+          <Link
+            href="/dashboard"
+            className="flex w-full items-center"
+          >
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            Dashboard
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
           <LogIn className="mr-2 h-4 w-4" />
           Login
         </DropdownMenuItem>
