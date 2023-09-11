@@ -1,12 +1,7 @@
-<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M250 500C388.071 500 500 388.071 500 250C500 111.929 388.071 0 250 0C111.929 0 0 111.929 0 250C0 388.071 111.929 500 250 500Z" fill="url(#paint0_linear_1_10)"/>
-<path d="M275.641 135.887C308.728 130.138 326.74 168.207 336.193 185.069C347.307 204.614 362.892 293.526 362.892 293.526C362.892 293.526 329.806 207.297 287.266 149.683C244.599 92.0697 203.848 118.896 203.848 118.896" stroke="white" stroke-width="10" stroke-miterlimit="10"/>
-<path d="M266.443 399.683C289.565 411.18 314.603 405.687 333.254 382.821C351.905 359.954 362.891 293.654 362.891 293.654" stroke="white" stroke-width="10" stroke-miterlimit="10"/>
-<path d="M362.893 293.526C362.893 293.526 116.214 147.64 108.55 123.496C100.885 99.3514 150.323 82.7444 203.849 118.897C257.374 155.049 362.893 293.526 362.893 293.526Z" stroke="white" stroke-width="10" stroke-miterlimit="10"/>
-<path d="M362.892 293.527C362.892 293.527 209.213 369.791 209.213 389.464C209.213 409.137 252.008 412.459 283.433 390.358C314.859 368.258 362.892 293.527 362.892 293.527Z" stroke="white" stroke-width="10" stroke-miterlimit="10"/>
-<path d="M366.726 294.034L387.549 317.156C387.549 317.156 408.755 312.174 408.755 294.418C408.755 276.661 388.06 269.89 388.06 269.89L366.854 294.034H366.726Z" stroke="white" stroke-width="10" stroke-miterlimit="10"/>
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 48C37.2548 48 48 37.2548 48 24C48 10.7452 37.2548 0 24 0C10.7452 0 0 10.7452 0 24C0 37.2548 10.7452 48 24 48Z" fill="url(#paint0_linear_3_9)"/>
 <defs>
-<linearGradient id="paint0_linear_1_10" x1="1.14971" y1="19.2897" x2="419.903" y2="407.639" gradientUnits="userSpaceOnUse">
+<linearGradient id="paint0_linear_3_9" x1="0.110373" y1="1.85181" x2="40.3107" y2="39.1334" gradientUnits="userSpaceOnUse">
 <stop stop-color="#6DCFF6"/>
 <stop offset="0.14" stop-color="#78CBF1"/>
 <stop offset="0.4" stop-color="#97C0E6"/>
