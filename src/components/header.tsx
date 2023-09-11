@@ -14,7 +14,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Skeleton } from "./ui/skeleton";
 
-const Header = () => {
+const AppearanceSwitcher = () => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
 
@@ -32,16 +32,54 @@ const Header = () => {
   );
 
   return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          size="icon"
+          variant="outline"
+          aria-haspopup
+        >
+          {resolvedIcon}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => setTheme("light")}
+          className="justify-between"
+        >
+          Light <Sun className="h-4 w-4" />
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => setTheme("dark")}
+          className="justify-between"
+        >
+          Dark <Moon className="h-4 w-4" />
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => setTheme("system")}
+          className="justify-between"
+        >
+          System <Laptop2 className="h-4 w-4" />
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+const Header = () => {
+  return (
     <header className="flex w-full items-center justify-between border-b border-border bg-neutral-50 p-3 dark:bg-neutral-950">
       <div className="flex items-center space-x-3">
         <Image
           src="/content/logo.svg"
-          width={35}
-          height={35}
+          width={25}
+          height={25}
           alt="Scallop logo"
         />
         <h1 className="w-28 cursor-default text-lg font-semibold leading-none sm:w-full sm:text-xl">
-          Scallop Playground
+          Playground
         </h1>
       </div>
       <div className="flex items-center space-x-7">
@@ -61,39 +99,7 @@ const Header = () => {
             GitHub
           </Link>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              size="icon"
-              variant="outline"
-              aria-haspopup
-            >
-              {resolvedIcon}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => setTheme("light")}
-              className="justify-between"
-            >
-              Light <Sun className="h-4 w-4" />
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => setTheme("dark")}
-              className="justify-between"
-            >
-              Dark <Moon className="h-4 w-4" />
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => setTheme("system")}
-              className="justify-between"
-            >
-              System <Laptop2 className="h-4 w-4" />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <AppearanceSwitcher />
       </div>
     </header>
   );
