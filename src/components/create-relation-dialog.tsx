@@ -149,7 +149,11 @@ const CreateRelationDialog = ({
     </SelectItem>
   ));
 
-  const ArgumentWindow = function ArgumentWindow({ args }: { args: Argument[] }) {
+  const ArgumentWindow = function ArgumentWindow({
+    args,
+  }: {
+    args: Argument[];
+  }) {
     const argListEmpty = args.length === 0;
     const argumentList = args.map((argument, index) => (
       <div
