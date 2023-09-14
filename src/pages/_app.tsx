@@ -2,6 +2,7 @@ import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
+import Layout from "~/components/layout";
 import ThemeProvider from "~/components/theme-provider";
 import { Toaster } from "~/components/ui/toaster";
 import "~/styles/globals.css";
@@ -21,9 +22,12 @@ const plexMono = IBM_Plex_Mono({
   preload: false,
 });
 
-const App = ({ Component, pageProps }: AppProps<{session: Session}>) => {
+const App = ({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppProps<{ session: Session }>) => {
   return (
-    <SessionProvider session={pageProps.session}>
+    <SessionProvider session={session}>
       <ThemeProvider
         attribute="class"
         defaultTheme="light"
@@ -43,7 +47,9 @@ const App = ({ Component, pageProps }: AppProps<{session: Session}>) => {
           }
         `}</style>
         <div className={`${inter.variable} ${plexMono.variable} font-sans`}>
-          <Component {...pageProps} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
           <Toaster />
         </div>
       </ThemeProvider>
