@@ -1,4 +1,5 @@
-import { Plus } from "lucide-react";
+import { LogIn, Plus } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 
 import { Button } from "~/components/ui/button";
@@ -9,11 +10,24 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Skeleton } from "~/components/ui/skeleton";
 
 const Dashboard = () => {
-  return (
-    <main className="flex min-h-screen flex-col space-y-10 bg-background p-5">
-      <div className="flex flex-col space-y-1.5">
+  const { status } = useSession();
+
+  if (status === "loading") {
+    return (
+      <main className="h-[calc(100vh-53px)] p-4 bg-background">
+        <Skeleton className="h-full w-full rounded-xl flex items-center justify-center">
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </Skeleton>
+      </main>
+    );
+  }
+
+  if (status === "authenticated") {
+    return (
+      <main className="flex flex-col space-y-1.5 min-h-screen bg-background p-4">
         <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
           Your projects
         </h3>
@@ -34,7 +48,18 @@ const Dashboard = () => {
             </Button>
           </CardContent>
         </Card>
-      </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="flex flex-col items-center justify-center h-[calc(100vh-53px)] bg-background space-y-5">
+      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+        Please sign in to view your dashboard.
+      </h3>
+      <Button onClick={() => signIn()}>
+        <LogIn className="mr-2 h-4 w-4" /> Sign in
+      </Button>
     </main>
   );
 };
