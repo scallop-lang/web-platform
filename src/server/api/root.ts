@@ -1,6 +1,6 @@
-import { createTRPCRouter } from "./trpc";
 import { projectRouter } from "./routers/project";
 import { scallopRouter } from "./routers/scallop";
+import { createTRPCRouter } from "./trpc";
 
 /**
  * This is the primary router for your server.

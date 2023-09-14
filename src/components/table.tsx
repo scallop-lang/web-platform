@@ -1,8 +1,8 @@
 import { ListPlus, ListX, MoreVertical, Settings2, Tag } from "lucide-react";
-import { memo, useState } from "react";
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from "~/utils/cn";
-import { isValidType } from "~/utils/isvalidtype";
+import { isValidType } from "~/utils/is-valid-type";
 import type {
   Argument,
   Fact,

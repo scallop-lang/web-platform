@@ -14,7 +14,6 @@ import DeleteRelationDialog from "./delete-relation-dialog";
 import { Table } from "./table";
 import { Card } from "./ui/card";
 
-
 const RelationSelect = ({
   inputs,
   outputs,
@@ -25,7 +24,7 @@ const RelationSelect = ({
   inputs: RelationRecord;
   outputs: RelationRecord;
   bothEmpty: boolean;
-  activeRelationName: string,
+  activeRelationName: string;
   setActiveRelationName: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const parseRelations = (record: RelationRecord) => {
@@ -112,7 +111,7 @@ const TableEditor = ({
     }
     setActiveRelationName(relation.name);
   }
-  
+
   // delete relation from inputs or outputs, depending on what was chosen
   function deleteRelation(relation: SclRelation) {
     if (relation.type === "input") {

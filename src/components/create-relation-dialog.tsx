@@ -1,8 +1,8 @@
 import { PlusSquare, Table2, Trash, X } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from "~/utils/cn";
-import { isValidType } from "~/utils/isvalidtype";
+import { isValidType } from "~/utils/is-valid-type";
 import {
   argumentTypes,
   type Argument,
