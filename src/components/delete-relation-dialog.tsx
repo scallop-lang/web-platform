@@ -1,7 +1,9 @@
 import { Trash, X } from "lucide-react";
-import { Button } from "./ui/button";
 import { useState } from "react";
+
 import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
+
+import { Button } from "./ui/button";
 import {
   Dialog,
   DialogContent,

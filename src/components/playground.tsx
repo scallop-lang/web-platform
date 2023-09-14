@@ -1,5 +1,7 @@
 import { useState } from "react";
+
 import { type RelationRecord, type SclProgram } from "~/utils/schemas-types";
+
 import CodeEditor from "./code-editor";
 import TableEditor from "./table-editor";
 

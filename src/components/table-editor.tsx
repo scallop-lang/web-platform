@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   Select,
   SelectContent,
@@ -9,11 +10,11 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
+
 import CreateRelationDialog from "./create-relation-dialog";
 import DeleteRelationDialog from "./delete-relation-dialog";
 import { Table } from "./table";
 import { Card } from "./ui/card";
-
 
 const RelationSelect = ({
   inputs,
@@ -25,7 +26,7 @@ const RelationSelect = ({
   inputs: RelationRecord;
   outputs: RelationRecord;
   bothEmpty: boolean;
-  activeRelationName: string,
+  activeRelationName: string;
   setActiveRelationName: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const parseRelations = (record: RelationRecord) => {
@@ -112,7 +113,7 @@ const TableEditor = ({
     }
     setActiveRelationName(relation.name);
   }
-  
+
   // delete relation from inputs or outputs, depending on what was chosen
   function deleteRelation(relation: SclRelation) {
     if (relation.type === "input") {
