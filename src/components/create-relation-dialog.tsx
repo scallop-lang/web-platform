@@ -1,6 +1,7 @@
 import { PlusSquare, Table2, Trash, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+
 import { cn } from "~/utils/cn";
 import { isValidType } from "~/utils/is-valid-type";
 import {
@@ -10,6 +11,7 @@ import {
   type RelationRecord,
   type SclRelation,
 } from "~/utils/schemas-types";
+
 import { Button } from "./ui/button";
 import {
   Dialog,

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   Select,
   SelectContent,
@@ -9,6 +10,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
+
 import CreateRelationDialog from "./create-relation-dialog";
 import DeleteRelationDialog from "./delete-relation-dialog";
 import { Table } from "./table";

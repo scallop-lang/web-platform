@@ -2,10 +2,13 @@ import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
+
 import Layout from "~/components/layout";
 import ThemeProvider from "~/components/theme-provider";
 import { Toaster } from "~/components/ui/toaster";
+
 import "~/styles/globals.css";
+
 import { api } from "~/utils/api";
 
 const inter = Inter({

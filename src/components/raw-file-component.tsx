@@ -1,6 +1,8 @@
 import { Check, Clipboard, FileCode2, FileDown } from "lucide-react";
 import { useState } from "react";
+
 import { type ArgumentType, type RelationRecord } from "~/utils/schemas-types";
+
 import { Button } from "./ui/button";
 import {
   Dialog,

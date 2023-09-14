@@ -1,6 +1,7 @@
 import { ListPlus, ListX, MoreVertical, Settings2, Tag } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+
 import { cn } from "~/utils/cn";
 import { isValidType } from "~/utils/is-valid-type";
 import type {
@@ -9,6 +10,7 @@ import type {
   RelationRecord,
   SclRelation,
 } from "~/utils/schemas-types";
+
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import {

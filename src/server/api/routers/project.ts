@@ -1,13 +1,12 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
   ProjectSchema,
   type SclRelation,
   type SclRelationInput,
 } from "~/utils/schemas-types";
-
-import { TRPCError } from "@trpc/server";
 
 export const projectRouter = createTRPCRouter({
   create: publicProcedure
