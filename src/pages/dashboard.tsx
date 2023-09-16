@@ -1,6 +1,6 @@
-import { LogIn, Plus } from "lucide-react";
+import { ArrowRight, LogIn, Plus } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import Link from "next/link";
+import { useRouter } from "next/router";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 
 const Dashboard = () => {
   const { status } = useSession();
+  const router = useRouter();
 
   if (status === "loading") {
     return (
@@ -31,23 +32,38 @@ const Dashboard = () => {
         <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
           Your projects
         </h3>
-        <Card className="w-[350px]">
-          <CardHeader>
-            <CardTitle>New project</CardTitle>
-            <CardDescription>
-              Start an empty project from scratch. Just the defaults. No
-              relations defined.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <Link href="/">
+        <div className="flex space-x-4">
+          <Card className="w-[350px]">
+            <CardHeader>
+              <CardTitle>New project</CardTitle>
+              <CardDescription>
+                Start an empty project from scratch. Just the defaults. No
+                relations defined.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => router.push("/")}>
                 <Plus className="mr-2 h-4 w-4" />
                 Create
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+              </Button>
+            </CardContent>
+          </Card>
+          <Card className="w-[350px]">
+            <CardHeader>
+              <CardTitle>Untitled 34</CardTitle>
+              <CardDescription>
+                Totally real project. Click the button to go to the project
+                page.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => router.push("/project/random-project-id")}>
+                <ArrowRight className="mr-2 w-4 h-4" />
+                Go to project
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </main>
     );
   }
