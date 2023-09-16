@@ -18,6 +18,11 @@ model Project {
   inputs      String   @db.Text
   outputs     String   @db.Text
   published   Boolean  @default(false)
+
+  author      User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String  
+
+  @@index([authorId, id])
 }
 
 model Session {
@@ -55,6 +60,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  projects      Project[]
 }
 
 model VerificationToken {
