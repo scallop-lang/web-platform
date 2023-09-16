@@ -1,8 +1,9 @@
 import { PlusSquare, Table2, Trash, X } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+
 import { cn } from "~/utils/cn";
-import { isValidType } from "~/utils/isvalidtype";
+import { isValidType } from "~/utils/is-valid-type";
 import {
   argumentTypes,
   type Argument,
@@ -10,6 +11,7 @@ import {
   type RelationRecord,
   type SclRelation,
 } from "~/utils/schemas-types";
+
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -149,7 +151,11 @@ const CreateRelationDialog = ({
     </SelectItem>
   ));
 
-  const ArgumentWindow = function ArgumentWindow({ args }: { args: Argument[] }) {
+  const ArgumentWindow = function ArgumentWindow({
+    args,
+  }: {
+    args: Argument[];
+  }) {
     const argListEmpty = args.length === 0;
     const argumentList = args.map((argument, index) => (
       <div

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   Select,
   SelectContent,
@@ -9,7 +10,9 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
+
 import CreateRelationDialog from "./create-relation-dialog";
+import DeleteRelationDialog from "./delete-relation-dialog";
 import { Table } from "./table";
 import { Card } from "./ui/card";
 
@@ -23,7 +26,7 @@ const RelationSelect = ({
   inputs: RelationRecord;
   outputs: RelationRecord;
   bothEmpty: boolean;
-  activeRelationName: string,
+  activeRelationName: string;
   setActiveRelationName: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const parseRelations = (record: RelationRecord) => {
@@ -111,6 +114,20 @@ const TableEditor = ({
     setActiveRelationName(relation.name);
   }
 
+  // delete relation from inputs or outputs, depending on what was chosen
+  function deleteRelation(relation: SclRelation) {
+    if (relation.type === "input") {
+      const inputsCopy = structuredClone(inputs);
+      delete inputsCopy[relation.name];
+      setInputs(inputsCopy);
+    } else {
+      const outputsCopy = structuredClone(outputs);
+      delete outputsCopy[relation.name];
+      setOutputs(outputsCopy);
+    }
+    setActiveRelationName("");
+  }
+
   const bothEmpty =
     Object.keys(inputs).length === 0 && Object.keys(outputs).length === 0;
 
@@ -122,13 +139,21 @@ const TableEditor = ({
           outputs={outputs}
           addRelation={addRelation}
         />
-        <RelationSelect
-          inputs={inputs}
-          outputs={outputs}
-          bothEmpty={bothEmpty}
-          activeRelationName={activeRelationName}
-          setActiveRelationName={setActiveRelationName}
-        />
+        <div className="flex justify-between space-x-2">
+          <DeleteRelationDialog
+            inputs={inputs}
+            outputs={outputs}
+            selectedRelationName={activeRelationName}
+            deleteRelation={deleteRelation}
+          />
+          <RelationSelect
+            inputs={inputs}
+            outputs={outputs}
+            bothEmpty={bothEmpty}
+            activeRelationName={activeRelationName}
+            setActiveRelationName={setActiveRelationName}
+          />
+        </div>
       </div>
       <Card className="h-0 grow p-4">
         {bothEmpty ? (

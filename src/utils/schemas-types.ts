@@ -99,10 +99,10 @@ export type {
 export {
   ArgSchema,
   ArgTypeSchema,
-  SclProgramSchema,
-  SclRelationSchema,
-  SclRelationInputSchema,
-  ProjectSchema,
   argumentTypes,
+  ProjectSchema,
   relationToSchema,
+  SclProgramSchema,
+  SclRelationInputSchema,
+  SclRelationSchema,
 };

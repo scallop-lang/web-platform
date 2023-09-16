@@ -5,19 +5,18 @@ import {
   ScallopHighlighter,
   ScallopLinter,
 } from "codemirror-lang-scallop";
-
 import { Loader, PlayCircle } from "lucide-react";
-import { useEffect, useState } from "react";
-
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+
+import { api } from "~/utils/api";
+import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
+
+import RawFileComponent from "./raw-file-component";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
-
-import { v4 as uuidv4 } from "uuid";
-import { api } from "~/utils/api";
-import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
-import RawFileComponent from "./raw-file-component";
 import { useToast } from "./ui/use-toast";
 
 const CodeEditor = ({

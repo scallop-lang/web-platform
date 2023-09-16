@@ -1,8 +1,18 @@
-import { Laptop2, LayoutDashboard, LogIn, Moon, Sun, User } from "lucide-react";
+import {
+  Laptop2,
+  LayoutDashboard,
+  LogIn,
+  LogOut,
+  Moon,
+  Sun,
+  User,
+} from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -21,6 +31,51 @@ import { Skeleton } from "./ui/skeleton";
 const AvatarDropdown = () => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
+  const { data: session, status } = useSession();
+
+  let userName: string | null | undefined;
+  let subtitle: string | null | undefined;
+  let avatar: React.ReactNode;
+  let accountOption: React.ReactNode;
+
+  if (status === "loading") {
+    userName = "Loading...";
+    subtitle = "Loading...";
+    avatar = <Skeleton className="h-9 w-9 rounded-full cursor-pointer" />;
+    accountOption = <DropdownMenuItem disabled>Loading...</DropdownMenuItem>;
+  } else if (status === "authenticated") {
+    userName = session.user?.name;
+    subtitle = session.user?.email;
+    avatar = (
+      <Avatar className="h-9 w-9">
+        <AvatarFallback className="cursor-pointer">
+          <p className="scroll-m-20 text-xl font-semibold tracking-tight">
+            {userName ? userName.charAt(0) : "S"}
+          </p>
+        </AvatarFallback>
+      </Avatar>
+    );
+    accountOption = (
+      <DropdownMenuItem onClick={() => signOut()}>
+        <LogOut className="mr-2 h-4 w-4" />
+        Sign out
+      </DropdownMenuItem>
+    );
+  } else {
+    userName = "Guest";
+    subtitle = "Log in to save your progress.";
+    avatar = (
+      <div className="flex h-9 w-9 rounded-full bg-zinc-100 dark:bg-zinc-900 items-center justify-center cursor-pointer">
+        <User className="h-5 w-5" />
+      </div>
+    );
+    accountOption = (
+      <DropdownMenuItem onClick={() => signIn()}>
+        <LogIn className="mr-2 h-4 w-4" />
+        Sign in
+      </DropdownMenuItem>
+    );
+  }
 
   // to avoid hydration mismatch, we render a skeleton before page is mounted on client
   // this is because on the server, `resolvedTheme` is undefined
@@ -37,18 +92,12 @@ const AvatarDropdown = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Avatar className="h-9 w-9">
-          <AvatarFallback className="cursor-pointer">
-            <User className="h-5 w-5" />
-          </AvatarFallback>
-        </Avatar>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>{avatar}</DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>
-          <p>Guest</p>
+          <p>{userName ? userName : "Scallop user"}</p>
           <p className="text-sm font-normal text-muted-foreground">
-            Log in to save your progress.
+            {subtitle ? subtitle : "You are logged in."}
           </p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -77,16 +126,13 @@ const AvatarDropdown = () => {
         <DropdownMenuItem>
           <Link
             href="/dashboard"
-            className="flex w-full items-center"
+            className="flex w-full items-center cursor-default"
           >
             <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
+            Go to dashboard
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <LogIn className="mr-2 h-4 w-4" />
-          Login
-        </DropdownMenuItem>
+        {accountOption}
       </DropdownMenuContent>
     </DropdownMenu>
   );
