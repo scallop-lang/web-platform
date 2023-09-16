@@ -5,13 +5,21 @@ import { type RelationRecord, type SclProgram } from "~/utils/schemas-types";
 import CodeEditor from "./code-editor";
 import TableEditor from "./table-editor";
 
-const Playground = () => {
-  const [program, setProgram] = useState<SclProgram>("");
-  const [inputs, setInputs] = useState<RelationRecord>({});
-  const [outputs, setOutputs] = useState<RelationRecord>({});
+const Playground = ({
+  initProgram,
+  initInputs,
+  initOutputs,
+}: {
+  initProgram: SclProgram;
+  initInputs: RelationRecord;
+  initOutputs: RelationRecord;
+}) => {
+  const [program, setProgram] = useState<SclProgram>(initProgram);
+  const [inputs, setInputs] = useState<RelationRecord>(initInputs);
+  const [outputs, setOutputs] = useState<RelationRecord>(initOutputs);
 
   return (
-    <main className="grid h-[calc(100vh-53px)] grid-cols-2 gap-3 bg-background p-4">
+    <div className="grid grid-cols-2 h-full gap-3">
       <CodeEditor
         inputs={inputs}
         outputs={outputs}
@@ -25,7 +33,7 @@ const Playground = () => {
         setInputs={setInputs}
         setOutputs={setOutputs}
       />
-    </main>
+    </div>
   );
 };
 
