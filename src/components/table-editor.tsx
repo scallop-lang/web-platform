@@ -12,7 +12,7 @@ import {
 import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
 
 import CreateRelationDialog from "./create-relation-dialog";
-import DeleteRelationDialog from "./delete-relation-dialog";
+import DeleteRelation from "./delete-relation";
 import { Table } from "./table";
 import { Card } from "./ui/card";
 
@@ -69,7 +69,7 @@ const RelationSelect = ({
       onValueChange={setActiveRelationName}
       disabled={bothEmpty}
     >
-      <SelectTrigger className="w-96">
+      <SelectTrigger className="w-96 h-9">
         <SelectValue placeholder={bothEmpty ? "Empty" : "Nothing selected"} />
       </SelectTrigger>
       <SelectContent>
@@ -132,7 +132,7 @@ const TableEditor = ({
     Object.keys(inputs).length === 0 && Object.keys(outputs).length === 0;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col space-y-4">
       <div className="flex justify-between space-x-10">
         <CreateRelationDialog
           inputs={inputs}
@@ -140,7 +140,7 @@ const TableEditor = ({
           addRelation={addRelation}
         />
         <div className="flex justify-between space-x-2">
-          <DeleteRelationDialog
+          <DeleteRelation
             inputs={inputs}
             outputs={outputs}
             selectedRelationName={activeRelationName}

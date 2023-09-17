@@ -45,27 +45,30 @@ const DeleteRelation = ({
       }}
     >
       <DialogTrigger asChild>
-        <Button disabled={!selectedRelationName}>
-          <Trash /> Delete
+        <Button
+          variant="outline"
+          disabled={!selectedRelationName}
+        >
+          <Trash className="mr-2 w-4 h-4" /> Delete
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Wait! Don&apos;t Delete Yet!</DialogTitle>
+          <DialogTitle>Wait! Don&apos;t delete yet!</DialogTitle>
           <DialogDescription>
             Are you sure you want to delete the relation{" "}
             <b>{selectedRelationName}</b>?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
+          <Button variant="outline">
+            <X className="mr-2 h-4 w-4" /> No, cancel.
+          </Button>
           <Button
             variant="destructive"
             onClick={() => closeDialogBeforeDelete(relation)}
           >
-            <Trash className="mr-2 h-4 w-4" /> Yes, Delete.
-          </Button>
-          <Button onClick={() => setDialogOpen(false)}>
-            <X className="mr-2 h-4 w-4" /> No, Cancel.
+            <Trash className="mr-2 h-4 w-4" /> Yes, delete.
           </Button>
         </DialogFooter>
       </DialogContent>

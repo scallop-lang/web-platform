@@ -12,20 +12,11 @@ const ProjectHeader = ({ router }: { router: NextRouter }) => {
       </h2>
 
       <div className="flex space-x-3">
-        <Button
-          size="sm"
-          onClick={() => alert("yes")}
-        >
-          More interesting buttons
-        </Button>
-        <Button
-          size="sm"
-          onClick={() => alert("me when I delete project")}
-        >
+        <Button onClick={() => alert("yes")}>More interesting buttons</Button>
+        <Button onClick={() => alert("me when I delete project")}>
           Save project
         </Button>
         <Button
-          size="sm"
           variant="destructive"
           onClick={() => alert("totally deleted")}
         >
