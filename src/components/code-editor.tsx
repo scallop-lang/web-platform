@@ -40,12 +40,6 @@ const CodeEditor = ({
   // undefined on the server. see pages/input.tsx for more info
   useEffect(() => setMounted(true), []);
 
-  // Sample usages of project api
-  const projectId = "clm9yv5500000j0dkf4aqjo08";
-  // const create = api.project.create.useMutation();
-  const update = api.project.updateProjectById.useMutation();
-  // const get = api.project.getProjectById.useQuery({ id: projectId });
-
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
       const outputsCopy = structuredClone(outputs);
@@ -107,16 +101,6 @@ const CodeEditor = ({
               program: program,
               inputs: Object.values(inputs),
               outputs: Object.values(outputs),
-            });
-
-            update.mutate({
-              id: projectId,
-              project: {
-                title: "Test",
-                program: program,
-                inputs: Object.values(inputs),
-                outputs: Object.values(outputs),
-              },
             });
 
             toast({
