@@ -92,7 +92,7 @@ const AvatarDropdown = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>{avatar}</DropdownMenuTrigger>
+      <DropdownMenuTrigger>{avatar}</DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>
           <p>{userName ? userName : "Scallop user"}</p>

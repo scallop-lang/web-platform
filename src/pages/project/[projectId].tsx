@@ -1,42 +1,48 @@
-import type { NextRouter } from "next/router";
-import { useRouter } from "next/router";
+import type { NextPage } from "next/types";
 
 import Playground from "~/components/playground";
 import { Button } from "~/components/ui/button";
+import { api } from "~/utils/api";
+import type { RelationRecord } from "~/utils/schemas-types";
 
-const ProjectHeader = ({ router }: { router: NextRouter }) => {
-  return (
-    <div className="flex items-center justify-between">
-      <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-        Project name: {router.query.projectId}
-      </h2>
+const Project: NextPage<{ projectId: string }> = ({ projectId }) => {
+  const project = api.project.getProjectById.useQuery({
+    id: projectId,
+  });
 
-      <div className="flex space-x-3">
-        <Button onClick={() => alert("yes")}>More interesting buttons</Button>
-        <Button onClick={() => alert("me when I delete project")}>
-          Save project
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={() => alert("totally deleted")}
-        >
-          Delete project
-        </Button>
-      </div>
-    </div>
-  );
-};
+  const program = project.data?.program ? project.data?.program : "";
+  const inputs: RelationRecord = {};
+  const outputs: RelationRecord = {};
 
-const Project = () => {
-  const router = useRouter();
+  project.data?.inputs.forEach((InputRelation) => {
+    inputs[InputRelation.name] = InputRelation;
+  });
+
+  project.data?.outputs.forEach((OutputRelation) => {
+    outputs[OutputRelation.name] = OutputRelation;
+  });
 
   return (
     <main className="flex flex-col h-[calc(100vh-53px)] gap-3 bg-background p-4">
-      <ProjectHeader router={router} />
+      <div className="flex items-center justify-between">
+        <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+          Project name: {projectId}
+        </h2>
+
+        <div className="flex space-x-3">
+          <Button onClick={() => alert("poo poo pee pee")}>Save project</Button>
+          <Button
+            variant="destructive"
+            onClick={() => alert("totally deleted")}
+          >
+            Delete project
+          </Button>
+        </div>
+      </div>
       <Playground
-        initProgram={""}
-        initInputs={{}}
-        initOutputs={{}}
+        initProgram={program}
+        initInputs={inputs}
+        initOutputs={outputs}
       />
     </main>
   );

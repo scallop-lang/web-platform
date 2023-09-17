@@ -1,7 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import {
   ProjectSchema,
   type SclRelation,
@@ -9,18 +13,38 @@ import {
 } from "~/utils/schemas-types";
 
 export const projectRouter = createTRPCRouter({
-  create: publicProcedure
-    .input(ProjectSchema)
-    .mutation(async ({ ctx, input }) => {
-      const project = await ctx.prisma.project.create({
-        data: input,
-      });
-      return project;
-    }),
+  create: protectedProcedure.mutation(async ({ ctx }) => {
+    const userId = ctx.session?.user ? ctx.session.user.id : null;
+    const project = await ctx.prisma.project.create({
+      data: {
+        title: "Untitled project",
+        inputs: "",
+        program: "",
+        outputs: "",
+        authorId: userId,
+      },
+    });
+    return project;
+  }),
 
-  getAllProjects: publicProcedure.query(async ({ ctx }) => {
+  getPublicProjects: publicProcedure.query(async ({ ctx }) => {
     const projects = await ctx.prisma.project.findMany({
       take: 100,
+      where: {
+        published: true,
+      },
+      orderBy: [{ createdAt: "desc" }],
+    });
+    return projects;
+  }),
+
+  getProjectsByUser: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session?.user ? ctx.session.user.id : null;
+    const projects = await ctx.prisma.project.findMany({
+      take: 100,
+      where: {
+        authorId: userId,
+      },
       orderBy: [{ createdAt: "desc" }],
     });
     return projects;
@@ -29,25 +53,33 @@ export const projectRouter = createTRPCRouter({
   getProjectById: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const project = await ctx.prisma.project.findUnique({
-        where: { id: input.id },
+      let project = await ctx.prisma.project.findUnique({
+        where: { id: input.id, published: true },
       });
+
+      if (!project && ctx.session?.user) {
+        project = await ctx.prisma.project.findUnique({
+          where: { id: input.id, authorId: ctx.session.user.id },
+        });
+      }
 
       if (!project) throw new TRPCError({ code: "NOT_FOUND" });
 
       return {
         ...project,
-        inputs: JSON.parse(project.inputs) as SclRelationInput,
-        outputs: JSON.parse(project.outputs) as SclRelation,
+        inputs: JSON.parse(project.inputs) as SclRelationInput[],
+        outputs: JSON.parse(project.outputs) as SclRelation[],
       };
     }),
 
-  updateProjectById: publicProcedure
+  updateProjectById: protectedProcedure
     .input(z.object({ id: z.string(), project: ProjectSchema }))
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user ? ctx.session.user.id : null;
       const project = await ctx.prisma.project.update({
         where: {
           id: input.id,
+          authorId: userId,
         },
         data: input.project,
       });
