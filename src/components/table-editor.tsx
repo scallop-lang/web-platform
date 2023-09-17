@@ -69,7 +69,7 @@ const RelationSelect = ({
       onValueChange={setActiveRelationName}
       disabled={bothEmpty}
     >
-      <SelectTrigger className="w-96 h-9">
+      <SelectTrigger className="w-2/3 h-9">
         <SelectValue placeholder={bothEmpty ? "Empty" : "Nothing selected"} />
       </SelectTrigger>
       <SelectContent>
@@ -139,7 +139,7 @@ const TableEditor = ({
           outputs={outputs}
           addRelation={addRelation}
         />
-        <div className="flex justify-between space-x-2">
+        <div className="flex grow justify-end space-x-2">
           <DeleteRelation
             inputs={inputs}
             outputs={outputs}
