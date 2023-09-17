@@ -1,12 +1,13 @@
 import { TRPCError } from "@trpc/server";
-import { z, type ZodTypeAny } from "zod";
+import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
-  relationToSchema,
+  FactSchema,
   SclProgramSchema,
   SclRelationInputSchema,
   SclRelationSchema,
+  type Fact,
 } from "~/utils/schemas-types";
 
 import { env } from "../../../env.mjs";
@@ -50,22 +51,15 @@ export const scallopRouter = createTRPCRouter({
         }
       }
 
-      const outputRelSchema: Record<string, ZodTypeAny> = {};
-      input.outputs.forEach((relation) => {
-        outputRelSchema[relation.name] = relationToSchema(relation);
-      });
-
-      const schema = z.object(outputRelSchema);
-      const body: Record<string, [number, string[]][]> = schema.parse(
-        await res.json(),
-        {
+      const body: Record<string, Fact[]> = z
+        .record(z.string(), FactSchema.array())
+        .parse(await res.json(), {
           errorMap: (_issue, ctx) => {
             return {
               message: `[@output]: ${ctx.defaultError}`,
             };
           },
-        }
-      );
+        });
 
       return body;
     }),

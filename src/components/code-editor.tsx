@@ -53,11 +53,11 @@ const CodeEditor = ({
       for (const [relationName, facts] of Object.entries(data)) {
         outputsCopy[relationName]!.facts = [];
 
-        for (const [tag, tuple] of facts) {
+        for (const fact of facts) {
           outputsCopy[relationName]!.facts.push({
             id: uuidv4(),
-            tag: tag,
-            tuple: tuple,
+            tag: fact.tag,
+            tuple: fact.tuple,
           });
         }
       }

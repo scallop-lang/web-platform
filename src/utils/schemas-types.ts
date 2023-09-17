@@ -34,6 +34,7 @@ type Fact = z.infer<typeof FactSchema>;
 type SclProgram = z.infer<typeof SclProgramSchema>;
 type SclRelation = z.infer<typeof SclRelationSchema>;
 type SclRelationInput = z.infer<typeof SclRelationInputSchema>;
+type Project = z.infer<typeof ProjectSchema>;
 type RelationRecord = Record<string, SclRelation>;
 
 const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
@@ -51,22 +52,25 @@ const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
 // generates a Zod schema for the given relation.
 const relationToSchema = (relation: SclRelation) => {
   const schema = relation.args.map((arg) => typeToSchema[arg.type]);
-  return z.tuple([z.number(), z.tuple(schema as [])]).array();
+  return z
+    .object({
+      id: z.string(),
+      tag: z.number(),
+      tuple: z.tuple(schema as []),
+    })
+    .array();
 };
 
 const SclRelationInputSchema = SclRelationSchema.transform((relation) => {
   return {
     ...relation,
-    facts: relationToSchema(relation).parse(
-      relation.facts.map((fact) => [fact.tag, fact.tuple]),
-      {
-        errorMap: (_issue, ctx) => {
-          return {
-            message: `[@rel ${relation.name}]: ${ctx.defaultError}`,
-          };
-        },
-      }
-    ),
+    facts: relationToSchema(relation).parse(relation.facts, {
+      errorMap: (_issue, ctx) => {
+        return {
+          message: `[@rel ${relation.name}]: ${ctx.defaultError}`,
+        };
+      },
+    }),
   };
 });
 
@@ -94,6 +98,7 @@ export type {
   SclProgram,
   SclRelation,
   SclRelationInput,
+  Project,
 };
 
 export {
@@ -105,4 +110,5 @@ export {
   SclProgramSchema,
   SclRelationInputSchema,
   SclRelationSchema,
+  FactSchema,
 };

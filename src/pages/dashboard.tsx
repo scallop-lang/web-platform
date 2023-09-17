@@ -1,6 +1,6 @@
 import { ArrowRight, LogIn, Plus } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { useRouter, type NextRouter } from "next/router";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -11,10 +11,46 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
+import { api } from "~/utils/api";
+
+const ProjectCard = ({
+  router,
+  projectId,
+  name,
+  createdAt,
+}: {
+  router: NextRouter;
+  projectId: string;
+  name: string;
+  createdAt: Date;
+}) => {
+  return (
+    <Card className="w-[350px]">
+      <CardHeader>
+        <CardTitle>{name}</CardTitle>
+        <CardDescription>
+          Actually a real project lol. Created on {createdAt.toDateString()}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Button onClick={() => router.push(`/project/${projectId}`)}>
+          <ArrowRight className="mr-2 w-4 h-4" />
+          Go to project
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
 
 const Dashboard = () => {
   const { status } = useSession();
   const router = useRouter();
+  const projectsQuery = api.project.getProjectsByUser.useQuery();
+  const createMutation = api.project.create.useMutation({
+    onSuccess: async (projectData) => {
+      await router.push(`/project/${projectData.id}`);
+    },
+  });
 
   if (status === "loading") {
     return (
@@ -27,12 +63,28 @@ const Dashboard = () => {
   }
 
   if (status === "authenticated") {
+    const userProjectsList: React.ReactNode = projectsQuery.data?.map(
+      (project, index) => {
+        console.log(project);
+
+        return (
+          <ProjectCard
+            key={index}
+            router={router}
+            projectId={project.id}
+            name={project.title}
+            createdAt={project.createdAt}
+          />
+        );
+      }
+    );
+
     return (
       <main className="flex flex-col space-y-1.5 min-h-screen bg-background p-4">
         <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
           Your projects
         </h3>
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 space-y-4 flex-wrap">
           <Card className="w-[350px]">
             <CardHeader>
               <CardTitle>New project</CardTitle>
@@ -42,27 +94,17 @@ const Dashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => router.push("/")}>
+              <Button
+                onClick={() => {
+                  createMutation.mutate();
+                }}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Create
               </Button>
             </CardContent>
           </Card>
-          <Card className="w-[350px]">
-            <CardHeader>
-              <CardTitle>Untitled 34</CardTitle>
-              <CardDescription>
-                Totally real project. Click the button to go to the project
-                page.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => router.push("/project/random-project-id")}>
-                <ArrowRight className="mr-2 w-4 h-4" />
-                Go to project
-              </Button>
-            </CardContent>
-          </Card>
+          {userProjectsList ? userProjectsList : <div>None created</div>}
         </div>
       </main>
     );
