@@ -34,7 +34,6 @@ type Fact = z.infer<typeof FactSchema>;
 type SclProgram = z.infer<typeof SclProgramSchema>;
 type SclRelation = z.infer<typeof SclRelationSchema>;
 type SclRelationInput = z.infer<typeof SclRelationInputSchema>;
-type Project = z.infer<typeof ProjectSchema>;
 type RelationRecord = Record<string, SclRelation>;
 
 const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
@@ -98,7 +97,6 @@ export type {
   SclProgram,
   SclRelation,
   SclRelationInput,
-  Project,
 };
 
 export {
