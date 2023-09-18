@@ -1,19 +1,11 @@
-import {
-  Laptop2,
-  LayoutDashboard,
-  LogIn,
-  LogOut,
-  Moon,
-  Sun,
-  User,
-} from "lucide-react";
+import { Laptop2, LogIn, LogOut, Moon, Sun, User } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,8 +38,15 @@ const AvatarDropdown = () => {
   } else if (status === "authenticated") {
     userName = session.user?.name;
     subtitle = session.user?.email;
+
+    const imageUrl = session.user?.image;
+
     avatar = (
       <Avatar className="h-9 w-9">
+        <AvatarImage
+          src={imageUrl ? imageUrl : ""}
+          alt={"Profile picture"}
+        />
         <AvatarFallback className="cursor-pointer">
           <p className="scroll-m-20 text-xl font-semibold tracking-tight">
             {userName ? userName.charAt(0) : "S"}
@@ -63,7 +62,7 @@ const AvatarDropdown = () => {
     );
   } else {
     userName = "Guest";
-    subtitle = "Log in to save your progress.";
+    subtitle = "Sign in to save your progress and to access the dashboard.";
     avatar = (
       <div className="flex h-9 w-9 rounded-full bg-zinc-100 dark:bg-zinc-900 items-center justify-center cursor-pointer">
         <User className="h-5 w-5" />
@@ -93,7 +92,10 @@ const AvatarDropdown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{avatar}</DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent
+        align="end"
+        className="w-[250px]"
+      >
         <DropdownMenuLabel>
           <p>{userName ? userName : "Scallop user"}</p>
           <p className="text-sm font-normal text-muted-foreground">
@@ -123,15 +125,6 @@ const AvatarDropdown = () => {
           </DropdownMenuPortal>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link
-            href="/dashboard"
-            className="flex w-full items-center cursor-default"
-          >
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Go to dashboard
-          </Link>
-        </DropdownMenuItem>
         {accountOption}
       </DropdownMenuContent>
     </DropdownMenu>
@@ -141,7 +134,7 @@ const AvatarDropdown = () => {
 const Header = () => {
   return (
     <header className="flex w-full items-center justify-between border-b border-border bg-background p-2">
-      <nav className="flex space-x-8">
+      <nav className="flex space-x-6">
         <Link
           href="/"
           className="ml-1 flex items-center space-x-2 hover:underline"
@@ -155,12 +148,6 @@ const Header = () => {
           <h4 className="scroll-m-20 text-lg font-semibold tracking-tight">
             Playground
           </h4>
-        </Link>
-        <Link
-          href="/examples"
-          className="flex items-center text-sm font-medium hover:underline"
-        >
-          Examples
         </Link>
         <Link
           href="https://scallop-lang.github.io/doc/index.html"
@@ -177,7 +164,15 @@ const Header = () => {
           Main Site
         </Link>
       </nav>
-      <AvatarDropdown />
+      <div className="flex space-x-6">
+        <Link
+          href="/dashboard"
+          className="flex items-center text-sm font-medium hover:underline"
+        >
+          Dashboard
+        </Link>
+        <AvatarDropdown />
+      </div>
     </header>
   );
 };

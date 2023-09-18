@@ -1,23 +1,23 @@
-import { useState } from "react";
-
 import { type RelationRecord, type SclProgram } from "~/utils/schemas-types";
 
 import CodeEditor from "./code-editor";
 import TableEditor from "./table-editor";
 
 const Playground = ({
-  initProgram,
-  initInputs,
-  initOutputs,
+  program,
+  inputs,
+  outputs,
+  setProgram,
+  setInputs,
+  setOutputs,
 }: {
-  initProgram: SclProgram;
-  initInputs: RelationRecord;
-  initOutputs: RelationRecord;
+  program: SclProgram;
+  inputs: RelationRecord;
+  outputs: RelationRecord;
+  setProgram: React.Dispatch<React.SetStateAction<SclProgram>>;
+  setInputs: React.Dispatch<React.SetStateAction<RelationRecord>>;
+  setOutputs: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
-  const [program, setProgram] = useState<SclProgram>(initProgram);
-  const [inputs, setInputs] = useState<RelationRecord>(initInputs);
-  const [outputs, setOutputs] = useState<RelationRecord>(initOutputs);
-
   return (
     <div className="grid grid-cols-2 h-full gap-3">
       <CodeEditor

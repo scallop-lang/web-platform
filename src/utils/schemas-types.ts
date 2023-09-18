@@ -19,7 +19,7 @@ const FactSchema = z.object({
   tuple: z.coerce.string().array(),
 });
 
-const SclProgramSchema = z.string().min(1);
+const SclProgramSchema = z.string();
 const SclRelationSchema = z.object({
   type: z.enum(["input", "output"]),
   name: NameSchema,

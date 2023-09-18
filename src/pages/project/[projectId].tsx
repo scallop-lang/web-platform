@@ -3,13 +3,15 @@ import type {
   GetServerSideProps,
   InferGetServerSidePropsType,
 } from "next/types";
+import { useState } from "react";
 
 import Playground from "~/components/playground";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { useToast } from "~/components/ui/use-toast";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
-import type { RelationRecord } from "~/utils/schemas-types";
+import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
 import { generateSSRHelper } from "~/utils/ssr-helper";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
@@ -32,31 +34,39 @@ const ProjectPage = ({
     },
   });
 
-  const program = project.program;
-  const inputs: RelationRecord = {};
-  const outputs: RelationRecord = {};
+  const inputsCopy: RelationRecord = {};
+  const outputsCopy: RelationRecord = {};
 
   project.inputs.forEach((input) => {
-    inputs[input.name] = input;
+    inputsCopy[input.name] = input;
   });
 
   project.outputs.forEach((output) => {
-    outputs[output.name] = output;
+    outputsCopy[output.name] = output;
   });
+
+  const [program, setProgram] = useState<SclProgram>(project.program);
+  const [inputs, setInputs] = useState<RelationRecord>(inputsCopy);
+  const [outputs, setOutputs] = useState<RelationRecord>(outputsCopy);
+  const [projectTitle, setProjectTitle] = useState<string>(project.title);
 
   return (
     <main className="flex flex-col h-[calc(100vh-53px)] gap-3 bg-background p-4">
       <div className="flex items-center justify-between">
-        <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-          Project name: {project.id}
-        </h2>
+        <Input
+          type="text"
+          defaultValue={projectTitle}
+          onChange={(e) => setProjectTitle(e.target.value)}
+          className="scroll-m-20 text-2xl font-semibold tracking-tight w-fit"
+          placeholder={project.title}
+        />
         <div className="flex space-x-3">
           <Button
             onClick={() => {
               updateProject.mutate({
                 id: project.id,
                 project: {
-                  title: project.title ? project.title : "Untitled Project",
+                  title: projectTitle ? projectTitle : "Untitled Project",
                   program: program,
                   inputs: Object.values(inputs),
                   outputs: Object.values(outputs),
@@ -75,9 +85,12 @@ const ProjectPage = ({
         </div>
       </div>
       <Playground
-        initProgram={program}
-        initInputs={inputs}
-        initOutputs={outputs}
+        program={program}
+        inputs={inputs}
+        outputs={outputs}
+        setProgram={setProgram}
+        setInputs={setInputs}
+        setOutputs={setOutputs}
       />
     </main>
   );
