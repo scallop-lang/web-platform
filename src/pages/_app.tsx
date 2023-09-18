@@ -14,6 +14,7 @@ import { api } from "~/utils/api";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  preload: true,
 });
 
 const plexMono = IBM_Plex_Mono({

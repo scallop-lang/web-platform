@@ -17,19 +17,25 @@ const ProjectCard = ({
   router,
   projectId,
   name,
+  description,
   createdAt,
 }: {
   router: NextRouter;
   projectId: string;
   name: string;
+  description: string | null;
   createdAt: Date;
 }) => {
   return (
-    <Card className="w-[350px]">
+    <Card className="w-[350px] h-[200px]">
       <CardHeader>
-        <CardTitle>{name}</CardTitle>
-        <CardDescription>
-          Actually a real project lol. Created on {createdAt.toDateString()}
+        <CardTitle className="truncate">{name}</CardTitle>
+        <CardDescription className="line-clamp-2 flex flex-col space-y-2">
+          <p>{description ? description : "No description provided."}</p>
+          <p>
+            Created on {createdAt.toLocaleDateString()} at{" "}
+            {createdAt.toLocaleTimeString()}.
+          </p>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -43,8 +49,9 @@ const ProjectCard = ({
 };
 
 const Dashboard = () => {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
+
   const projectsQuery = api.project.getProjectsByUser.useQuery();
   const createMutation = api.project.create.useMutation({
     onSuccess: async (projectData) => {
@@ -71,37 +78,37 @@ const Dashboard = () => {
             router={router}
             projectId={project.id}
             name={project.title}
+            description={project.description}
             createdAt={project.createdAt}
           />
         );
       }
     );
 
+    const name = session.user?.name ? session.user.name : "Scallop user";
+    const first = name.split(" ")[0];
+
     return (
-      <main className="flex flex-col space-y-1.5 min-h-screen bg-background p-4">
-        <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
-          Your projects
+      <main className="flex flex-col space-y-3 min-h-screen bg-background p-4">
+        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+          Hello, {first ? first : name}.
         </h3>
-        <div className="flex space-x-4 space-y-4 flex-wrap">
-          <Card className="w-[350px]">
-            <CardHeader>
-              <CardTitle>New project</CardTitle>
-              <CardDescription>
-                Start an empty project from scratch. Just the defaults. No
-                relations defined.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                onClick={() => {
-                  createMutation.mutate();
-                }}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="flex gap-4 flex-wrap">
+          <button
+            onClick={() => {
+              createMutation.mutate();
+            }}
+          >
+            <Card className="w-[350px] p-6 hover:bg-muted transition h-[200px] flex flex-col items-center justify-center">
+              <Plus className="w-8 h-8 text-muted-foreground" />
+              <h3 className="scroll-m-20 text-xl font-semibold tracking-tight text-muted-foreground ">
+                Create new project
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Start an empty project from scratch.
+              </p>
+            </Card>
+          </button>
           {userProjectsList ? userProjectsList : <div>None created</div>}
         </div>
       </main>

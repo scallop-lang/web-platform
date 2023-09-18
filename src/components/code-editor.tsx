@@ -1,10 +1,6 @@
 import { lintGutter } from "@codemirror/lint";
 import CodeMirror from "@uiw/react-codemirror";
-import {
-  Scallop,
-  ScallopHighlighter,
-  ScallopLinter,
-} from "codemirror-lang-scallop";
+import { Scallop, ScallopHighlighter } from "codemirror-lang-scallop";
 import { Loader, PlayCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -81,7 +77,7 @@ const CodeEditor = ({
       extensions={[
         Scallop(),
         ScallopHighlighter(resolvedTheme!),
-        ScallopLinter,
+        //ScallopLinter,
         lintGutter(),
       ]}
       theme={resolvedTheme === "light" ? "light" : "dark"}
