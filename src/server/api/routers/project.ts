@@ -18,9 +18,9 @@ export const projectRouter = createTRPCRouter({
     const project = await ctx.prisma.project.create({
       data: {
         title: "Untitled project",
-        inputs: "",
+        inputs: "[]",
+        outputs: "[]",
         program: "",
-        outputs: "",
         authorId: userId,
       },
     });
