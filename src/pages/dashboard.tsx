@@ -65,8 +65,6 @@ const Dashboard = () => {
   if (status === "authenticated") {
     const userProjectsList: React.ReactNode = projectsQuery.data?.map(
       (project, index) => {
-        console.log(project);
-
         return (
           <ProjectCard
             key={index}
