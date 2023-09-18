@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
+import { useToast } from "~/components/ui/use-toast";
 import { api } from "~/utils/api";
 
 const ProjectCard = ({
@@ -50,39 +51,61 @@ const ProjectCard = ({
 
 const Dashboard = () => {
   const { data: session, status } = useSession();
+  const { toast } = useToast();
   const router = useRouter();
 
-  const projectsQuery = api.project.getProjectsByUser.useQuery();
-  const createMutation = api.project.create.useMutation({
+  const { data, isLoading, isError, error } =
+    api.project.getProjectsByUser.useQuery();
+
+  const { mutate } = api.project.create.useMutation({
     onSuccess: async (projectData) => {
       await router.push(`/project/${projectData.id}`);
     },
   });
 
+  if (isError) {
+    toast({
+      title: "An error occurred",
+      description: `Something happened while loading your projects. Reason: ${error.message}`,
+    });
+  }
+
   if (status === "loading") {
     return (
       <main className="h-[calc(100vh-53px)] p-4 bg-background">
         <Skeleton className="h-full w-full rounded-xl flex items-center justify-center">
-          <p className="text-sm text-muted-foreground">Loading...</p>
+          <p className="text-sm text-muted-foreground">
+            Signing into dashboard...
+          </p>
         </Skeleton>
       </main>
     );
   }
 
   if (status === "authenticated") {
-    const userProjectsList: React.ReactNode = projectsQuery.data?.map(
-      (project, index) => {
-        return (
-          <ProjectCard
-            key={index}
-            router={router}
-            projectId={project.id}
-            name={project.title}
-            description={project.description}
-            createdAt={project.createdAt}
-          />
-        );
-      }
+    const projectsList: React.ReactNode = isLoading ? (
+      <Skeleton className="w-[350px] h-[200px] rounded-lg flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">
+          Loading your projects...
+        </p>
+      </Skeleton>
+    ) : data ? (
+      data.map((project, index) => (
+        <ProjectCard
+          key={index}
+          router={router}
+          projectId={project.id}
+          name={project.title}
+          description={project.description}
+          createdAt={project.createdAt}
+        />
+      ))
+    ) : (
+      <Card className="w-[350px] h-[200px] flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">
+          No projects found. Create one!
+        </p>
+      </Card>
     );
 
     const name = session.user?.name ? session.user.name : "Scallop user";
@@ -91,14 +114,10 @@ const Dashboard = () => {
     return (
       <main className="flex flex-col space-y-3 min-h-screen bg-background p-4">
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-          Hello, {first ? first : name}.
+          Welcome back, {first ? first : name}.
         </h3>
         <div className="flex gap-4 flex-wrap">
-          <button
-            onClick={() => {
-              createMutation.mutate();
-            }}
-          >
+          <button onClick={() => mutate()}>
             <Card className="w-[350px] p-6 hover:bg-muted transition h-[200px] flex flex-col items-center justify-center">
               <Plus className="w-8 h-8 text-muted-foreground" />
               <h3 className="scroll-m-20 text-xl font-semibold tracking-tight text-muted-foreground ">
@@ -109,7 +128,7 @@ const Dashboard = () => {
               </p>
             </Card>
           </button>
-          {userProjectsList ? userProjectsList : <div>None created</div>}
+          {projectsList}
         </div>
       </main>
     );
