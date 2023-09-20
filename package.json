@@ -33,6 +33,7 @@
     "@trpc/react-query": "^10.26.0",
     "@trpc/server": "^10.26.0",
     "@types/uuid": "^9.0.2",
+    "@uiw/codemirror-themes": "^4.21.13",
     "@uiw/react-codemirror": "^4.21.9",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",

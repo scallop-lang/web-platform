@@ -1,12 +1,17 @@
 import { lintGutter } from "@codemirror/lint";
 import CodeMirror from "@uiw/react-codemirror";
-import { Scallop, ScallopHighlighter } from "codemirror-lang-scallop";
+import {
+  Scallop,
+  ScallopHighlighter,
+  ScallopLinter,
+} from "codemirror-lang-scallop";
 import { Loader, PlayCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { api } from "~/utils/api";
+import { ScallopDark, ScallopLight } from "~/utils/editor-themes";
 import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
 
 import RawFileComponent from "./raw-file-component";
@@ -77,10 +82,10 @@ const CodeEditor = ({
       extensions={[
         Scallop(),
         ScallopHighlighter(resolvedTheme!),
-        //ScallopLinter,
+        ScallopLinter,
         lintGutter(),
       ]}
-      theme={resolvedTheme === "light" ? "light" : "dark"}
+      theme={resolvedTheme === "light" ? ScallopLight : ScallopDark}
       autoFocus={true}
       placeholder={`// write your Scallop program here`}
       style={{ height: "100%" }}
