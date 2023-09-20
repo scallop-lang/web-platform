@@ -87,8 +87,8 @@ dependencies:
     specifier: ^2.0.0
     version: 2.0.0
   codemirror-lang-scallop:
-    specifier: ^0.1.4
-    version: 0.1.4
+    specifier: ^1.0.0
+    version: 1.0.0
   lucide-react:
     specifier: ^0.263.1
     version: 0.263.1(react@18.2.0)
@@ -2290,8 +2290,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /codemirror-lang-scallop@0.1.4:
-    resolution: {integrity: sha512-IP4UtzYfmWjrHUuJLNW+ULZYzAYsC1+H3TR1p9WnMy887NIfEGNGA6f03FGSyGOAdwAy37uHgLQ6j8jCMU8Gcw==}
+  /codemirror-lang-scallop@1.0.0:
+    resolution: {integrity: sha512-pu+csuN9VdShrY5kajIBFnpi3/aqymC2K+EvAozLvhmW8LRGgDZWdOPdAMik19XKFymB5a6BUAiCTUOMNDgGDQ==}
     dependencies:
       '@codemirror/language': 6.8.0
       '@codemirror/lint': 6.4.0
