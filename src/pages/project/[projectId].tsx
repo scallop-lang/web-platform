@@ -1,4 +1,5 @@
 import type { inferRouterOutputs } from "@trpc/server";
+import { Loader, Save, Trash } from "lucide-react";
 import type {
   GetServerSideProps,
   InferGetServerSidePropsType,
@@ -21,18 +22,17 @@ const ProjectPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { toast } = useToast();
 
-  const updateProject = api.project.updateProjectById.useMutation({
-    onSuccess: () => {
-      toast({
-        description: "Project successfully saved!",
-      });
-    },
-    onError: (error) => {
-      toast({
-        description: `Project failed to save! Reason: ${error.message}`,
-      });
-    },
-  });
+  const { mutate: saveProject, isLoading: projectIsSaving } =
+    api.project.updateProjectById.useMutation({
+      onSuccess: () =>
+        toast({
+          description: "Project successfully saved!",
+        }),
+      onError: (error) =>
+        toast({
+          description: `Project failed to save! Reason: ${error.message}`,
+        }),
+    });
 
   const inputsCopy: RelationRecord = {};
   const outputsCopy: RelationRecord = {};
@@ -62,24 +62,34 @@ const ProjectPage = ({
         />
         <div className="flex space-x-3">
           <Button
-            onClick={() => {
-              updateProject.mutate({
+            onClick={() =>
+              saveProject({
                 id: project.id,
                 project: {
-                  title: projectTitle ? projectTitle : "Untitled Project",
+                  title: projectTitle,
                   program: program,
                   inputs: Object.values(inputs),
                   outputs: Object.values(outputs),
                 },
-              });
-            }}
+              })
+            }
+            disabled={projectIsSaving}
           >
-            Save project
+            {projectIsSaving ? (
+              <>
+                <Loader className="mr-2 w-4 h-4" /> Saving...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 w-4 h-4" /> Save project
+              </>
+            )}
           </Button>
           <Button
             variant="destructive"
             onClick={() => alert("totally deleted")}
           >
+            <Trash className="mr-2 w-4 h-4" />
             Delete project
           </Button>
         </div>
