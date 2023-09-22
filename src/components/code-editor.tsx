@@ -7,7 +7,7 @@ import {
 } from "codemirror-lang-scallop";
 import { Loader, PlayCircle } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { api } from "~/utils/api";
@@ -19,20 +19,10 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
 import { useToast } from "./ui/use-toast";
+import { ProjectContext } from "~/pages/project/projectContext";
 
-const CodeEditor = ({
-  inputs,
-  outputs,
-  program,
-  setProgram,
-  setOutputs,
-}: {
-  inputs: RelationRecord;
-  outputs: RelationRecord;
-  program: SclProgram;
-  setProgram: React.Dispatch<React.SetStateAction<SclProgram>>;
-  setOutputs: React.Dispatch<React.SetStateAction<RelationRecord>>;
-}) => {
+const CodeEditor = () => {
+  const {inputs, outputs, program, setOutputs, setProgram } = useContext(ProjectContext);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
   const { toast } = useToast();

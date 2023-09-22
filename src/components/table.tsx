@@ -1,5 +1,5 @@
 import { ListPlus, ListX, MoreVertical, Settings2, Tag } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { cn } from "~/utils/cn";
@@ -23,6 +23,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
+import { TableContext } from "~/pages/project/projectContext";
 
 const AddRowButton = ({
   relation,
@@ -377,14 +378,14 @@ const TableRow = ({
 // we would usually store the state of the table in its own component, but
 // we're actually passing down table state via the `record` prop
 const Table = ({
-  relationName,
   record,
   setRecord,
 }: {
-  relationName: string;
   record: RelationRecord;
   setRecord: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
+  const { activeRelationName } = useContext(TableContext);
+  const relationName = activeRelationName;
   const relation = record[relationName]!;
 
   // for each row, we generate the cells for each column
