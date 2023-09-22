@@ -17,16 +17,16 @@ interface TableContextType {
 
 export const ProjectContext = createContext<ProjectContextType>({
     program: "",
-    setProgram: () => {},
+    setProgram: () => undefined,
     inputs: {},
-    setInputs: () => {},
+    setInputs: () => undefined,
     outputs: {},
-    setOutputs: () => {}
+    setOutputs: () => undefined
 });
 
 export const TableContext = createContext<TableContextType>({
     activeRelationName: "",
-    setActiveRelationName: () => {}
+    setActiveRelationName: () => undefined
 });
 
 export const ProjectProvider = ({ children }: { children: React.ReactNode }) => {
