@@ -72,3 +72,5 @@ export const useProjectContext = () => {
 export const useTableContext = () => {
     return useContext<TableContextType>(TableContext);
 }
+
+export default ProjectContext;
