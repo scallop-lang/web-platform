@@ -12,14 +12,13 @@ import { v4 as uuidv4 } from "uuid";
 
 import { api } from "~/utils/api";
 import { ScallopDark, ScallopLight } from "~/utils/editor-themes";
-import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
 
 import RawFileComponent from "./raw-file-component";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
 import { useToast } from "./ui/use-toast";
-import { ProjectContext } from "~/pages/project/projectContext";
+import { ProjectContext } from "~/components/projectContext";
 
 const CodeEditor = () => {
   const {inputs, outputs, program, setOutputs, setProgram } = useContext(ProjectContext);

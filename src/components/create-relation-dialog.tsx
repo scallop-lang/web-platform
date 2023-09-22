@@ -8,7 +8,6 @@ import {
   argumentTypes,
   type Argument,
   type ArgumentType,
-  type RelationRecord,
   type SclRelation,
 } from "~/utils/schemas-types";
 
@@ -38,7 +37,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { ProjectContext, TableContext } from "~/pages/project/projectContext";
+import { ProjectContext, TableContext } from "~/components/projectContext";
 
 const StringArg: Argument = {
   type: "String",

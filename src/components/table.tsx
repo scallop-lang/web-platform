@@ -23,7 +23,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
-import { TableContext } from "~/pages/project/projectContext";
+import { TableContext } from "~/components/projectContext";
 
 const AddRowButton = ({
   relation,

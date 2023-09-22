@@ -1,4 +1,4 @@
-import { useState, useContext, createContext } from 'react';
+import { useState, createContext } from 'react';
 import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
 
 interface ProjectContextType {
@@ -64,13 +64,3 @@ export const TableProvider = ({ children }: { children: React.ReactNode }) => {
         </TableContext.Provider>
     )
 }
-
-export const useProjectContext = () => {
-    return useContext<ProjectContextType>(ProjectContext);
-}
-
-export const useTableContext = () => {
-    return useContext<TableContextType>(TableContext);
-}
-
-export default ProjectContext;

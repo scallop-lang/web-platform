@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { ProjectContext, TableContext } from "~/pages/project/projectContext";
+import { ProjectContext, TableContext } from "~/components/projectContext";
 import {
   Select,
   SelectContent,

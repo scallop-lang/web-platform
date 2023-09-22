@@ -1,5 +1,5 @@
 import { type RelationRecord, type SclProgram } from "~/utils/schemas-types";
-import { ProjectContext } from "~/pages/project/projectContext";
+import { ProjectContext } from "~/components/projectContext";
 import CodeEditor from "./code-editor";
 import TableEditor from "./table-editor";
 
