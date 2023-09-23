@@ -1,5 +1,6 @@
+import { ProjectContext } from "~/components/project-context";
 import { type RelationRecord, type SclProgram } from "~/utils/schemas-types";
-import { ProjectContext } from "~/components/projectContext";
+
 import CodeEditor from "./code-editor";
 import TableEditor from "./table-editor";
 
@@ -20,16 +21,18 @@ const Playground = ({
 }) => {
   return (
     <div className="grid grid-cols-2 h-full gap-3">
-      <ProjectContext.Provider value={{
-        program,
-        setProgram,
-        inputs,
-        setInputs,
-        outputs,
-        setOutputs
-      }}>
-        <CodeEditor/>
-        <TableEditor/>
+      <ProjectContext.Provider
+        value={{
+          program,
+          setProgram,
+          inputs,
+          setInputs,
+          outputs,
+          setOutputs,
+        }}
+      >
+        <CodeEditor />
+        <TableEditor />
       </ProjectContext.Provider>
     </div>
   );

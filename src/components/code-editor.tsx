@@ -10,6 +10,7 @@ import { useTheme } from "next-themes";
 import { useContext, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+import { ProjectContext } from "~/components/project-context";
 import { api } from "~/utils/api";
 import { ScallopDark, ScallopLight } from "~/utils/editor-themes";
 
@@ -18,10 +19,10 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
 import { useToast } from "./ui/use-toast";
-import { ProjectContext } from "~/components/projectContext";
 
 const CodeEditor = () => {
-  const {inputs, outputs, program, setOutputs, setProgram } = useContext(ProjectContext);
+  const { inputs, outputs, program, setOutputs, setProgram } =
+    useContext(ProjectContext);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
   const { toast } = useToast();

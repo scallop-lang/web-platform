@@ -1,5 +1,6 @@
-import React, { useState, useContext } from "react";
-import { ProjectContext, TableContext } from "~/components/projectContext";
+import React, { useContext, useState } from "react";
+
+import { ProjectContext, TableContext } from "~/components/project-context";
 import {
   Select,
   SelectContent,
@@ -16,13 +17,10 @@ import DeleteRelation from "./delete-relation";
 import { Table } from "./table";
 import { Card } from "./ui/card";
 
-const RelationSelect = ({
-  bothEmpty
-}: {
-  bothEmpty: boolean;
-}) => {
-  const {inputs, outputs} = useContext(ProjectContext);
-  const { activeRelationName, setActiveRelationName } = useContext(TableContext);
+const RelationSelect = ({ bothEmpty }: { bothEmpty: boolean }) => {
+  const { inputs, outputs } = useContext(ProjectContext);
+  const { activeRelationName, setActiveRelationName } =
+    useContext(TableContext);
   const parseRelations = (record: RelationRecord) => {
     const selectItems: React.ReactNode[] = [];
 
@@ -81,22 +79,22 @@ const RelationSelect = ({
 };
 
 const TableEditor = () => {
-  const {inputs, outputs, setInputs, setOutputs} = useContext(ProjectContext);
+  const { inputs, outputs, setInputs, setOutputs } = useContext(ProjectContext);
   const [activeRelationName, setActiveRelationName] = useState("");
 
   const bothEmpty =
     Object.keys(inputs).length === 0 && Object.keys(outputs).length === 0;
 
   return (
-    <TableContext.Provider value={{activeRelationName, setActiveRelationName}}>
+    <TableContext.Provider
+      value={{ activeRelationName, setActiveRelationName }}
+    >
       <div className="flex flex-col space-y-4">
         <div className="flex justify-between space-x-10">
-          <CreateRelationDialog/>
+          <CreateRelationDialog />
           <div className="flex grow justify-end space-x-2">
-            <DeleteRelation/>
-            <RelationSelect
-              bothEmpty={bothEmpty}
-            />
+            <DeleteRelation />
+            <RelationSelect bothEmpty={bothEmpty} />
           </div>
         </div>
         <Card className="h-0 grow p-4">

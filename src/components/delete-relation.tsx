@@ -1,6 +1,7 @@
 import { Trash, X } from "lucide-react";
 import { useContext, useState } from "react";
 
+import { ProjectContext, TableContext } from "~/components/project-context";
 import type { SclRelation } from "~/utils/schemas-types";
 
 import { Button } from "./ui/button";
@@ -13,11 +14,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { ProjectContext, TableContext } from "~/components/projectContext";
 
 const DeleteRelation = () => {
-  const { inputs, outputs, setInputs, setOutputs} = useContext(ProjectContext);
-  const { activeRelationName, setActiveRelationName } = useContext(TableContext);
+  const { inputs, outputs, setInputs, setOutputs } = useContext(ProjectContext);
+  const { activeRelationName, setActiveRelationName } =
+    useContext(TableContext);
 
   const record = inputs[activeRelationName] ? inputs : outputs;
   const relation = record[activeRelationName]!;
