@@ -40,12 +40,7 @@ const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
   String: z.coerce.string(),
   Integer: z.coerce.number().int(),
   Float: z.coerce.number(),
-  Boolean: z.enum(["true", "True", "false", "False"]).transform((val) => {
-    if (val === "true" || val === "True") {
-      return true;
-    }
-    return false;
-  }),
+  Boolean: z.boolean(),
 };
 
 // generates a Zod schema for the given relation.
@@ -104,7 +99,6 @@ export {
   ArgTypeSchema,
   argumentTypes,
   ProjectSchema,
-  relationToSchema,
   SclProgramSchema,
   SclRelationInputSchema,
   SclRelationSchema,
