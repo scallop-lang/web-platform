@@ -1,12 +1,13 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
 import NextAuth, { type AuthOptions } from "next-auth";
+import type { Adapter } from "next-auth/adapters";
 import GithubProvider, { type GithubProfile } from "next-auth/providers/github";
 
 const prisma = new PrismaClient();
 
 export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     GithubProvider<GithubProfile>({
       clientId: process.env.GITHUB_ID!,
@@ -19,7 +20,7 @@ export const authOptions: AuthOptions = {
       if (session.user) {
         session.user.id = user.id;
         session.user.email = user.email;
-        session.user.role = "USER";
+        session.user.role = user.role;
       }
 
       return session;
