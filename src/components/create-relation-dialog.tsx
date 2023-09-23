@@ -1,5 +1,5 @@
 import { PlusSquare, Table2, Trash, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { cn } from "~/utils/cn";
@@ -8,7 +8,6 @@ import {
   argumentTypes,
   type Argument,
   type ArgumentType,
-  type RelationRecord,
   type SclRelation,
 } from "~/utils/schemas-types";
 
@@ -38,6 +37,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { ProjectContext, TableContext } from "~/components/projectContext";
 
 const StringArg: Argument = {
   type: "String",
@@ -70,15 +70,9 @@ const ArgumentNameCell = ({ argument }: { argument: Argument }) => {
   );
 };
 
-const CreateRelationDialog = ({
-  inputs,
-  outputs,
-  addRelation,
-}: {
-  inputs: RelationRecord;
-  outputs: RelationRecord;
-  addRelation: (relation: SclRelation) => void;
-}) => {
+const CreateRelationDialog = () => {
+  const { inputs, outputs, setInputs, setOutputs } = useContext(ProjectContext);
+  const { setActiveRelationName } = useContext(TableContext);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // current state of the relation being created
@@ -116,6 +110,22 @@ const CreateRelationDialog = ({
       probability: hasProbability,
       facts: [],
     };
+  }
+
+  // adds newly created relation to inputs or outputs, depending on
+  // what was chosen in the create relation dialog
+
+  function addRelation(relation: SclRelation) {
+    if (relation.type === "input") {
+      const inputsCopy = structuredClone(inputs);
+      inputsCopy[relation.name] = relation;
+      setInputs(inputsCopy);
+    } else {
+      const outputsCopy = structuredClone(outputs);
+      outputsCopy[relation.name] = relation;
+      setOutputs(outputsCopy);
+    }
+    setActiveRelationName(relation.name);
   }
 
   // validate dialog

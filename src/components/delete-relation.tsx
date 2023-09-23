@@ -1,7 +1,7 @@
 import { Trash, X } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
-import type { RelationRecord, SclRelation } from "~/utils/schemas-types";
+import type { SclRelation } from "~/utils/schemas-types";
 
 import { Button } from "./ui/button";
 import {
@@ -13,20 +13,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import { ProjectContext, TableContext } from "~/components/projectContext";
 
-const DeleteRelation = ({
-  inputs,
-  outputs,
-  selectedRelationName,
-  deleteRelation,
-}: {
-  inputs: RelationRecord;
-  outputs: RelationRecord;
-  selectedRelationName: string;
-  deleteRelation: (relation: SclRelation) => void;
-}) => {
-  const record = inputs[selectedRelationName] ? inputs : outputs;
-  const relation = record[selectedRelationName]!;
+const DeleteRelation = () => {
+  const { inputs, outputs, setInputs, setOutputs} = useContext(ProjectContext);
+  const { activeRelationName, setActiveRelationName } = useContext(TableContext);
+
+  const record = inputs[activeRelationName] ? inputs : outputs;
+  const relation = record[activeRelationName]!;
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -35,6 +29,20 @@ const DeleteRelation = ({
       deleteRelation(relation);
       setDialogOpen(false);
     }
+  }
+
+  // delete relation from inputs or outputs, depending on what was chosen
+  function deleteRelation(relation: SclRelation) {
+    if (relation.type === "input") {
+      const inputsCopy = structuredClone(inputs);
+      delete inputsCopy[relation.name];
+      setInputs(inputsCopy);
+    } else {
+      const outputsCopy = structuredClone(outputs);
+      delete outputsCopy[relation.name];
+      setOutputs(outputsCopy);
+    }
+    setActiveRelationName("");
   }
 
   return (
@@ -47,7 +55,7 @@ const DeleteRelation = ({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          disabled={!selectedRelationName}
+          disabled={!activeRelationName}
         >
           <Trash className="mr-2 w-4 h-4" /> Delete
         </Button>
@@ -57,7 +65,7 @@ const DeleteRelation = ({
           <DialogTitle>Wait! Don&apos;t delete yet!</DialogTitle>
           <DialogDescription>
             Are you sure you want to delete the relation{" "}
-            <b>{selectedRelationName}</b>?
+            <b>{activeRelationName}</b>?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
