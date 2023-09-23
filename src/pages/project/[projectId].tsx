@@ -1,10 +1,11 @@
 import type { inferRouterOutputs } from "@trpc/server";
 import { Loader, Save, Trash } from "lucide-react";
+import { useRouter } from "next/router";
 import type {
   GetServerSideProps,
   InferGetServerSidePropsType,
 } from "next/types";
-import { useState } from "react";
+import { useReducer, useState } from "react";
 
 import Playground from "~/components/playground";
 import { Button } from "~/components/ui/button";
@@ -21,6 +22,7 @@ const ProjectPage = ({
   project,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { toast } = useToast();
+  const router = useRouter();
 
   const { mutate: saveProject, isLoading: projectIsSaving } =
     api.project.updateProjectById.useMutation({
@@ -31,6 +33,20 @@ const ProjectPage = ({
       onError: (error) =>
         toast({
           description: `Project failed to save! Reason: ${error.message}`,
+        }),
+    });
+
+  const { mutate: deleteProjectById, isLoading: projectIsDeleting } =
+    api.project.deleteProjectById.useMutation({
+      onSuccess: async () => {
+        toast({
+          description: "Project successfully deleted!",
+        })
+        await router.push("/dashboard");
+      },
+      onError: (error) =>
+        toast({
+          description: `Project failed to delete! Reason: ${error.message}`,
         }),
     });
 
@@ -87,10 +103,20 @@ const ProjectPage = ({
           </Button>
           <Button
             variant="destructive"
-            onClick={() => alert("totally deleted")}
+            onClick={() => deleteProjectById({
+              id: project.id
+            })}
+            disabled={projectIsDeleting}
           >
-            <Trash className="mr-2 w-4 h-4" />
-            Delete project
+            {projectIsDeleting ? (
+              <>
+                <Loader className="mr-2 w-4 h-4" /> Deleting...
+              </>
+            ) : (
+              <>
+                <Trash className="mr-2 w-4 h-4" /> Delete project
+              </>
+            )}
           </Button>
         </div>
       </div>
