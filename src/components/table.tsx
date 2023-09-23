@@ -2,6 +2,7 @@ import { ListPlus, ListX, MoreVertical, Settings2, Tag } from "lucide-react";
 import { useContext, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+import { TableContext } from "~/components/project-context";
 import { cn } from "~/utils/cn";
 import { isValidType } from "~/utils/is-valid-type";
 import type {
@@ -23,7 +24,6 @@ import {
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
-import { TableContext } from "~/components/projectContext";
 
 const AddRowButton = ({
   relation,

@@ -2,6 +2,7 @@ import { PlusSquare, Table2, Trash, X } from "lucide-react";
 import { useContext, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+import { ProjectContext, TableContext } from "~/components/project-context";
 import { cn } from "~/utils/cn";
 import { isValidType } from "~/utils/is-valid-type";
 import {
@@ -37,7 +38,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { ProjectContext, TableContext } from "~/components/projectContext";
 
 const StringArg: Argument = {
   type: "String",
