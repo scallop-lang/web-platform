@@ -40,7 +40,12 @@ const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
   String: z.coerce.string(),
   Integer: z.coerce.number().int(),
   Float: z.coerce.number(),
-  Boolean: z.coerce.boolean(),
+  Boolean: z.enum(["true", "True", "false", "False"]).transform((val) => {
+    if (val === "true" || val === "True") {
+      return true;
+    }
+    return false;
+  }),
 };
 
 // generates a Zod schema for the given relation.
