@@ -331,7 +331,7 @@ const TableRow = ({
         return (
           <BooleanCell
             key={argument.id}
-            initialState={initialState === "true"}
+            initialState={initialState.toString() === "true"}
             updateCell={updateCell}
             relationType={relation.type}
           />
