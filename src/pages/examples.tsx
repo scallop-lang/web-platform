@@ -9,8 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { api } from "~/utils/api";
 
 const Examples = () => {
+  const getExamples = api.project.getFeaturedProjects.useQuery({
+    description: "AAAI benchmark",
+  });
+
   return (
     <main className="flex min-h-screen flex-col space-y-10 bg-background p-5">
       <div className="flex flex-col space-y-1.5">

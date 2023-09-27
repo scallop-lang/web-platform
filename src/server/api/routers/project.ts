@@ -30,15 +30,15 @@ export const projectRouter = createTRPCRouter({
   deleteProjectById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-    const userId = ctx.session?.user ? ctx.session.user.id : null;
-    const project = await ctx.prisma.project.delete({
-      where: {
-        id: input.id,
-        authorId: userId,
-      },
-    });
-    return project;
-  }),
+      const userId = ctx.session?.user ? ctx.session.user.id : null;
+      const project = await ctx.prisma.project.delete({
+        where: {
+          id: input.id,
+          authorId: userId,
+        },
+      });
+      return project;
+    }),
 
   getPublicProjects: publicProcedure.query(async ({ ctx }) => {
     const projects = await ctx.prisma.project.findMany({
@@ -97,5 +97,20 @@ export const projectRouter = createTRPCRouter({
         data: input.project,
       });
       return project;
+    }),
+
+  getFeaturedProjects: publicProcedure
+    .input(z.object({ description: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const projects = await ctx.prisma.project.findMany({
+        where: {
+          author: {
+            role: "ADMIN",
+          },
+          description: input.description,
+          published: true,
+        },
+      });
+      return projects;
     }),
 });
