@@ -11,8 +11,8 @@ import {
 } from "~/components/ui/card";
 import { api } from "~/utils/api";
 
-const Examples = () => {
-  const getExamples = api.project.getFeaturedProjects.useQuery({
+const Featured = () => {
+  const getFeatured = api.project.getFeaturedProjects.useQuery({
     description: "AAAI benchmark",
   });
 
@@ -41,4 +41,4 @@ const Examples = () => {
   );
 };
 
-export default Examples;
+export default Featured;

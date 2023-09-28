@@ -7,7 +7,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import {
-  ProjectSchema,
+  UpdateProjectSchema,
   type SclRelation,
   type SclRelationInput,
 } from "~/utils/schemas-types";
@@ -86,7 +86,7 @@ export const projectRouter = createTRPCRouter({
     }),
 
   updateProjectById: protectedProcedure
-    .input(z.object({ id: z.string(), project: ProjectSchema }))
+    .input(z.object({ id: z.string(), project: UpdateProjectSchema }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session?.user ? ctx.session.user.id : null;
       const project = await ctx.prisma.project.update({
