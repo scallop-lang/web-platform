@@ -76,6 +76,8 @@ const AvatarDropdown = () => {
     );
   }
 
+  console.log(session?.user?.role);
+
   // to avoid hydration mismatch, we render a skeleton before page is mounted on client
   // this is because on the server, `resolvedTheme` is undefined
   // also see https://github.com/pacocoursey/next-themes#avoid-hydration-mismatch
@@ -97,7 +99,11 @@ const AvatarDropdown = () => {
         className="w-[250px]"
       >
         <DropdownMenuLabel>
-          <p>{userName ? userName : "Scallop user"}</p>
+          <span>{`${userName ? userName : "Scallop user"}${
+            session?.user?.role
+              ? ` (${session.user.role === "ADMIN" ? "Admin" : "User"})`
+              : ""
+          }`}</span>
           <p className="text-sm font-normal text-muted-foreground">
             {subtitle ? subtitle : "You are logged in."}
           </p>

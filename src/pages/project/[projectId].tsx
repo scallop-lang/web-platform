@@ -5,7 +5,7 @@ import type {
   GetServerSideProps,
   InferGetServerSidePropsType,
 } from "next/types";
-import { useReducer, useState } from "react";
+import { useState } from "react";
 
 import Playground from "~/components/playground";
 import { Button } from "~/components/ui/button";
@@ -38,10 +38,14 @@ const ProjectPage = ({
 
   const { mutate: deleteProjectById, isLoading: projectIsDeleting } =
     api.project.deleteProjectById.useMutation({
-      onSuccess: async () => {
+      onSuccess: async ({ title }) => {
         toast({
-          description: "Project successfully deleted!",
-        })
+          description: (
+            <p>
+              Project <b>{title}</b> successfully deleted!
+            </p>
+          ),
+        });
         await router.push("/dashboard");
       },
       onError: (error) =>
@@ -103,9 +107,11 @@ const ProjectPage = ({
           </Button>
           <Button
             variant="destructive"
-            onClick={() => deleteProjectById({
-              id: project.id
-            })}
+            onClick={() =>
+              deleteProjectById({
+                id: project.id,
+              })
+            }
             disabled={projectIsDeleting}
           >
             {projectIsDeleting ? (

@@ -35,11 +35,11 @@ const ProjectCard = ({
       <CardHeader>
         <CardTitle className="truncate">{name}</CardTitle>
         <CardDescription className="line-clamp-2 flex flex-col space-y-2">
-          <p>{description ? description : "No description provided."}</p>
-          <p>
+          <span>{description ? description : "No description provided."}</span>
+          <span>
             Created on {createdAt.toLocaleDateString()} at{" "}
             {createdAt.toLocaleTimeString()}.
-          </p>
+          </span>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -104,7 +104,7 @@ const Dashboard = () => {
           Loading your projects...
         </p>
       </Skeleton>
-    ) : projectData ? (
+    ) : projectData && projectData.length > 0 ? (
       projectData.map((project, index) => (
         <ProjectCard
           key={index}
