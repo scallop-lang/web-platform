@@ -10,6 +10,8 @@ import { useState } from "react";
 import Playground from "~/components/playground";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Switch } from "~/components/ui/switch";
 import { useToast } from "~/components/ui/use-toast";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
@@ -36,7 +38,7 @@ const ProjectPage = ({
         }),
     });
 
-  const { mutate: deleteProjectById, isLoading: projectIsDeleting } =
+  const { mutate: deleteProject, isLoading: projectIsDeleting } =
     api.project.deleteProjectById.useMutation({
       onSuccess: async ({ title }) => {
         toast({
@@ -68,31 +70,51 @@ const ProjectPage = ({
   const [program, setProgram] = useState<SclProgram>(project.program);
   const [inputs, setInputs] = useState<RelationRecord>(inputsCopy);
   const [outputs, setOutputs] = useState<RelationRecord>(outputsCopy);
-  const [projectTitle, setProjectTitle] = useState<string>(project.title);
+  const [title, setTitle] = useState<string>(project.title);
+  const [published, setPublished] = useState<boolean>(project.published);
 
   return (
     <main className="flex flex-col h-[calc(100vh-53px)] gap-3 bg-background p-4">
       <div className="flex items-center justify-between">
         <Input
           type="text"
-          defaultValue={projectTitle}
-          onChange={(e) => setProjectTitle(e.target.value)}
+          defaultValue={title}
+          onChange={(e) => setTitle(e.target.value)}
           className="scroll-m-20 text-2xl font-semibold tracking-tight w-fit"
           placeholder={project.title}
         />
         <div className="flex space-x-3">
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="publish-switch">
+              {published ? "Unpublish" : "Publish"}
+            </Label>
+            <Switch
+              id="publish-switch"
+              checked={published}
+              onCheckedChange={(checked: boolean) => {
+                setPublished(checked);
+                saveProject({
+                  id: project.id,
+                  project: {
+                    published: checked,
+                  },
+                });
+              }}
+            />
+          </div>
           <Button
-            onClick={() =>
+            className="w-36"
+            onClick={() => {
               saveProject({
                 id: project.id,
                 project: {
-                  title: projectTitle,
+                  title: title,
                   program: program,
                   inputs: Object.values(inputs),
                   outputs: Object.values(outputs),
                 },
-              })
-            }
+              });
+            }}
             disabled={projectIsSaving}
           >
             {projectIsSaving ? (
@@ -108,7 +130,7 @@ const ProjectPage = ({
           <Button
             variant="destructive"
             onClick={() =>
-              deleteProjectById({
+              deleteProject({
                 id: project.id,
               })
             }

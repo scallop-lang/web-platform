@@ -68,13 +68,14 @@ const SclRelationInputSchema = SclRelationSchema.transform((relation) => {
   };
 });
 
-const ProjectSchema = z
+const UpdateProjectSchema = z
   .object({
-    title: z.string().max(255),
+    title: z.string().max(255).optional(),
     description: z.string().optional(),
-    program: SclProgramSchema,
-    inputs: SclRelationInputSchema.array(),
-    outputs: SclRelationSchema.array(),
+    published: z.boolean().optional(),
+    program: SclProgramSchema.optional(),
+    inputs: SclRelationInputSchema.array().optional(),
+    outputs: SclRelationSchema.array().optional(),
   })
   .transform((project) => {
     return {
@@ -98,7 +99,7 @@ export {
   ArgSchema,
   ArgTypeSchema,
   argumentTypes,
-  ProjectSchema,
+  UpdateProjectSchema,
   SclProgramSchema,
   SclRelationInputSchema,
   SclRelationSchema,

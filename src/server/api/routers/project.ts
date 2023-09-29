@@ -7,7 +7,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import {
-  ProjectSchema,
+  UpdateProjectSchema,
   type SclRelation,
   type SclRelationInput,
 } from "~/utils/schemas-types";
@@ -30,15 +30,15 @@ export const projectRouter = createTRPCRouter({
   deleteProjectById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-    const userId = ctx.session?.user ? ctx.session.user.id : null;
-    const project = await ctx.prisma.project.delete({
-      where: {
-        id: input.id,
-        authorId: userId,
-      },
-    });
-    return project;
-  }),
+      const userId = ctx.session?.user ? ctx.session.user.id : null;
+      const project = await ctx.prisma.project.delete({
+        where: {
+          id: input.id,
+          authorId: userId,
+        },
+      });
+      return project;
+    }),
 
   getPublicProjects: publicProcedure.query(async ({ ctx }) => {
     const projects = await ctx.prisma.project.findMany({
@@ -86,7 +86,7 @@ export const projectRouter = createTRPCRouter({
     }),
 
   updateProjectById: protectedProcedure
-    .input(z.object({ id: z.string(), project: ProjectSchema }))
+    .input(z.object({ id: z.string(), project: UpdateProjectSchema }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session?.user ? ctx.session.user.id : null;
       const project = await ctx.prisma.project.update({
@@ -97,5 +97,20 @@ export const projectRouter = createTRPCRouter({
         data: input.project,
       });
       return project;
+    }),
+
+  getFeaturedProjects: publicProcedure
+    .input(z.object({ description: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const projects = await ctx.prisma.project.findMany({
+        where: {
+          author: {
+            role: "ADMIN",
+          },
+          description: input.description,
+          published: true,
+        },
+      });
+      return projects;
     }),
 });
