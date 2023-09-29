@@ -40,9 +40,13 @@ const ProjectPage = ({
 
   const { mutate: deleteProject, isLoading: projectIsDeleting } =
     api.project.deleteProjectById.useMutation({
-      onSuccess: async () => {
+      onSuccess: async ({ title }) => {
         toast({
-          description: "Project successfully deleted!",
+          description: (
+            <p>
+              Project <b>{title}</b> successfully deleted!
+            </p>
+          ),
         });
         await router.push("/dashboard");
       },

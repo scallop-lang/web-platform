@@ -19,7 +19,7 @@ export const authOptions: AuthOptions = {
       if (session.user) {
         session.user.id = user.id;
         session.user.email = user.email;
-        session.user.role = "USER";
+        session.user.role = user.role;
       }
 
       return session;
