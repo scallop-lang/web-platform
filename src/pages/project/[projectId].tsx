@@ -24,7 +24,7 @@ type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 const ProjectPage = ({
   project,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const { toast } = useToast();
   const router = useRouter();
   const isAuthor = session?.user?.id === project.authorId;
