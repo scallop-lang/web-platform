@@ -1,5 +1,6 @@
 import type { inferRouterOutputs } from "@trpc/server";
 import { Loader, Save, Trash } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import type {
   GetServerSideProps,
@@ -23,8 +24,10 @@ type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 const ProjectPage = ({
   project,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { data: session, status } = useSession();
   const { toast } = useToast();
   const router = useRouter();
+  const isAuthor = session?.user?.id === project.authorId;
 
   const { mutate: saveProject, isLoading: projectIsSaving } =
     api.project.updateProjectById.useMutation({
@@ -76,77 +79,85 @@ const ProjectPage = ({
   return (
     <main className="flex flex-col h-[calc(100vh-53px)] gap-3 bg-background p-4">
       <div className="flex items-center justify-between">
-        <Input
-          type="text"
-          defaultValue={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="scroll-m-20 text-2xl font-semibold tracking-tight w-fit"
-          placeholder={project.title}
-        />
-        <div className="flex space-x-3">
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="publish-switch">
-              {published ? "Unpublish" : "Publish"}
-            </Label>
-            <Switch
-              id="publish-switch"
-              checked={published}
-              onCheckedChange={(checked: boolean) => {
-                setPublished(checked);
+        {isAuthor ? (
+          <Input
+            type="text"
+            defaultValue={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="scroll-m-20 text-2xl font-semibold tracking-tight w-fit"
+            placeholder={project.title}
+          />
+        ) : (
+          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight w-fit">
+            {title}
+          </h3>
+        )}
+        {isAuthor ? (
+          <div className="flex space-x-5">
+            <span className="flex items-center space-x-2">
+              <Label htmlFor="publish-switch">
+                {published ? "Published" : "Unpublished"}
+              </Label>
+              <Switch
+                id="publish-switch"
+                checked={published}
+                onCheckedChange={(checked: boolean) => {
+                  setPublished(checked);
+                  saveProject({
+                    id: project.id,
+                    project: {
+                      published: checked,
+                    },
+                  });
+                }}
+              />
+            </span>
+            <Button
+              className="w-36"
+              onClick={() => {
                 saveProject({
                   id: project.id,
                   project: {
-                    published: checked,
+                    title: title,
+                    program: program,
+                    inputs: Object.values(inputs),
+                    outputs: Object.values(outputs),
                   },
                 });
               }}
-            />
+              disabled={projectIsSaving}
+            >
+              {projectIsSaving ? (
+                <>
+                  <Loader className="mr-2 w-4 h-4" /> Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 w-4 h-4" /> Save project
+                </>
+              )}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() =>
+                deleteProject({
+                  id: project.id,
+                })
+              }
+              disabled={projectIsDeleting}
+            >
+              {projectIsDeleting ? (
+                <>
+                  <Loader className="mr-2 w-4 h-4" /> Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash className="mr-2 w-4 h-4" /> Delete project
+                </>
+              )}
+            </Button>
           </div>
-          <Button
-            className="w-36"
-            onClick={() => {
-              saveProject({
-                id: project.id,
-                project: {
-                  title: title,
-                  program: program,
-                  inputs: Object.values(inputs),
-                  outputs: Object.values(outputs),
-                },
-              });
-            }}
-            disabled={projectIsSaving}
-          >
-            {projectIsSaving ? (
-              <>
-                <Loader className="mr-2 w-4 h-4" /> Saving...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 w-4 h-4" /> Save project
-              </>
-            )}
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() =>
-              deleteProject({
-                id: project.id,
-              })
-            }
-            disabled={projectIsDeleting}
-          >
-            {projectIsDeleting ? (
-              <>
-                <Loader className="mr-2 w-4 h-4" /> Deleting...
-              </>
-            ) : (
-              <>
-                <Trash className="mr-2 w-4 h-4" /> Delete project
-              </>
-            )}
-          </Button>
-        </div>
+        ) : null}
       </div>
       <Playground
         program={program}

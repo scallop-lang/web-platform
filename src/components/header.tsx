@@ -156,6 +156,12 @@ const Header = () => {
           </h4>
         </Link>
         <Link
+          href="/featured"
+          className="flex items-center text-sm font-medium hover:underline"
+        >
+          Featured
+        </Link>
+        <Link
           href="https://scallop-lang.github.io/doc/index.html"
           target="_blank"
           className="flex items-center text-sm font-medium hover:underline"

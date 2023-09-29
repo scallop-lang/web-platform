@@ -1,70 +1,14 @@
-import { ArrowRight, Loader, LogIn, Plus } from "lucide-react";
+import { Loader, LogIn, Plus } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter, type NextRouter } from "next/router";
-import React, { useState } from "react";
+import { useRouter } from "next/router";
+import React from "react";
 
+import ProjectCard from "~/components/project-card";
 import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useToast } from "~/components/ui/use-toast";
 import { api } from "~/utils/api";
-
-const ProjectCard = ({
-  router,
-  projectId,
-  name,
-  description,
-  createdAt,
-}: {
-  router: NextRouter;
-  projectId: string;
-  name: string;
-  description: string | null;
-  createdAt: Date;
-}) => {
-  const [loading, setLoading] = useState(false);
-
-  return (
-    <Card className="w-[350px] h-[200px]">
-      <CardHeader>
-        <CardTitle className="truncate">{name}</CardTitle>
-        <CardDescription className="line-clamp-2 flex flex-col space-y-2">
-          <span>{description ? description : "No description provided."}</span>
-          <span>
-            Created on {createdAt.toLocaleDateString()} at{" "}
-            {createdAt.toLocaleTimeString()}.
-          </span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Button
-          onClick={async () => {
-            setLoading(true);
-            await router.push(`/project/${projectId}`);
-          }}
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <Loader className="mr-2 w-4 h-4" /> Loading...
-            </>
-          ) : (
-            <>
-              <ArrowRight className="mr-2 w-4 h-4" />
-              Go to project
-            </>
-          )}
-        </Button>
-      </CardContent>
-    </Card>
-  );
-};
 
 const Dashboard = () => {
   const { data: session, status } = useSession();
@@ -148,9 +92,9 @@ const Dashboard = () => {
 
     return (
       <main className="flex flex-col space-y-3 min-h-screen bg-background p-4">
-        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+        <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight">
           Welcome back, {first ? first : name}.
-        </h3>
+        </h2>
         <div className="flex gap-4 flex-wrap">
           <button onClick={() => mutate()}>{createProjectButton}</button>
           {projectsList}
