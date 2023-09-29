@@ -99,18 +99,15 @@ export const projectRouter = createTRPCRouter({
       return project;
     }),
 
-  getFeaturedProjects: publicProcedure
-    .input(z.object({ description: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const projects = await ctx.prisma.project.findMany({
-        where: {
-          author: {
-            role: "ADMIN",
-          },
-          description: input.description,
-          published: true,
+  getFeaturedProjects: publicProcedure.query(async ({ ctx }) => {
+    const projects = await ctx.prisma.project.findMany({
+      where: {
+        author: {
+          role: "ADMIN",
         },
-      });
-      return projects;
-    }),
+        published: true,
+      },
+    });
+    return projects;
+  }),
 });
