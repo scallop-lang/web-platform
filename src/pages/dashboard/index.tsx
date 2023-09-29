@@ -105,9 +105,9 @@ const Dashboard = () => {
         </p>
       </Skeleton>
     ) : projectData && projectData.length > 0 ? (
-      projectData.map((project, index) => (
+      projectData.map((project) => (
         <ProjectCard
-          key={index}
+          key={project.id}
           router={router}
           projectId={project.id}
           name={project.title}
