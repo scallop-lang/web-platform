@@ -1,11 +1,18 @@
-import { Laptop2, LogIn, LogOut, Moon, Sun, User } from "lucide-react";
+import {
+  ExternalLink,
+  Laptop2,
+  LogIn,
+  LogOut,
+  Moon,
+  Sun,
+  User,
+} from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +24,11 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Skeleton } from "./ui/skeleton";
+} from "~/components/ui/dropdown-menu";
+import { Skeleton } from "~/components/ui/skeleton";
 
 const AvatarDropdown = () => {
-  const [mounted, setMounted] = useState(false);
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const { data: session, status } = useSession();
 
   let userName: string | null | undefined;
@@ -33,13 +39,15 @@ const AvatarDropdown = () => {
   if (status === "loading") {
     userName = "Loading...";
     subtitle = "Loading...";
-    avatar = <Skeleton className="h-9 w-9 rounded-full cursor-pointer" />;
+    avatar = <Skeleton className="h-9 w-9 cursor-pointer rounded-full" />;
     accountOption = <DropdownMenuItem disabled>Loading...</DropdownMenuItem>;
-  } else if (status === "authenticated") {
+  }
+
+  if (status === "authenticated") {
+    const imageUrl = session.user?.image;
+
     userName = session.user?.name;
     subtitle = session.user?.email;
-
-    const imageUrl = session.user?.image;
 
     avatar = (
       <Avatar className="h-9 w-9">
@@ -54,42 +62,36 @@ const AvatarDropdown = () => {
         </AvatarFallback>
       </Avatar>
     );
+
     accountOption = (
       <DropdownMenuItem onClick={() => signOut()}>
-        <LogOut className="mr-2 h-4 w-4" />
-        Sign out
-      </DropdownMenuItem>
-    );
-  } else {
-    userName = "Guest";
-    subtitle = "Sign in to save your progress and to access the dashboard.";
-    avatar = (
-      <div className="flex h-9 w-9 rounded-full bg-zinc-100 dark:bg-zinc-900 items-center justify-center cursor-pointer">
-        <User className="h-5 w-5" />
-      </div>
-    );
-    accountOption = (
-      <DropdownMenuItem onClick={() => signIn()}>
-        <LogIn className="mr-2 h-4 w-4" />
-        Sign in
+        <span className="flex grow items-center justify-between">
+          Sign out
+          <LogOut className="h-4 w-4" />
+        </span>
       </DropdownMenuItem>
     );
   }
 
-  console.log(session?.user?.role);
+  if (status === "unauthenticated") {
+    userName = "Guest";
+    subtitle = "Sign in to save your progress and to access the dashboard.";
 
-  // to avoid hydration mismatch, we render a skeleton before page is mounted on client
-  // this is because on the server, `resolvedTheme` is undefined
-  // also see https://github.com/pacocoursey/next-themes#avoid-hydration-mismatch
-  useEffect(() => setMounted(true), []);
+    avatar = (
+      <div className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900">
+        <User className="h-5 w-5" />
+      </div>
+    );
 
-  const resolvedIcon = !mounted ? (
-    <Skeleton className="mr-2 h-4 w-4 rounded-full" />
-  ) : resolvedTheme === "light" ? (
-    <Sun className="mr-2 h-4 w-4" />
-  ) : (
-    <Moon className="mr-2 h-4 w-4" />
-  );
+    accountOption = (
+      <DropdownMenuItem onClick={() => signIn()}>
+        <span className="flex grow items-center justify-between">
+          Sign in
+          <LogIn className="h-4 w-4" />
+        </span>
+      </DropdownMenuItem>
+    );
+  }
 
   return (
     <DropdownMenu>
@@ -99,38 +101,71 @@ const AvatarDropdown = () => {
         className="w-[250px]"
       >
         <DropdownMenuLabel>
-          <span>{`${userName ? userName : "Scallop user"}${
-            session?.user?.role
-              ? ` (${session.user.role === "ADMIN" ? "Admin" : "User"})`
-              : ""
-          }`}</span>
+          <span>
+            {`${userName ? userName : "Scallop user"}${
+              session?.user?.role
+                ? ` (${session.user.role === "ADMIN" ? "Admin" : "User"})`
+                : ""
+            }`}
+          </span>
           <p className="text-sm font-normal text-muted-foreground">
             {subtitle ? subtitle : "You are logged in."}
           </p>
         </DropdownMenuLabel>
+
         <DropdownMenuSeparator />
+
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            {resolvedIcon} Appearance
+            <span className="flex flex-col">
+              <p>Appearance</p>
+              <p className="text-sm text-muted-foreground">
+                {theme === "system" ? (
+                  <span className="flex items-center">
+                    <Laptop2 className="mr-1 h-3.5 w-3.5" /> System (
+                    {resolvedTheme})
+                  </span>
+                ) : resolvedTheme === "light" ? (
+                  <span className="flex items-center">
+                    <Sun className="mr-1 h-3.5 w-3.5" /> Light
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    <Moon className="mr-1 h-3.5 w-3.5" /> Dark
+                  </span>
+                )}
+              </p>
+            </span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
               <DropdownMenuItem onClick={() => setTheme("light")}>
-                <Sun className="mr-2 h-4 w-4" />
                 Light
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("dark")}>
-                <Moon className="mr-2 h-4 w-4" />
                 Dark
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("system")}>
-                <Laptop2 className="mr-2 h-4 w-4" />
                 System
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>
+
         <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={() =>
+            window.open(
+              "https://scallop-lang.github.io/doc/index.html",
+              "_blank",
+            )
+          }
+        >
+          <span className="flex grow items-center justify-between">
+            Visit language docs <ExternalLink className="h-4 w-4" />
+          </span>
+        </DropdownMenuItem>
         {accountOption}
       </DropdownMenuContent>
     </DropdownMenu>
@@ -140,43 +175,38 @@ const AvatarDropdown = () => {
 const Header = () => {
   return (
     <header className="flex w-full items-center justify-between border-b border-border bg-background p-2">
-      <nav className="flex space-x-6">
+      <nav className="flex space-x-5">
         <Link
-          href="/"
-          className="ml-1 flex items-center space-x-2 hover:underline"
+          href="https://scallop-lang.github.io/"
+          target="_blank"
+          className="ml-1 flex items-center space-x-1.5 hover:underline"
         >
           <Image
-            width={25}
-            height={25}
+            width={18}
+            height={18}
             src="/content/logo.svg"
             alt="Scallop logo"
           />
           <h4 className="scroll-m-20 text-lg font-semibold tracking-tight">
-            Playground
+            Scallop
           </h4>
         </Link>
+
+        <Link
+          href="https://play.scallop-lang.org/"
+          className="flex items-center text-sm font-medium hover:underline"
+        >
+          Playground
+        </Link>
+
         <Link
           href="/featured"
           className="flex items-center text-sm font-medium hover:underline"
         >
           Featured
         </Link>
-        <Link
-          href="https://scallop-lang.github.io/doc/index.html"
-          target="_blank"
-          className="flex items-center text-sm font-medium hover:underline"
-        >
-          Language Docs
-        </Link>
-        <Link
-          href="https://scallop-lang.github.io/"
-          target="_blank"
-          className="flex items-center text-sm font-medium hover:underline"
-        >
-          Main Site
-        </Link>
       </nav>
-      <div className="flex space-x-6">
+      <div className="flex space-x-5">
         <Link
           href="/dashboard"
           className="flex items-center text-sm font-medium hover:underline"
