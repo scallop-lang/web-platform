@@ -25,10 +25,11 @@
   "include": [
     ".eslintrc.cjs",
     "next-env.d.ts",
+    "**/*.js",
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs"
-  ],
+, "prettier.config.js"  ],
   "exclude": ["node_modules"]
 }

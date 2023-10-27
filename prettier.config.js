@@ -1,8 +1,8 @@
 /** @type {import("prettier").Config & import("@ianvs/prettier-plugin-sort-imports").PrettierConfig}} */
 const config = {
   plugins: [
-    require.resolve("prettier-plugin-tailwindcss"),
-    require.resolve("@ianvs/prettier-plugin-sort-imports"),
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss",
   ],
   singleAttributePerLine: true,
   importOrder: [
@@ -16,4 +16,4 @@ const config = {
   ],
 };
 
-module.exports = config;
+export default config;
