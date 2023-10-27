@@ -1,6 +1,5 @@
 // Inspired by react-hot-toast library
 import * as React from "react";
-
 import type { ToastActionElement, ToastProps } from "src/components/ui/toast";
 
 const TOAST_LIMIT = 4 as const;
@@ -81,7 +80,7 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t
+          t.id === action.toast.id ? { ...t, ...action.toast } : t,
         ),
       };
 
@@ -106,7 +105,7 @@ export const reducer = (state: State, action: Action): State => {
                 ...t,
                 open: false,
               }
-            : t
+            : t,
         ),
       };
     }

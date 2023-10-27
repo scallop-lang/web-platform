@@ -1,4 +1,12 @@
-import { Laptop2, LogIn, LogOut, Moon, User } from "lucide-react";
+import {
+  ExternalLink,
+  Laptop2,
+  LogIn,
+  LogOut,
+  Moon,
+  Sun,
+  User,
+} from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -57,8 +65,10 @@ const AvatarDropdown = () => {
 
     accountOption = (
       <DropdownMenuItem onClick={() => signOut()}>
-        <LogOut className="mr-2 h-4 w-4" />
-        Sign out
+        <span className="flex grow items-center justify-between">
+          Sign out
+          <LogOut className="h-4 w-4" />
+        </span>
       </DropdownMenuItem>
     );
   }
@@ -75,8 +85,10 @@ const AvatarDropdown = () => {
 
     accountOption = (
       <DropdownMenuItem onClick={() => signIn()}>
-        <LogIn className="mr-2 h-4 w-4" />
-        Sign in
+        <span className="flex grow items-center justify-between">
+          Sign in
+          <LogIn className="h-4 w-4" />
+        </span>
       </DropdownMenuItem>
     );
   }
@@ -100,37 +112,60 @@ const AvatarDropdown = () => {
             {subtitle ? subtitle : "You are logged in."}
           </p>
         </DropdownMenuLabel>
+
         <DropdownMenuSeparator />
+
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <span className="flex flex-col">
               <p>Appearance</p>
               <p className="text-sm text-muted-foreground">
-                {theme === "system"
-                  ? `System (${resolvedTheme})`
-                  : resolvedTheme === "light"
-                  ? "Light"
-                  : "Dark"}
+                {theme === "system" ? (
+                  <span className="flex items-center">
+                    <Laptop2 className="mr-1 h-3.5 w-3.5" /> System (
+                    {resolvedTheme})
+                  </span>
+                ) : resolvedTheme === "light" ? (
+                  <span className="flex items-center">
+                    <Sun className="mr-1 h-3.5 w-3.5" /> Light
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    <Moon className="mr-1 h-3.5 w-3.5" /> Dark
+                  </span>
+                )}
               </p>
             </span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
               <DropdownMenuItem onClick={() => setTheme("light")}>
-                <span className="bg-red-100">Light</span>
+                Light
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("dark")}>
                 Dark
-                <Moon className="mr-2 h-4 w-4" />
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("system")}>
                 System
-                <Laptop2 className="mr-2 h-4 w-4" />
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>
+
         <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={() =>
+            window.open(
+              "https://scallop-lang.github.io/doc/index.html",
+              "_blank",
+            )
+          }
+        >
+          <span className="flex grow items-center justify-between">
+            Visit language docs <ExternalLink className="h-4 w-4" />
+          </span>
+        </DropdownMenuItem>
         {accountOption}
       </DropdownMenuContent>
     </DropdownMenu>
@@ -169,14 +204,6 @@ const Header = () => {
           className="flex items-center text-sm font-medium hover:underline"
         >
           Featured
-        </Link>
-
-        <Link
-          href="https://scallop-lang.github.io/doc/index.html"
-          target="_blank"
-          className="flex items-center text-sm font-medium hover:underline"
-        >
-          Language Docs
         </Link>
       </nav>
       <div className="flex space-x-5">
