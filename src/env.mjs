@@ -10,6 +10,10 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "test", "production"]),
     FLASK_SERVER: z.string(),
     DATABASE_URL: z.string(),
+    NEXTAUTH_URL: z.string(),
+    NEXTAUTH_SECRET: z.string(),
+    GITHUB_ID: z.string(),
+    GITHUB_SECRET: z.string(),
   },
 
   /**
@@ -17,9 +21,7 @@ export const env = createEnv({
    * isn't built with invalid env vars. To expose them to the client, prefix them with
    * `NEXT_PUBLIC_`.
    */
-  client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
-  },
+  client: {},
 
   /**
    * You can't destruct `process.env` as a regular object in the Next.js edge runtimes (e.g.
@@ -29,7 +31,12 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     FLASK_SERVER: process.env.FLASK_SERVER,
     DATABASE_URL: process.env.DATABASE_URL,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    GITHUB_ID: process.env.GITHUB_ID,
+    GITHUB_SECRET: process.env.GITHUB_SECRET,
   },
+
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
    * This is especially useful for Docker builds.
