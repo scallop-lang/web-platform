@@ -64,7 +64,7 @@ const ArgumentNameCell = ({ argument }: { argument: Argument }) => {
         isValidName
           ? ""
           : "bg-red-100 hover:bg-red-50 focus:bg-red-100 focus-visible:ring-red-500",
-        "basis-1/2"
+        "basis-1/2",
       )}
     />
   );
@@ -206,7 +206,7 @@ const CreateRelationDialog = () => {
         <div
           className={cn(
             "flex h-72 flex-col space-y-2 overflow-y-auto rounded-md border border-border p-3",
-            argListEmpty ? "justify-center" : "justify-start"
+            argListEmpty ? "justify-center" : "justify-start",
           )}
         >
           {argListEmpty ? (
@@ -269,7 +269,7 @@ const CreateRelationDialog = () => {
                 className={cn(
                   isValidName
                     ? ""
-                    : "bg-red-100 hover:bg-red-50 focus:bg-red-100 focus-visible:ring-red-500"
+                    : "bg-red-100 hover:bg-red-50 focus:bg-red-100 focus-visible:ring-red-500",
                 )}
               />
               <p className="cursor-default text-sm text-muted-foreground">

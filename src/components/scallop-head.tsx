@@ -1,9 +1,22 @@
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 const ScallopHead = () => {
+  const { asPath } = useRouter();
+
   return (
     <Head>
-      <title>Scallop Playground</title>
+      <title>
+        {asPath === "/play"
+          ? "Playground | "
+          : asPath === "/featured"
+          ? "Featured | "
+          : asPath === "/dashboard"
+          ? "Dashboard | "
+          : ""}
+        Scallop
+      </title>
+
       <link
         rel="icon"
         type="image/svg+xml"

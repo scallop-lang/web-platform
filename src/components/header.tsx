@@ -155,18 +155,25 @@ const AvatarDropdown = () => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
+          onClick={() => window.open("https://www.scallop-lang.org/", "_blank")}
+        >
+          <span className="flex grow items-center justify-between">
+            Visit scallop-lang <ExternalLink className="h-4 w-4" />
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
           onClick={() =>
-            window.open(
-              "https://scallop-lang.github.io/doc/index.html",
-              "_blank",
-            )
+            window.open("https://www.scallop-lang.org/doc/index.html", "_blank")
           }
         >
           <span className="flex grow items-center justify-between">
-            Visit language docs <ExternalLink className="h-4 w-4" />
+            Language documentation <ExternalLink className="h-4 w-4" />
           </span>
         </DropdownMenuItem>
-        {accountOption}
+
+        <DropdownMenuSeparator />
+
+        <>{accountOption}</>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -177,8 +184,7 @@ const Header = () => {
     <header className="flex w-full items-center justify-between border-b border-border bg-background p-2">
       <nav className="flex space-x-5">
         <Link
-          href="https://scallop-lang.github.io/"
-          target="_blank"
+          href="/"
           className="ml-1 flex items-center space-x-1.5 hover:underline"
         >
           <Image
@@ -193,7 +199,7 @@ const Header = () => {
         </Link>
 
         <Link
-          href="https://play.scallop-lang.org/"
+          href="/play"
           className="flex items-center text-sm font-medium hover:underline"
         >
           Playground

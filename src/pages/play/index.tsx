@@ -15,14 +15,14 @@ const WelcomeAlert = () => {
 
   return (
     <Alert className="shrink-0">
-      <PartyPopper className="mr-2 w-5 h-5" />
+      <PartyPopper className="mr-2 h-5 w-5" />
       <AlertTitle>Welcome to Scallop!</AlertTitle>
       <AlertDescription>
         If you close the playground all work will be lost. Make an account to
         access the{" "}
         <Link
           href="/dashboard"
-          className="underline font-medium"
+          className="font-medium underline"
         >
           dashboard
         </Link>{" "}
@@ -44,7 +44,7 @@ const Root = () => {
   const [initialOutputs, setInitialOutputs] = useState<RelationRecord>({});
 
   return (
-    <main className="flex flex-col h-[calc(100vh-53px)] gap-3 bg-background p-4">
+    <main className="flex h-[calc(100vh-53px)] flex-col gap-3 bg-background p-4">
       <WelcomeAlert />
       <Playground
         program={initialProgram}
