@@ -3,7 +3,7 @@ import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
 
-import Layout from "~/components/layout";
+import CommonLayout from "~/components/common-layout";
 import ThemeProvider from "~/components/theme-provider";
 import { Toaster } from "~/components/ui/toaster";
 
@@ -49,12 +49,12 @@ const App = ({
             font-family: ${plexMono.style.fontFamily};
           }
         `}</style>
-        <div className={`${inter.variable} ${plexMono.variable} font-sans`}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+        <CommonLayout
+          className={`${inter.variable} ${plexMono.variable} font-sans`}
+        >
+          <Component {...pageProps} />
           <Toaster />
-        </div>
+        </CommonLayout>
       </ThemeProvider>
     </SessionProvider>
   );
