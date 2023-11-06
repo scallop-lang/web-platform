@@ -19,8 +19,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"]
-    },
-    "typeRoots": ["./node_modules/@types", "./types"]
+    }
   },
   "include": [
     ".eslintrc.cjs",
@@ -29,7 +28,8 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
-    "**/*.mjs"
-, "prettier.config.js"  ],
+    "**/*.mjs",
+    "prettier.config.js"
+  ],
   "exclude": ["node_modules"]
 }
