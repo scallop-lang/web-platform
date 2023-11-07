@@ -8,7 +8,7 @@ import type {
 } from "next/types";
 import { useState } from "react";
 
-import Playground from "~/components/playground";
+import ScallopEditor from "~/components/scallop-editor";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -77,18 +77,18 @@ const ProjectPage = ({
   const [published, setPublished] = useState<boolean>(project.published);
 
   return (
-    <main className="flex flex-col h-[calc(100vh-53px)] gap-3 bg-background p-4">
+    <main className="flex h-[calc(100vh-53px)] flex-col gap-3 bg-background p-4">
       <div className="flex items-center justify-between">
         {isAuthor ? (
           <Input
             type="text"
             defaultValue={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="scroll-m-20 text-2xl font-semibold tracking-tight w-fit"
+            className="w-fit scroll-m-20 text-2xl font-semibold tracking-tight"
             placeholder={project.title}
           />
         ) : (
-          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight w-fit">
+          <h3 className="w-fit scroll-m-20 text-2xl font-semibold tracking-tight">
             {title}
           </h3>
         )}
@@ -129,11 +129,11 @@ const ProjectPage = ({
             >
               {projectIsSaving ? (
                 <>
-                  <Loader className="mr-2 w-4 h-4" /> Saving...
+                  <Loader className="mr-2 h-4 w-4" /> Saving...
                 </>
               ) : (
                 <>
-                  <Save className="mr-2 w-4 h-4" /> Save project
+                  <Save className="mr-2 h-4 w-4" /> Save project
                 </>
               )}
             </Button>
@@ -148,18 +148,18 @@ const ProjectPage = ({
             >
               {projectIsDeleting ? (
                 <>
-                  <Loader className="mr-2 w-4 h-4" /> Deleting...
+                  <Loader className="mr-2 h-4 w-4" /> Deleting...
                 </>
               ) : (
                 <>
-                  <Trash className="mr-2 w-4 h-4" /> Delete project
+                  <Trash className="mr-2 h-4 w-4" /> Delete project
                 </>
               )}
             </Button>
           </div>
         ) : null}
       </div>
-      <Playground
+      <ScallopEditor
         program={program}
         inputs={inputs}
         outputs={outputs}

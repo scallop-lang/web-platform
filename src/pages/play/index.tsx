@@ -1,11 +1,11 @@
-import Playground from "~/components/playground";
+import { ScallopEditor } from "~/components/scallop-editor";
 
-const Root = () => {
+const Playground = () => {
   return (
     <main className="flex h-[calc(100vh-53px)] flex-col gap-3 bg-background p-4">
-      <Playground />
+      <ScallopEditor />
     </main>
   );
 };
 
-export default Root;
+export default Playground;

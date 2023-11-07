@@ -1,8 +1,7 @@
+import { CodeEditor } from "~/components/code-editor";
 import { Card } from "~/components/ui/card";
 
-import CodeEditor from "./code-editor";
-
-const Playground = () => {
+const ScallopEditor = () => {
   return (
     <div className="grid h-full auto-rows-fr grid-cols-2 gap-3">
       <CodeEditor />
@@ -11,4 +10,4 @@ const Playground = () => {
   );
 };
 
-export default Playground;
+export { ScallopEditor };

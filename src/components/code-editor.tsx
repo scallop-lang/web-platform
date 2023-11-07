@@ -8,17 +8,16 @@ import {
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
+import { Card } from "~/components/ui/card";
+import { Skeleton } from "~/components/ui/skeleton";
 import { ScallopDark, ScallopLight } from "~/utils/editor-themes";
-
-import { Card } from "./ui/card";
-import { Skeleton } from "./ui/skeleton";
 
 const CodeEditor = () => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
 
   // this is to avoid hydration mismatch due to `resolvedTheme` being
-  // undefined on the server
+  // undefined on the server (because we use SSR)
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -39,11 +38,10 @@ const CodeEditor = () => {
       autoFocus={true}
       placeholder={`// write your Scallop program here`}
       style={{ height: "100%" }}
-      onChange={(code) => console.log("code: ", code)}
     />
   );
 
   return <Card className="col-span-1 h-full grow p-4">{resolvedEditor}</Card>;
 };
 
-export default CodeEditor;
+export { CodeEditor };
