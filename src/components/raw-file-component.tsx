@@ -75,13 +75,18 @@ const RawFileComponent = ({
         .map(({ type, name }) => {
           return name ? `${name}: ${parseType(type)}` : parseType(type);
         })
-        .join(", ")})`
+        .join(", ")})`,
     );
 
     // then parse facts
     rawArray.push(`rel ${relation.name} = {`);
     relation.facts.forEach(({ tag, tuple }, factIndex) => {
-      let fact = `  ${tag}::(${tuple
+      // if the tag is an integer, we need to add a .0 to the end of it
+      const parsedTag = tag.toString().includes(".")
+        ? tag.toString()
+        : tag + ".0";
+
+      let fact = `  ${parsedTag}::(${tuple
         .map((value, argIndex) => {
           const type = relation.args[argIndex]!.type;
 

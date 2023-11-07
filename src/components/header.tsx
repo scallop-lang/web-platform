@@ -37,7 +37,7 @@ const AvatarDropdown = () => {
   let accountOption: React.ReactNode;
 
   if (status === "loading") {
-    userName = "Loading...";
+    userName = "Getting user...";
     subtitle = "Loading...";
     avatar = <Skeleton className="h-9 w-9 cursor-pointer rounded-full" />;
     accountOption = <DropdownMenuItem disabled>Loading...</DropdownMenuItem>;

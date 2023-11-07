@@ -5,6 +5,9 @@ import {
   ScallopHighlighter,
   ScallopLinter,
 } from "codemirror-lang-scallop";
+
+import { relationButtonPlugin}  from "~/utils/relation-button";
+import { Loader, PlayCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -33,6 +36,7 @@ const CodeEditor = () => {
         ScallopHighlighter(resolvedTheme!),
         ScallopLinter,
         lintGutter(),
+        relationButtonPlugin,
       ]}
       theme={resolvedTheme === "light" ? ScallopLight : ScallopDark}
       autoFocus={true}

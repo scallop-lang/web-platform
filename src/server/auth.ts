@@ -1,11 +1,53 @@
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import type { Role } from "@prisma/client";
 import { type GetServerSidePropsContext } from "next";
-import { getServerSession } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
+import { getServerSession, type DefaultSession } from "next-auth";
+import GithubProvider from "next-auth/providers/github";
 
-import { authOptions } from "../pages/api/auth/[...nextauth]";
+import { env } from "~/env.mjs";
+import { db } from "~/server/db";
 
-export const getServerAuthSession = async (ctx: {
+declare module "next-auth" {
+  interface Session extends DefaultSession {
+    user: {
+      id: string;
+      role?: Role;
+    } & DefaultSession["user"];
+  }
+
+  interface User {
+    role?: Role;
+  }
+}
+
+const authOptions: NextAuthOptions = {
+  callbacks: {
+    session: ({ session, user }) => ({
+      ...session,
+      user: {
+        ...session.user,
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+    }),
+  },
+  adapter: PrismaAdapter(db),
+  providers: [
+    // [TODO) apparently we're missing a field for GitHub OAuth? LOL
+    GithubProvider({
+      clientId: env.GITHUB_ID,
+      clientSecret: env.GITHUB_SECRET,
+    }),
+  ],
+};
+
+const getServerAuthSession = async (ctx: {
   req: GetServerSidePropsContext["req"];
   res: GetServerSidePropsContext["res"];
 }) => {
   return await getServerSession(ctx.req, ctx.res, authOptions);
 };
+
+export { authOptions, getServerAuthSession };

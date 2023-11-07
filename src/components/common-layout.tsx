@@ -1,7 +1,16 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-const ScallopHead = () => {
+import Header from "~/components/header";
+import { cn } from "~/utils/cn";
+
+const CommonLayout = ({
+  className,
+  children,
+}: {
+  className: string;
+  children: React.ReactNode;
+}) => {
   const { asPath } = useRouter();
 
   const title =
@@ -16,21 +25,14 @@ const ScallopHead = () => {
       : "") + "Scallop";
 
   return (
-    <Head>
-      <title>{title}</title>
-
-      <link
-        rel="icon"
-        type="image/svg+xml"
-        href="/favicon.svg"
-      />
-      <link
-        rel="icon"
-        type="image/png"
-        href="/favicon.png"
-      />
-    </Head>
+    <div className={cn(className)}>
+      <Head>
+        <title>{title}</title>
+      </Head>
+      <Header />
+      {children}
+    </div>
   );
 };
 
-export default ScallopHead;
+export default CommonLayout;

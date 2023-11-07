@@ -5,7 +5,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { getServerAuthSession } from "../auth";
-import { prisma } from "../db";
+import { db } from "../db";
 
 /**
  * 1. CONTEXT
@@ -32,7 +32,7 @@ type CreateContextOptions = {
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
-    prisma,
+    prisma: db,
   };
 };
 
@@ -106,6 +106,7 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
   return next({
     ctx: {
       // infers the `session` as non-nullable
