@@ -35,6 +35,7 @@ const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(db),
   providers: [
+    // [TODO) apparently we're missing a field for GitHub OAuth? LOL
     GithubProvider({
       clientId: env.GITHUB_ID,
       clientSecret: env.GITHUB_SECRET,
