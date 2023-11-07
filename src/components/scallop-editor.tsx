@@ -4,7 +4,7 @@ import { CodeEditor } from "~/components/code-editor";
 import { ResizeHandle } from "~/components/resize-handle";
 import { Card } from "~/components/ui/card";
 
-const ScallopEditor = () => {
+const ScallopEditor = ({ program }: { program: string }) => {
   return (
     <PanelGroup
       direction="horizontal"
@@ -15,7 +15,7 @@ const ScallopEditor = () => {
         defaultSize={50}
         className="mr-1"
       >
-        <CodeEditor />
+        <CodeEditor program={program} />
       </Panel>
 
       <ResizeHandle />

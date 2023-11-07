@@ -13,7 +13,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { ScallopDark, ScallopLight } from "~/utils/editor-themes";
 import { relationButtonPlugin } from "~/utils/relation-button";
 
-const CodeEditor = () => {
+const CodeEditor = ({ program }: { program: string }) => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
 
@@ -27,7 +27,7 @@ const CodeEditor = () => {
     <Skeleton className="h-full w-full rounded-md" />
   ) : (
     <CodeMirror
-      value={""}
+      value={program}
       height="100%"
       extensions={[
         Scallop(),
