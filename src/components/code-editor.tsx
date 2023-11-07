@@ -41,7 +41,7 @@ const CodeEditor = () => {
     />
   );
 
-  return <Card className="col-span-1 h-full grow p-4">{resolvedEditor}</Card>;
+  return <Card className="h-full p-4">{resolvedEditor}</Card>;
 };
 
 export { CodeEditor };
