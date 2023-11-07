@@ -119,6 +119,9 @@ dependencies:
   react-dom:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
+  react-resizable-panels:
+    specifier: ^0.0.55
+    version: 0.0.55(react-dom@18.2.0)(react@18.2.0)
   superjson:
     specifier: 1.12.2
     version: 1.12.2
@@ -140,8 +143,8 @@ devDependencies:
     specifier: ^4.1.1
     version: 4.1.1(prettier@3.0.3)
   '@types/codemirror':
-    specifier: ^5.60.12
-    version: 5.60.12
+    specifier: ^5.60.13
+    version: 5.60.13
   '@types/eslint':
     specifier: ^8.44.6
     version: 8.44.6
@@ -1780,10 +1783,10 @@ packages:
     resolution: {integrity: sha512-1/h9KCPkTNNmpN5VKfKO4kPcl/W4Y9VQla4YGg4pydSh/+4b//0IPfvk3Oz4tz/tvWyAUlBKkBVhD3GfDLcAQA==}
     dev: false
 
-  /@types/codemirror@5.60.12:
-    resolution: {integrity: sha512-SFSj5Tb/mtQoVgaltsipdRGG1PkcFu/L0OXPNBGCXYUQtwsNoAGRNNHOTl1jYcQUcEI77EiUfk94bgETTbSo/A==}
+  /@types/codemirror@5.60.13:
+    resolution: {integrity: sha512-qLWcKUwYDYB7mZpE++0Jn3i1TJ2GW8nlhALRAfjaKgb1HRnk2qcNqWxZ+BpPY1h4n4IQT0foThaOxWHxEL8MnQ==}
     dependencies:
-      '@types/tern': 0.23.6
+      '@types/tern': 0.23.7
     dev: true
 
   /@types/eslint@8.44.6:
@@ -1837,8 +1840,8 @@ packages:
     resolution: {integrity: sha512-MMzuxN3GdFwskAnb6fz0orFvhfqi752yjaXylr0Rp4oDg5H0Zn1IuyRhDVvYOwAXoJirx2xuS16I3WjxnAIHiQ==}
     dev: true
 
-  /@types/tern@0.23.6:
-    resolution: {integrity: sha512-ntalN+F2msUwz7/OCCADN4FwxtIGqF4Hqwxd15yAn0VOUozj1VaIrH4Prh95N8y69K3bQpHFVGwTJDZC4oRtvA==}
+  /@types/tern@0.23.7:
+    resolution: {integrity: sha512-0YS9XCZ0LAhlP11HV9SqncUYyz9Ggsgc7Om/AmchKvoeFyj0qPaJmX6rJ93mJVExizWDzUMb49gAtVpI1uHd8Q==}
     dependencies:
       '@types/estree': 1.0.3
     dev: true
@@ -4069,6 +4072,16 @@ packages:
       tslib: 2.6.2
       use-callback-ref: 1.3.0(@types/react@18.2.33)(react@18.2.0)
       use-sidecar: 1.1.2(@types/react@18.2.33)(react@18.2.0)
+    dev: false
+
+  /react-resizable-panels@0.0.55(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-J/LTFzUEjJiqwSjVh8gjUXkQDA8MRPjARASfn++d2+KOgA+9UcRYUfE3QBJixer2vkk+ffQ4cq3QzWzzHgqYpQ==}
+    peerDependencies:
+      react: ^16.14.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /react-ssr-prepass@1.5.0(react@18.2.0):

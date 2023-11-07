@@ -1,25 +1,11 @@
-import { useState } from "react";
+import { ScallopEditor } from "~/components/scallop-editor";
 
-import Playground from "~/components/playground";
-import { type RelationRecord } from "~/utils/schemas-types";
-
-const Root = () => {
-  const [initialProgram, setInitialProgram] = useState("");
-  const [initialInputs, setInitialInputs] = useState<RelationRecord>({});
-  const [initialOutputs, setInitialOutputs] = useState<RelationRecord>({});
-
+const Playground = () => {
   return (
-    <main className="flex h-[calc(100vh-53px)] flex-col gap-3 bg-background p-4">
-      <Playground
-        program={initialProgram}
-        inputs={initialInputs}
-        outputs={initialOutputs}
-        setProgram={setInitialProgram}
-        setInputs={setInitialInputs}
-        setOutputs={setInitialOutputs}
-      />
+    <main className="h-[calc(100vh-53px)] w-full bg-background p-4">
+      <ScallopEditor />
     </main>
   );
 };
 
-export default Root;
+export default Playground;
