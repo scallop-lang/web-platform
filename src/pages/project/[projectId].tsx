@@ -8,7 +8,7 @@ import type {
 } from "next/types";
 import { useState } from "react";
 
-import ScallopEditor from "~/components/scallop-editor";
+import { ScallopEditor } from "~/components/scallop-editor";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -16,7 +16,7 @@ import { Switch } from "~/components/ui/switch";
 import { useToast } from "~/components/ui/use-toast";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
-import type { RelationRecord, SclProgram } from "~/utils/schemas-types";
+import type { RelationRecord } from "~/utils/schemas-types";
 import { generateSSRHelper } from "~/utils/ssr-helper";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
@@ -70,9 +70,6 @@ const ProjectPage = ({
     outputsCopy[output.name] = output;
   });
 
-  const [program, setProgram] = useState<SclProgram>(project.program);
-  const [inputs, setInputs] = useState<RelationRecord>(inputsCopy);
-  const [outputs, setOutputs] = useState<RelationRecord>(outputsCopy);
   const [title, setTitle] = useState<string>(project.title);
   const [published, setPublished] = useState<boolean>(project.published);
 
@@ -119,9 +116,9 @@ const ProjectPage = ({
                   id: project.id,
                   project: {
                     title: title,
-                    program: program,
-                    inputs: Object.values(inputs),
-                    outputs: Object.values(outputs),
+                    program: project.program,
+                    inputs: Object.values(project.inputs),
+                    outputs: Object.values(project.outputs),
                   },
                 });
               }}
@@ -159,14 +156,7 @@ const ProjectPage = ({
           </div>
         ) : null}
       </div>
-      <ScallopEditor
-        program={program}
-        inputs={inputs}
-        outputs={outputs}
-        setProgram={setProgram}
-        setInputs={setInputs}
-        setOutputs={setOutputs}
-      />
+      <ScallopEditor program={project.program} />
     </main>
   );
 };
