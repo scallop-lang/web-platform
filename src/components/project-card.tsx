@@ -53,11 +53,11 @@ const ProjectCard = ({
         >
           {loading ? (
             <>
-              <Loader className="mr-2 w-4 h-4" /> Loading...
+              <Loader className="mr-2 h-4 w-4" /> Loading...
             </>
           ) : (
             <>
-              <ArrowRight className="mr-2 w-4 h-4" />
+              <ArrowRight className="mr-2 h-4 w-4" />
               Go to project
             </>
           )}

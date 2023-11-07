@@ -5,15 +5,13 @@ import {
   ScallopHighlighter,
   ScallopLinter,
 } from "codemirror-lang-scallop";
-
-import { relationButtonPlugin}  from "~/utils/relation-button";
-import { Loader, PlayCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 import { Card } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { ScallopDark, ScallopLight } from "~/utils/editor-themes";
+import { relationButtonPlugin } from "~/utils/relation-button";
 
 const CodeEditor = () => {
   const [mounted, setMounted] = useState(false);
