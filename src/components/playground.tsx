@@ -20,7 +20,7 @@ const Playground = ({
   setOutputs: React.Dispatch<React.SetStateAction<RelationRecord>>;
 }) => {
   return (
-    <div className="grid grid-cols-2 h-full gap-3">
+    <div className="flex h-full gap-3">
       <ProjectContext.Provider
         value={{
           program,

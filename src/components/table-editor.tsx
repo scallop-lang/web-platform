@@ -89,7 +89,7 @@ const TableEditor = () => {
     <TableContext.Provider
       value={{ activeRelationName, setActiveRelationName }}
     >
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4 w-full">
         <div className="flex justify-between space-x-10">
           <CreateRelationDialog />
           <div className="flex grow justify-end space-x-2">
