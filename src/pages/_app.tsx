@@ -1,7 +1,7 @@
+import { GeistMono, GeistSans } from "geist/font";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
-import { IBM_Plex_Mono, Inter } from "next/font/google";
 
 import CommonLayout from "~/components/common-layout";
 import ThemeProvider from "~/components/theme-provider";
@@ -10,20 +10,6 @@ import { Toaster } from "~/components/ui/toaster";
 import "~/styles/globals.css";
 
 import { api } from "~/utils/api";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  preload: true,
-});
-
-const plexMono = IBM_Plex_Mono({
-  weight: ["400", "700", "100", "200", "300", "500", "600"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-plex-mono",
-  preload: false,
-});
 
 const App = ({
   Component,
@@ -42,15 +28,15 @@ const App = ({
           global
         >{`
           :root {
-            font-family: ${inter.style.fontFamily};
+            font-family: ${GeistSans.style.fontFamily};
           }
 
           .font-mono {
-            font-family: ${plexMono.style.fontFamily};
+            font-family: ${GeistMono.style.fontFamily};
           }
         `}</style>
         <CommonLayout
-          className={`${inter.variable} ${plexMono.variable} font-sans`}
+          className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}
         >
           <Component {...pageProps} />
           <Toaster />

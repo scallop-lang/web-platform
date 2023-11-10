@@ -46,8 +46,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)"],
-        mono: ["var(--font-plex-mono)"],
+        sans: ["var(--font-geist-sans)"],
+        mono: ["var(--font-geist-mono)"],
       },
       keyframes: {
         "accordion-down": {

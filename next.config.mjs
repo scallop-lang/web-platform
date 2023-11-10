@@ -19,6 +19,9 @@ const config = {
       },
     ];
   },
+
+  // see https://github.com/vercel/geist-font/issues/13#issuecomment-1798598309
+  transpilePackages: ["geist"],
 };
 
 export default config;
