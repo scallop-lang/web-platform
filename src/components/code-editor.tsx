@@ -5,45 +5,31 @@ import {
   ScallopHighlighter,
   ScallopLinter,
 } from "codemirror-lang-scallop";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 
 import { Card } from "~/components/ui/card";
-import { Skeleton } from "~/components/ui/skeleton";
-import { ScallopDark, ScallopLight } from "~/utils/editor-themes";
+import { ScallopLight } from "~/utils/editor-themes";
 import { relationButtonPlugin } from "~/utils/relation-button";
 
 const CodeEditor = ({ program }: { program: string }) => {
-  const [mounted, setMounted] = useState(false);
-  const { resolvedTheme } = useTheme();
-
-  // this is to avoid hydration mismatch due to `resolvedTheme` being
-  // undefined on the server (because we use SSR)
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const resolvedEditor = !mounted ? (
-    <Skeleton className="h-full w-full rounded-md" />
-  ) : (
-    <CodeMirror
-      value={program}
-      height="100%"
-      extensions={[
-        Scallop(),
-        ScallopHighlighter(resolvedTheme!),
-        ScallopLinter,
-        lintGutter(),
-        relationButtonPlugin,
-      ]}
-      theme={resolvedTheme === "light" ? ScallopLight : ScallopDark}
-      autoFocus={true}
-      placeholder={`// write your Scallop program here`}
-      style={{ height: "100%" }}
-    />
+  return (
+    <Card className="h-full p-4">
+      <CodeMirror
+        value={program}
+        height="100%"
+        extensions={[
+          Scallop(),
+          ScallopHighlighter("light"),
+          ScallopLinter,
+          lintGutter(),
+          relationButtonPlugin,
+        ]}
+        theme={ScallopLight}
+        autoFocus={true}
+        placeholder={`// write your Scallop program here`}
+        style={{ height: "100%" }}
+      />
+    </Card>
   );
-
-  return <Card className="h-full p-4">{resolvedEditor}</Card>;
 };
 
 export { CodeEditor };
