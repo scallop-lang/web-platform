@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import useDrivePicker from "react-google-drive-picker";
 import { Button } from "~/components/ui/button";
 
@@ -10,7 +10,7 @@ const GooglePicker = ({}) => {
             gapi.client.init({
                 'apiKey' : 'AIzaSyCHJrogC4MIjl7sIWSjGvb9m515aeRXWOU'
             }).then(() => {
-                let tokenInfo = gapi.auth.getToken();
+                const tokenInfo = gapi.auth.getToken();
                 openPicker({
                     clientId: '494588134232-9k46v3kik6q4vbnleq3s5c62tau7obig.apps.googleusercontent.com',
                     developerKey: 'AIzaSyCHJrogC4MIjl7sIWSjGvb9m515aeRXWOU',
@@ -26,21 +26,8 @@ const GooglePicker = ({}) => {
                             element.style.zIndex = '2000';
                           }
                           if (data.action === 'picked') {
-                            if (!tokenInfo) {
-                              tokenInfo = gapi.auth.getToken();
-                            }
-                            const fetchOptions = {
-                              headers: {
-                                Authorization: `Bearer ${tokenInfo.access_token}`,
-                              },
-                            };
-                            const driveFileUrl = 'https://www.googleapis.com/drive/v3/files';
-                            data.docs.map(async (item) => {
-                                const response = await fetch(
-                                    `${driveFileUrl}/${item.id}?alt=media`,
-                                    fetchOptions
-                                );
-                                console.log(response);
+                            data.docs.map((item) => {
+                                console.log(item);
                             });
                         }
                     },
