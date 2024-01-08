@@ -7,13 +7,13 @@ import type {
   InferGetServerSidePropsType,
 } from "next/types";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { ScallopEditor } from "~/components/scallop-editor";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
-import { useToast } from "~/components/ui/use-toast";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
 import type { RelationRecord } from "~/utils/schemas-types";
@@ -25,38 +25,28 @@ const ProjectPage = ({
   project,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { data: session } = useSession();
-  const { toast } = useToast();
   const router = useRouter();
   const isAuthor = session?.user?.id === project.authorId;
 
   const { mutate: saveProject, isLoading: projectIsSaving } =
     api.project.updateProjectById.useMutation({
-      onSuccess: () =>
-        toast({
-          description: "Project successfully saved!",
-        }),
+      onSuccess: () => toast.success("Project successfully saved!"),
       onError: (error) =>
-        toast({
-          description: `Project failed to save! Reason: ${error.message}`,
-        }),
+        toast.error(`Project failed to save! Reason: ${error.message}`),
     });
 
   const { mutate: deleteProject, isLoading: projectIsDeleting } =
     api.project.deleteProjectById.useMutation({
       onSuccess: async ({ title }) => {
-        toast({
-          description: (
-            <p>
-              Project <b>{title}</b> successfully deleted!
-            </p>
-          ),
-        });
+        toast.success(
+          <p>
+            Project <b>{title}</b> successfully deleted!
+          </p>,
+        );
         await router.push("/dashboard");
       },
       onError: (error) =>
-        toast({
-          description: `Project failed to delete! Reason: ${error.message}`,
-        }),
+        toast.error(`Project failed to delete! Reason: ${error.message}`),
     });
 
   const inputsCopy: RelationRecord = {};
