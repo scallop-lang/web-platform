@@ -6,7 +6,8 @@ import type {
   GetServerSideProps,
   InferGetServerSidePropsType,
 } from "next/types";
-import { useState } from "react";
+import type { ElementRef } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ScallopEditor } from "~/components/scallop-editor";
@@ -16,6 +17,7 @@ import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
+import { cn } from "~/utils/cn";
 import type { RelationRecord } from "~/utils/schemas-types";
 import { generateSSRHelper } from "~/utils/ssr-helper";
 
@@ -26,7 +28,9 @@ const ProjectPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { data: session } = useSession();
   const router = useRouter();
-  const isAuthor = session?.user?.id === project.authorId;
+
+  const projectTitleRef = useRef<ElementRef<"input">>(null);
+  const [published, setPublished] = useState<boolean>(project.published);
 
   const { mutate: saveProject, isLoading: projectIsSaving } =
     api.project.updateProjectById.useMutation({
@@ -60,91 +64,105 @@ const ProjectPage = ({
     outputsCopy[output.name] = output;
   });
 
-  const [title, setTitle] = useState<string>(project.title);
-  const [published, setPublished] = useState<boolean>(project.published);
+  const isAuthor = session?.user?.id === project.authorId;
+  const createdAt = new Date(project.createdAt);
 
   return (
-    <main className="flex h-[calc(100vh-53px)] flex-col gap-3 bg-background p-4">
-      <div className="flex items-center justify-between">
-        {isAuthor ? (
-          <Input
-            type="text"
-            defaultValue={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-fit scroll-m-20 text-2xl font-semibold tracking-tight"
-            placeholder={project.title}
-          />
-        ) : (
-          <h3 className="w-fit scroll-m-20 text-2xl font-semibold tracking-tight">
-            {title}
-          </h3>
-        )}
-        {isAuthor ? (
-          <div className="flex space-x-5">
-            <span className="flex items-center space-x-2">
-              <Label htmlFor="publish-switch">
-                {published ? "Published" : "Unpublished"}
-              </Label>
-              <Switch
-                id="publish-switch"
-                checked={published}
-                onCheckedChange={(checked: boolean) => {
-                  setPublished(checked);
+    <main className="flex h-[calc(100vh-53px)] w-full flex-col bg-background">
+      <div className="grid grid-cols-2 border-b-[1.5px] border-border p-4">
+        <div className="col-span-1">
+          {isAuthor ? (
+            <Input
+              ref={projectTitleRef}
+              type="text"
+              defaultValue={project.title}
+              className="w-fit scroll-m-20 text-2xl font-semibold tracking-tight"
+              placeholder={project.title}
+            />
+          ) : (
+            <h3 className="w-fit scroll-m-20 text-2xl font-semibold tracking-tight">
+              {project.title}
+            </h3>
+          )}
+          <p className={cn("text-sm", isAuthor ? "mt-1.5" : false)}>
+            Created on {createdAt.toLocaleDateString()} at{" "}
+            {createdAt.toLocaleTimeString()}
+          </p>
+        </div>
+
+        <div className="flex items-start justify-end gap-1.5">
+          {isAuthor ? (
+            <div className="flex items-start justify-end gap-1.5">
+              <span className="flex items-center space-x-2">
+                <Label htmlFor="publish-switch">
+                  {published ? "Published!" : "Unpublished"}
+                </Label>
+                <Switch
+                  id="publish-switch"
+                  checked={published}
+                  onCheckedChange={(checked: boolean) => {
+                    setPublished(checked);
+                    saveProject({
+                      id: project.id,
+                      project: {
+                        published: checked,
+                      },
+                    });
+                  }}
+                />
+              </span>
+
+              <Button
+                onClick={() => {
                   saveProject({
                     id: project.id,
                     project: {
-                      published: checked,
+                      title: projectTitleRef.current!.value,
+                      program: project.program,
+                      inputs: Object.values(project.inputs),
+                      outputs: Object.values(project.outputs),
                     },
                   });
                 }}
-              />
-            </span>
-            <Button
-              className="w-36"
-              onClick={() => {
-                saveProject({
-                  id: project.id,
-                  project: {
-                    title: title,
-                    program: project.program,
-                    inputs: Object.values(project.inputs),
-                    outputs: Object.values(project.outputs),
-                  },
-                });
-              }}
-              disabled={projectIsSaving}
-            >
-              {projectIsSaving ? (
-                <>
-                  <Loader className="mr-2 h-4 w-4" /> Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" /> Save project
-                </>
-              )}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() =>
-                deleteProject({
-                  id: project.id,
-                })
-              }
-              disabled={projectIsDeleting}
-            >
-              {projectIsDeleting ? (
-                <>
-                  <Loader className="mr-2 h-4 w-4" /> Deleting...
-                </>
-              ) : (
-                <>
-                  <Trash className="mr-2 h-4 w-4" /> Delete project
-                </>
-              )}
-            </Button>
-          </div>
-        ) : null}
+                disabled={projectIsSaving}
+              >
+                {projectIsSaving ? (
+                  <>
+                    <Loader className="mr-2 h-4 w-4" /> Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" /> Save
+                  </>
+                )}
+              </Button>
+
+              <Button
+                variant="destructive"
+                onClick={() =>
+                  deleteProject({
+                    id: project.id,
+                  })
+                }
+                disabled={projectIsDeleting}
+              >
+                {projectIsDeleting ? (
+                  <>
+                    <Loader className="mr-2 h-4 w-4" /> Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash className="mr-2 h-4 w-4" /> Delete
+                  </>
+                )}
+              </Button>
+            </div>
+          ) : null}
+
+          <Button>Quick Layout... (dropdown)</Button>
+          <Button>Export... (dropdown)</Button>
+          <Button>Import</Button>
+        </div>
       </div>
       <ScallopEditor program={project.program} />
     </main>
