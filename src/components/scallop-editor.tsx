@@ -1,5 +1,4 @@
 import { Panel, PanelGroup } from "react-resizable-panels";
-
 import { CodeEditor } from "~/components/code-editor";
 import { ResizeHandle } from "~/components/resize-handle";
 import { Card } from "~/components/ui/card";

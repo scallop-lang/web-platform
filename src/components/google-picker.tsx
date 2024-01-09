@@ -1,5 +1,6 @@
 import useDrivePicker from "react-google-drive-picker";
-import { CallbackDoc } from "react-google-drive-picker/dist/typeDefs";
+import type { CallbackDoc } from "react-google-drive-picker/dist/typeDefs";
+import { useToast } from "~/components/ui/use-toast";
 import { Button } from "~/components/ui/button";
 
 const GooglePicker = ({
@@ -8,6 +9,7 @@ const GooglePicker = ({
     changeEditorFunction: (value: string) => void
 }) => {
     const [openPicker] = useDrivePicker();
+    const {toast} = useToast();
 
     const parseURL = async (file : CallbackDoc) => {
         try {
@@ -17,8 +19,13 @@ const GooglePicker = ({
                 alt:'media'
             });
             changeEditorFunction(response.body);
+            toast({
+                description: 'Successfully loaded file!'
+            })
         } catch (error) {
-            console.log(error);
+            toast({
+                description: 'Error: ' + !error
+            })
         }
     }
 
@@ -33,6 +40,7 @@ const GooglePicker = ({
                     clientId: '494588134232-9k46v3kik6q4vbnleq3s5c62tau7obig.apps.googleusercontent.com',
                     developerKey: 'AIzaSyCHJrogC4MIjl7sIWSjGvb9m515aeRXWOU',
                     viewId: 'DOCS',
+                    viewMimeTypes: 'application/octet-stream',
                     token: tokenInfo ? tokenInfo.access_token : undefined,
                     callbackFunction(data) {
                         const elements = Array.from(
@@ -45,7 +53,13 @@ const GooglePicker = ({
                           }
                           if (data.action === 'picked') {
                             data.docs.map(async (item) => {
-                                await parseURL(item);
+                                if (item.name.endsWith('.scl')) {
+                                    await parseURL(item);
+                                } else {
+                                    toast({
+                                        description: `File is not a Scallop file! You must pick a .scl file.`,
+                                    });
+                                }
                             });
                         }
                     },
@@ -62,6 +76,7 @@ const GooglePicker = ({
     return (
         <Button
             onClick={() => handleOpenPicker()}
+            className="mb-2"
         >
             Load From Drive
         </Button>
