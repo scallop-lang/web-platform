@@ -1,21 +1,41 @@
 import { lintGutter } from "@codemirror/lint";
-import CodeMirror from "@uiw/react-codemirror";
+import CodeMirror, { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import {
   Scallop,
   ScallopHighlighter,
   ScallopLinter,
 } from "codemirror-lang-scallop";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { ScallopDark, ScallopLight } from "~/utils/editor-themes";
 import { relationButtonPlugin } from "~/utils/relation-button";
 
+import GooglePicker from "~/components/google-picker";
+
 const CodeEditor = ({ program }: { program: string }) => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+
+  const cmRef = React.useRef<ReactCodeMirrorRef>(null);
+
+  function replaceEditorContent(value: string) { 
+    if (cmRef.current) {
+      const transaction = cmRef.current.view?.state.update({
+        changes: {
+          from: 0,
+          to: cmRef.current.view?.state.doc.length,
+          insert: value,
+        }
+      });
+      
+      if (transaction) {
+        cmRef.current.view?.dispatch(transaction);
+      }
+    }
+  }
 
   // this is to avoid hydration mismatch due to `resolvedTheme` being
   // undefined on the server (because we use SSR)
@@ -26,7 +46,10 @@ const CodeEditor = ({ program }: { program: string }) => {
   const resolvedEditor = !mounted ? (
     <Skeleton className="h-full w-full rounded-md" />
   ) : (
+    <>
+    <GooglePicker changeEditorFunction={replaceEditorContent}/>
     <CodeMirror
+      ref={cmRef}
       value={program}
       height="100%"
       extensions={[
@@ -41,6 +64,7 @@ const CodeEditor = ({ program }: { program: string }) => {
       placeholder={`// write your Scallop program here`}
       style={{ height: "100%" }}
     />
+    </>
   );
 
   return <Card className="h-full p-4">{resolvedEditor}</Card>;

@@ -5,6 +5,7 @@ import { ResizeHandle } from "~/components/resize-handle";
 import { Card } from "~/components/ui/card";
 
 const ScallopEditor = ({ program }: { program: string }) => {
+  
   return (
     <PanelGroup
       direction="horizontal"
