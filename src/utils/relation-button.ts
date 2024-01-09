@@ -15,10 +15,10 @@ class RelationWidget extends WidgetType {
   toDOM() {
     const wrap = document.createElement("span");
     wrap.setAttribute("aria-hidden", "true");
-    wrap.className = "scl-relation-button";
 
     const btn = wrap.appendChild(document.createElement("input"));
     btn.type = "button";
+    btn.name = "scl-relation-button";
     btn.setAttribute("json", this.json);
     btn.setAttribute(
       "style",
@@ -97,7 +97,7 @@ export const relationButtonPlugin = ViewPlugin.fromClass(
         const target = e.target as HTMLElement;
         if (
           target.nodeName == "INPUT" &&
-          target.parentElement!.classList.contains("scl-relation-button")
+          target.getAttribute("name") == "scl-relation-button"
         )
           console.log(JSON.parse(target.getAttribute("json") ?? ""));
       },
