@@ -373,8 +373,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
           defaultSize={25}
           minSize={25}
         >
-          <div className="flex gap-1.5 border-b-[1.5px] border-border p-2.5">
-            <Button className="w-1/2">
+          <div className="flex justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
+            <Button>
               <Plus
                 className="shrink-0 md:mr-1.5"
                 size={16}
@@ -385,7 +385,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
             </Button>
 
             <Input
-              className="w-1/2"
+              className="w-1/2 min-w-64"
               placeholder="Search..."
             />
           </div>

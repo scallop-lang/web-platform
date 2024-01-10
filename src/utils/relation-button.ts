@@ -126,7 +126,6 @@ export const relationButtonPlugin = ViewPlugin.fromClass(
             ]
           })
         }
-
       },
     },
   },
