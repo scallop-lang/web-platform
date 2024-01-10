@@ -1,4 +1,5 @@
 import { lintGutter } from "@codemirror/lint";
+import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import CodeMirror from "@uiw/react-codemirror";
 import {
   Scallop,
@@ -9,9 +10,18 @@ import {
 import { ScallopLight } from "~/utils/editor-themes";
 import { relationButtonPlugin } from "~/utils/relation-button";
 
-const CodeEditor = ({ program }: { program: string }) => {
+const CodeEditor = ({
+  program,
+  setProgram,
+  cmRef,
+}: {
+  program: string;
+  setProgram: React.Dispatch<React.SetStateAction<string>>;
+  cmRef: React.RefObject<ReactCodeMirrorRef>;
+}) => {
   return (
     <CodeMirror
+      ref={cmRef}
       value={program}
       height="100%"
       extensions={[
@@ -25,6 +35,7 @@ const CodeEditor = ({ program }: { program: string }) => {
       autoFocus={true}
       placeholder={`// write your Scallop program here`}
       style={{ height: "100%" }}
+      onChange={(value) => setProgram(value)}
     />
   );
 };
