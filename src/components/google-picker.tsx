@@ -11,7 +11,7 @@ const GooglePicker = ({
     const [openPicker] = useDrivePicker();
     const {toast} = useToast();
 
-    const parseURL = async (file : CallbackDoc) => {
+    const loadFile = async (file : CallbackDoc) => {
         try {
             console.log(file);
             const response = await gapi.client.drive.files.get({
@@ -43,7 +43,7 @@ const GooglePicker = ({
                     viewMimeTypes: 'application/octet-stream',
                     token: tokenInfo ? tokenInfo.access_token : undefined,
                     callbackFunction(data) {
-                        const elements = Array.from(
+                          const elements = Array.from(
                             document.getElementsByClassName(
                               'picker-dialog'
                             ) as HTMLCollectionOf<HTMLElement>
@@ -54,7 +54,7 @@ const GooglePicker = ({
                           if (data.action === 'picked') {
                             data.docs.map(async (item) => {
                                 if (item.name.endsWith('.scl')) {
-                                    await parseURL(item);
+                                    await loadFile(item);
                                 } else {
                                     toast({
                                         description: `File is not a Scallop file! You must pick a .scl file.`,

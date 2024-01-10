@@ -14,6 +14,7 @@ import { ScallopDark, ScallopLight } from "~/utils/editor-themes";
 import { relationButtonPlugin } from "~/utils/relation-button";
 
 import GooglePicker from "~/components/google-picker";
+import SaveToDrive from "~/components/save-to-drive";
 
 const CodeEditor = ({ program }: { program: string }) => {
   const [mounted, setMounted] = useState(false);
@@ -33,6 +34,7 @@ const CodeEditor = ({ program }: { program: string }) => {
       
       if (transaction) {
         cmRef.current.view?.dispatch(transaction);
+        console.log(program);
       }
     }
   }
@@ -48,6 +50,7 @@ const CodeEditor = ({ program }: { program: string }) => {
   ) : (
     <>
     <GooglePicker changeEditorFunction={replaceEditorContent}/>
+    <SaveToDrive program={program}/>
     <CodeMirror
       ref={cmRef}
       value={program}
