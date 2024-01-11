@@ -3,27 +3,40 @@ import { type Range } from "@codemirror/state";
 import type { DecorationSet, EditorView, ViewUpdate } from "@codemirror/view";
 import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
 
+type TableCell = {
+  content: string;
+  from: number;
+  to: number;
+};
+
+type Table = {
+  name: string;
+  facts: TableCell[][];
+};
+
 class RelationWidget extends WidgetType {
-  constructor(readonly relationName: string) {
+  constructor(readonly table: string) {
     super();
   }
 
   eq(other: RelationWidget) {
-    return other.relationName == this.relationName;
+    return other.table == this.table;
   }
 
   toDOM() {
     const wrap = document.createElement("span");
     wrap.setAttribute("aria-hidden", "true");
-    wrap.className = "scl-relation-button";
+
     const btn = wrap.appendChild(document.createElement("input"));
     btn.type = "button";
-    btn.name = this.relationName;
+    btn.name = "scl-relation-button";
+    btn.setAttribute("table", this.table);
     btn.setAttribute(
       "style",
       "vertical-align: middle; font-size: 8px; font-weight: bold; margin-left: 4px; border: 1px solid black; border-radius: 20px; cursor: pointer;",
     );
     btn.value = " ↪ ";
+
     return wrap;
   }
 
@@ -39,13 +52,42 @@ function relationButtons(view: EditorView) {
       from,
       to,
       enter: (node) => {
-        if (node.name == "RelationIdentifier") {
-          const relationName = view.state.doc.sliceString(node.from, node.to);
+        const relationIdNode = node.node.getChild("RelationIdentifier");
+        const factSetNode = node.node.getChild("FactSet");
+        if (node.name == "FactSetDecl" && relationIdNode && factSetNode) {
+          const relationName = view.state.doc.sliceString(relationIdNode.from, relationIdNode.to);
+          const relationFacts: TableCell[][] = [];
+
+          factSetNode.getChildren("ListItem").forEach((fact) => {
+            const tuple: TableCell[] = [];
+            const tupleNode = fact.getChild("ConstTuple");
+            if (tupleNode) {
+              const constantNode = tupleNode.getChild("Constant");
+              if (constantNode) {
+                tuple.push({
+                  content: view.state.doc.sliceString(constantNode.from, constantNode.to),
+                  from: constantNode.from,
+                  to: constantNode.to
+                });
+              } else {
+                tupleNode.getChildren("ListItem").forEach((constant) => {
+                  tuple.push({
+                    content: view.state.doc.sliceString(constant.from, constant.to),
+                    from: constant.from,
+                    to: constant.to
+                  });
+                });
+              }
+            }
+            relationFacts.push(tuple);
+          });
+
+          const relationTable = { name: relationName, facts: relationFacts };
           const deco = Decoration.widget({
-            widget: new RelationWidget(relationName),
+            widget: new RelationWidget(JSON.stringify(relationTable)),
             side: 1,
           });
-          widgets.push(deco.range(node.to));
+          widgets.push(deco.range(relationIdNode.to));
         }
       },
     });
@@ -70,13 +112,20 @@ export const relationButtonPlugin = ViewPlugin.fromClass(
     decorations: (v) => v.decorations,
 
     eventHandlers: {
-      mousedown: (e) => {
+      mousedown: (e, view) => {
         const target = e.target as HTMLElement;
         if (
           target.nodeName == "INPUT" &&
-          target.parentElement!.classList.contains("scl-relation-button")
-        )
-          console.log(target.getAttribute("name"));
+          target.getAttribute("name") == "scl-relation-button"
+        ) {
+          const obj = JSON.parse(target.getAttribute("table") ?? "") as Table;
+          view.dispatch({
+            changes: [
+              { from: obj.facts[0]?.[0]?.from ?? -1, to: obj.facts[0]?.[0]?.to ?? -1, insert: "\"Neelay\"" },
+              { from: obj.facts[1]?.[0]?.from ?? -1, to: obj.facts[1]?.[0]?.to ?? -1, insert: "\"Velingker\"" },
+            ]
+          })
+        }
       },
     },
   },
