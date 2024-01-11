@@ -55,21 +55,17 @@ const SaveToDrive = ({
     }
 
     const download = (content: string, filename: string) => {
-        gapi.load("client:auth2", () => {
-            gapi.client.init({
-                'apiKey' : 'AIzaSyBDRsgSPlCLFUe6RZ6zNT12LaeA4ip7aa4',
-                'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-                'scope' : 'https://www.googleapis.com/auth/drive.file'
-            }).then(() => {
-                const accessToken = gapi.auth.getToken();
-                console.log(accessToken);
+        const client: google.accounts.oauth2.TokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: '494588134232-gvaumsid2ucu5ckfrh45oer4ku2ch1bf.apps.googleusercontent.com',
+            scope: 'https://www.googleapis.com/auth/drive.file',
+            callback: (response) => {
                 openPicker({
                     clientId: '494588134232-gvaumsid2ucu5ckfrh45oer4ku2ch1bf.apps.googleusercontent.com',
                     developerKey: 'AIzaSyBDRsgSPlCLFUe6RZ6zNT12LaeA4ip7aa4',
                     viewId: 'FOLDERS',
                     setIncludeFolders: true,
                     setSelectFolderEnabled: true,
-                    token: accessToken ? accessToken.access_token : undefined,
+                    token: response ? response.access_token : undefined,
                     callbackFunction(data) {
                         if(data.action === 'picked') {
                             data.docs.map(async (item) => {
@@ -78,10 +74,9 @@ const SaveToDrive = ({
                         }
                     }
                 });
-            }).catch((error) => {
-                console.log(error);
-            });
+            }
         });
+        client.requestAccessToken();
     };
 
     return (

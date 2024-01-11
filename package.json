@@ -38,6 +38,7 @@
     "@trpc/server": "^10.43.1",
     "@types/gapi": "^0.0.47",
     "@types/gapi.client.drive-v3": "^0.0.4",
+    "@types/google.accounts": "^0.0.14",
     "@types/uuid": "^9.0.6",
     "@uiw/codemirror-themes": "^4.21.20",
     "@uiw/react-codemirror": "^4.21.20",

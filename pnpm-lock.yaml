@@ -86,6 +86,9 @@ dependencies:
   '@types/gapi.client.drive-v3':
     specifier: ^0.0.4
     version: 0.0.4
+  '@types/google.accounts':
+    specifier: ^0.0.14
+    version: 0.0.14
   '@types/uuid':
     specifier: ^9.0.6
     version: 9.0.6
@@ -648,8 +651,8 @@ packages:
       '@types/gapi.client.discovery-v1': 0.0.4
     dev: false
 
-  /@maxim_mazurok/gapi.client.drive-v3@0.0.20231220:
-    resolution: {integrity: sha512-sf76YMd4AqnfdhzOYvNNA5rdrCgT3XVff+cZfSsqGjQRpjL+rALIXkQ0JN457mGuBzLqtoALSWBqPtqtI0Aqkg==}
+  /@maxim_mazurok/gapi.client.drive-v3@0.0.20240108:
+    resolution: {integrity: sha512-qWgGRvjqGUpopcQOB+X4IlkPSmbIlXor4d4zZ5fKa2t/fo4e4JFC7DCYFQC4bAaVMz4W4L+gNyUMOZGJuCcCZA==}
     dependencies:
       '@types/gapi.client': 1.0.8
       '@types/gapi.client.discovery-v1': 0.0.4
@@ -1829,7 +1832,7 @@ packages:
   /@types/gapi.client.drive-v3@0.0.4:
     resolution: {integrity: sha512-jE37dJ0EzAdY0aJPFOp20xmec/aO0P4HtUIA9k07RMPyedFDOcuMlSac1r0PklwQdgXF7BHaMoObNHNAnwSQUQ==}
     dependencies:
-      '@maxim_mazurok/gapi.client.drive-v3': 0.0.20231220
+      '@maxim_mazurok/gapi.client.drive-v3': 0.0.20240108
     dev: false
 
   /@types/gapi.client@1.0.8:
@@ -1838,6 +1841,10 @@ packages:
 
   /@types/gapi@0.0.47:
     resolution: {integrity: sha512-/ZsLuq6BffMgbKMtZyDZ8vwQvTyKhKQ1G2K6VyWCgtHHhfSSXbk4+4JwImZiTjWNXfI2q1ZStAwFFHSkNoTkHA==}
+    dev: false
+
+  /@types/google.accounts@0.0.14:
+    resolution: {integrity: sha512-HqIVkVzpiLWhlajhQQd4rIV7czanFvXblJI2J1fSrL+VKQuQwwZ63m35D/mI0flsqKE6p/hNrAG0Yn4FD6JvNA==}
     dev: false
 
   /@types/json-schema@7.0.15:
