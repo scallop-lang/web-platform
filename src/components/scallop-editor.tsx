@@ -45,6 +45,17 @@ import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
 
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -55,6 +66,7 @@ import {
 } from "./ui/dialog";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
+import { Textarea } from "./ui/textarea";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
@@ -64,15 +76,20 @@ type ScallopEditorProps =
     }
   | { type: "project"; project: Project; isAuthor: boolean };
 
-const EditTitleButton = ({
+const EditDetailsButton = ({
   defaultTitle,
-  dispatchFn,
+  defaultDesc,
+  setTitleFn,
+  setDescFn,
 }: {
   defaultTitle: string;
-  dispatchFn: React.Dispatch<React.SetStateAction<string>>;
+  defaultDesc: string;
+  setTitleFn: React.Dispatch<React.SetStateAction<string>>;
+  setDescFn: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [open, setOpen] = useState(false);
-  const inputRef = useRef<ElementRef<"input">>(null);
+  const titleRef = useRef<ElementRef<"input">>(null);
+  const descRef = useRef<ElementRef<"textarea">>(null);
 
   return (
     <Dialog
@@ -85,26 +102,46 @@ const EditTitleButton = ({
           variant="none"
           className="ml-2"
         >
-          <span className="sr-only">Edit project name</span>
+          <span className="sr-only">Edit project details</span>
           <Pencil size={16} />
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit project name</DialogTitle>
+          <DialogTitle>Edit project details</DialogTitle>
           <DialogDescription>
-            Update your project name. Make sure to save your project afterwards.
+            Update your project name and description here. Make sure to save
+            your project afterwards.
           </DialogDescription>
         </DialogHeader>
-        <Input
-          ref={inputRef}
-          defaultValue={defaultTitle}
-        />
+
+        <div>
+          <Label htmlFor="title">Project name</Label>
+          <Input
+            id="title"
+            ref={titleRef}
+            placeholder={defaultTitle}
+            defaultValue={defaultTitle}
+          />
+        </div>
+        <div>
+          <Label htmlFor="description">Project description</Label>
+          <Textarea
+            id="description"
+            ref={descRef}
+            placeholder={
+              defaultDesc.length > 0 ? defaultDesc : "No description provided"
+            }
+            defaultValue={defaultDesc}
+          />
+        </div>
+
         <DialogFooter>
           <Button
             onClick={() => {
-              dispatchFn(inputRef.current!.value);
+              setTitleFn(titleRef.current!.value);
+              setDescFn(descRef.current!.value);
               setOpen(false);
             }}
           >
@@ -128,6 +165,13 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   );
   const [title, setTitle] = useState(
     type === "playground" ? "Playground" : project.title,
+  );
+  const [description, setDescription] = useState(
+    type === "playground"
+      ? "Scallop Playground"
+      : project.description
+        ? project.description
+        : "",
   );
   const [program, setProgram] = useState(
     editor.type === "playground" ? "" : editor.project.program,
@@ -154,13 +198,16 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         toast.error(`Project failed to delete! Reason: ${error.message}`),
     });
 
-  let subtitle;
+  let subtitle = "";
   if (type === "playground") {
     subtitle =
       "Get a feel for the language and workflow. Any work here will be lost on a browser refresh.";
   } else {
     const createdAt = new Date(project.createdAt);
-    subtitle = `Created on ${createdAt.toLocaleDateString()} at ${createdAt.toLocaleTimeString()}`;
+    subtitle += `Created on ${createdAt.toLocaleDateString()} at ${createdAt.toLocaleTimeString()}`;
+    subtitle +=
+      " • " +
+      (description.length > 0 ? description : "No description provided");
   }
 
   const isProjectAuthor = type === "project" && editor.isAuthor;
@@ -171,14 +218,16 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         <div className="col-span-1">
           <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight">
             {title}
-            {isProjectAuthor ? (
-              <EditTitleButton
+            {type === "project" && editor.isAuthor ? (
+              <EditDetailsButton
                 defaultTitle={title}
-                dispatchFn={setTitle}
+                defaultDesc={description}
+                setTitleFn={setTitle}
+                setDescFn={setDescription}
               />
             ) : null}
           </h2>
-          <p className="text-sm">{subtitle}</p>
+          <p className="truncate text-sm">{subtitle}</p>
         </div>
 
         <div className="col-span-1 flex flex-wrap items-center gap-2 sm:justify-end">
@@ -210,6 +259,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     id: project.id,
                     project: {
                       title: title,
+                      description: description,
                       program: program,
                       inputs: Object.values(project.inputs),
                       outputs: Object.values(project.outputs),
@@ -219,7 +269,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 disabled={projectIsSaving}
               >
                 {projectIsSaving ? (
-                  <Loader className="mr-2 h-4 w-4" />
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <Save className="mr-2 h-4 w-4" />
                 )}
@@ -267,70 +317,102 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <span className="sr-only">More options</span>
-                <MoreHorizontal size={18} />
-              </Button>
-            </DropdownMenuTrigger>
+          <AlertDialog>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <span className="sr-only">More options</span>
+                  <MoreHorizontal size={18} />
+                </Button>
+              </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end">
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Layout...</DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuItem
-                      onClick={() => panelGroupRef.current?.setLayout([25, 75])}
-                    >
-                      <PanelLeft
-                        className="mr-1.5"
-                        size={16}
-                      />{" "}
-                      25%—75%
-                    </DropdownMenuItem>
+              <DropdownMenuContent align="end">
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Layout...</DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          panelGroupRef.current?.setLayout([25, 75])
+                        }
+                      >
+                        <PanelLeft
+                          className="mr-1.5"
+                          size={16}
+                        />{" "}
+                        25%—75%
+                      </DropdownMenuItem>
 
-                    <DropdownMenuItem
-                      onClick={() => panelGroupRef.current?.setLayout([50, 50])}
-                    >
-                      <Columns2
-                        className="mr-1.5"
-                        size={16}
-                      />{" "}
-                      50%—50%
-                    </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          panelGroupRef.current?.setLayout([50, 50])
+                        }
+                      >
+                        <Columns2
+                          className="mr-1.5"
+                          size={16}
+                        />{" "}
+                        50%—50%
+                      </DropdownMenuItem>
 
-                    <DropdownMenuItem
-                      onClick={() => panelGroupRef.current?.setLayout([75, 25])}
-                    >
-                      <PanelRight
-                        className="mr-1.5"
-                        size={16}
-                      />{" "}
-                      75%—25%
-                    </DropdownMenuItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          panelGroupRef.current?.setLayout([75, 25])
+                        }
+                      >
+                        <PanelRight
+                          className="mr-1.5"
+                          size={16}
+                        />{" "}
+                        75%—25%
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
 
-              <DropdownMenuSeparator />
+                <DropdownMenuSeparator />
 
-              <DropdownMenuItem
-                className="text-red-600"
-                onClick={
-                  type === "project" && editor.isAuthor
-                    ? () =>
-                        deleteProject({
-                          id: project.id,
-                        })
-                    : undefined
-                }
-                disabled={projectIsDeleting}
-              >
-                {isProjectAuthor ? <>Delete project</> : <>Reset</>}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    disabled={projectIsDeleting}
+                  >
+                    {isProjectAuthor ? <>Delete project</> : <>Reset</>}
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {type === "playground"
+                    ? "Reset editor state?"
+                    : `Delete project?`}
+                </AlertDialogTitle>
+                <AlertDialogDescription>{`This action cannot be undone. This will completely ${
+                  type === "playground"
+                    ? "clean and reset the editor, just like a browser refresh."
+                    : `delete your project "${title}" and associated data.`
+                }`}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                  onClick={
+                    type === "project" && editor.isAuthor
+                      ? () =>
+                          deleteProject({
+                            id: project.id,
+                          })
+                      : () => setProgram("")
+                  }
+                >
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
