@@ -70,7 +70,7 @@ const Dashboard = () => {
 
     const createProjectButton = createIsLoading ? (
       <Card className="flex h-[200px] w-[350px] flex-col items-center justify-center bg-muted p-6 transition">
-        <Loader className="h-8 w-8" />
+        <Loader className="h-8 w-8 animate-spin" />
         <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
           Creating new project...
         </h3>
