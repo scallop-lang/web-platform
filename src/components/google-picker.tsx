@@ -32,13 +32,13 @@ const GooglePicker = ({
     const handleOpenPicker = () => {
         function start() {
             gapi.client.init({
-                'apiKey' : 'AIzaSyCHJrogC4MIjl7sIWSjGvb9m515aeRXWOU',
+                'apiKey' : 'AIzaSyBDRsgSPlCLFUe6RZ6zNT12LaeA4ip7aa4',
                 'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
             }).then(() => {
                 const tokenInfo = gapi.auth.getToken();
                 openPicker({
-                    clientId: '494588134232-9k46v3kik6q4vbnleq3s5c62tau7obig.apps.googleusercontent.com',
-                    developerKey: 'AIzaSyCHJrogC4MIjl7sIWSjGvb9m515aeRXWOU',
+                    clientId: '494588134232-gvaumsid2ucu5ckfrh45oer4ku2ch1bf.apps.googleusercontent.com',
+                    developerKey: 'AIzaSyBDRsgSPlCLFUe6RZ6zNT12LaeA4ip7aa4',
                     viewId: 'DOCS',
                     viewMimeTypes: 'application/octet-stream',
                     token: tokenInfo ? tokenInfo.access_token : undefined,

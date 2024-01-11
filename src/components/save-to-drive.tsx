@@ -55,26 +55,32 @@ const SaveToDrive = ({
     }
 
     const download = (content: string, filename: string) => {
-        const accessToken = gapi.auth.getToken();
-
-        if(!accessToken) {
-            return;
-        }
-        
-        openPicker({
-            clientId: '494588134232-9k46v3kik6q4vbnleq3s5c62tau7obig.apps.googleusercontent.com',
-            developerKey: 'AIzaSyCHJrogC4MIjl7sIWSjGvb9m515aeRXWOU',
-            viewId: 'FOLDERS',
-            setIncludeFolders: true,
-            setSelectFolderEnabled: true,
-            token: accessToken.access_token,
-            callbackFunction(data) {
-                if(data.action === 'picked') {
-                    data.docs.map(async (item) => {
-                        await sendToDrive({folder: item, content: content, filename: filename});
-                    });
-                }
-            }
+        gapi.load("client:auth2", () => {
+            gapi.client.init({
+                'apiKey' : 'AIzaSyBDRsgSPlCLFUe6RZ6zNT12LaeA4ip7aa4',
+                'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+                'scope' : 'https://www.googleapis.com/auth/drive.file'
+            }).then(() => {
+                const accessToken = gapi.auth.getToken();
+                console.log(accessToken);
+                openPicker({
+                    clientId: '494588134232-gvaumsid2ucu5ckfrh45oer4ku2ch1bf.apps.googleusercontent.com',
+                    developerKey: 'AIzaSyBDRsgSPlCLFUe6RZ6zNT12LaeA4ip7aa4',
+                    viewId: 'FOLDERS',
+                    setIncludeFolders: true,
+                    setSelectFolderEnabled: true,
+                    token: accessToken ? accessToken.access_token : undefined,
+                    callbackFunction(data) {
+                        if(data.action === 'picked') {
+                            data.docs.map(async (item) => {
+                                await sendToDrive({folder: item, content: content, filename: filename});
+                            });
+                        }
+                    }
+                });
+            }).catch((error) => {
+                console.log(error);
+            });
         });
     };
 
