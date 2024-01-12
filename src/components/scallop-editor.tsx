@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/router";
 import type { ElementRef } from "react";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
 
@@ -210,9 +210,20 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         toast.error(`Project failed to delete! Reason: ${error.message}`),
     });
 
-  const syncRelations = EditorView.updateListener.of((viewUpdate) => {
-    setRelations(parseRelationTables(viewUpdate.view));
-  });
+  const extensions = useMemo(() => {
+    const syncRelations = EditorView.updateListener.of((viewUpdate) => {
+      setRelations(parseRelationTables(viewUpdate.view));
+    });
+
+    return [
+      Scallop(),
+      ScallopHighlighter("light"),
+      ScallopLinter,
+      lintGutter(),
+      syncRelations,
+      relationButtonPlugin,
+    ];
+  }, []);
 
   let subtitle = "";
   if (type === "playground") {
@@ -461,14 +472,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
           <CodeMirror
             ref={cmRef}
             value={program}
-            extensions={[
-              Scallop(),
-              ScallopHighlighter("light"),
-              ScallopLinter,
-              lintGutter(),
-              syncRelations,
-              relationButtonPlugin,
-            ]}
+            extensions={extensions}
             style={{ height: "100%", overflow: "scroll" }}
           />
         </ResizablePanel>
