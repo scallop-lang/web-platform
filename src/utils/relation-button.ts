@@ -1,4 +1,5 @@
 import { syntaxTree } from "@codemirror/language";
+import type { EditorState } from "@codemirror/state";
 import { type Range } from "@codemirror/state";
 import type { DecorationSet, EditorView, ViewUpdate } from "@codemirror/view";
 import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
@@ -55,72 +56,65 @@ class RelationWidget extends WidgetType {
   }
 }
 
-export function parseRelationTables(view: EditorView) {
+export function parseRelationTables(state: EditorState) {
   const nodeTableArr: RelationTableProps[] = [];
 
-  for (const { from, to } of view.visibleRanges) {
-    syntaxTree(view.state).iterate({
-      from,
-      to,
-      enter: (node) => {
-        const relationIdNode = node.node.getChild("RelationIdentifier");
-        const factSetNode = node.node.getChild("FactSet");
+  syntaxTree(state).iterate({
+    enter: (node) => {
+      const relationIdNode = node.node.getChild("RelationIdentifier");
+      const factSetNode = node.node.getChild("FactSet");
 
-        if (node.name == "FactSetDecl" && relationIdNode && factSetNode) {
-          const name = view.state.doc.sliceString(
-            relationIdNode.from,
-            relationIdNode.to,
-          );
-          const facts: TableCell[][] = [];
+      if (node.name == "FactSetDecl" && relationIdNode && factSetNode) {
+        const name = state.doc.sliceString(
+          relationIdNode.from,
+          relationIdNode.to,
+        );
+        const facts: TableCell[][] = [];
 
-          factSetNode.getChildren("ListItem").forEach((fact) => {
-            const tuple: TableCell[] = [];
-            const tupleNode = fact.getChild("ConstTuple");
+        factSetNode.getChildren("ListItem").forEach((fact) => {
+          const tuple: TableCell[] = [];
+          const tupleNode = fact.getChild("ConstTuple");
 
-            if (tupleNode) {
-              const constantNode = tupleNode.getChild("Constant");
+          if (tupleNode) {
+            const constantNode = tupleNode.getChild("Constant");
 
-              if (constantNode) {
+            if (constantNode) {
+              tuple.push({
+                content: state.doc.sliceString(
+                  constantNode.from,
+                  constantNode.to,
+                ),
+                from: constantNode.from,
+                to: constantNode.to,
+              });
+            } else {
+              tupleNode.getChildren("ListItem").forEach((constant) => {
                 tuple.push({
-                  content: view.state.doc.sliceString(
-                    constantNode.from,
-                    constantNode.to,
-                  ),
-                  from: constantNode.from,
-                  to: constantNode.to,
+                  content: state.doc.sliceString(constant.from, constant.to),
+                  from: constant.from,
+                  to: constant.to,
                 });
-              } else {
-                tupleNode.getChildren("ListItem").forEach((constant) => {
-                  tuple.push({
-                    content: view.state.doc.sliceString(
-                      constant.from,
-                      constant.to,
-                    ),
-                    from: constant.from,
-                    to: constant.to,
-                  });
-                });
-              }
+              });
             }
+          }
 
-            facts.push(tuple);
-          });
+          facts.push(tuple);
+        });
 
-          nodeTableArr.push({
-            relationNode: relationIdNode,
-            table: { name, facts },
-          });
-        }
-      },
-    });
-  }
+        nodeTableArr.push({
+          relationNode: relationIdNode,
+          table: { name, facts },
+        });
+      }
+    },
+  });
 
   return nodeTableArr;
 }
 
 function relationButtons(view: EditorView) {
   const widgets: Range<Decoration>[] = [];
-  const nodeTableArr = parseRelationTables(view);
+  const nodeTableArr = parseRelationTables(view.state);
 
   nodeTableArr.forEach(({ relationNode, table }) => {
     const deco = Decoration.widget({

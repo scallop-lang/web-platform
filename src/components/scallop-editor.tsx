@@ -1,7 +1,7 @@
 import { lintGutter } from "@codemirror/lint";
 import type { inferRouterOutputs } from "@trpc/server";
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import CodeMirror, { EditorView } from "@uiw/react-codemirror";
+import CodeMirror, { EditorState, EditorView } from "@uiw/react-codemirror";
 import {
   Scallop,
   ScallopHighlighter,
@@ -184,9 +184,6 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         ? project.description
         : "",
   );
-  const [program, setProgram] = useState(
-    editor.type === "playground" ? "" : editor.project.program,
-  );
   const [relations, setRelations] = useState<RelationTableProps[]>([]);
 
   const { mutate: saveProject, isLoading: projectIsSaving } =
@@ -212,7 +209,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
   const extensions = useMemo(() => {
     const syncRelations = EditorView.updateListener.of((viewUpdate) => {
-      setRelations(parseRelationTables(viewUpdate.view));
+      setRelations(parseRelationTables(viewUpdate.state));
     });
 
     return [
@@ -287,7 +284,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     project: {
                       title: title,
                       description: description,
-                      program: program,
+                      program: cmRef.current!.view?.state.doc.toString(),
                       inputs: Object.values(project.inputs),
                       outputs: Object.values(project.outputs),
                     },
@@ -432,7 +429,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                           deleteProject({
                             id: project.id,
                           })
-                      : () => setProgram("")
+                      : () =>
+                          (cmRef.current!.state = EditorState.create({
+                            extensions,
+                          }))
                   }
                 >
                   Continue
@@ -471,9 +471,12 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
           <CodeMirror
             ref={cmRef}
-            value={program}
+            value={editor.type === "playground" ? "" : editor.project.program}
             extensions={extensions}
-            style={{ height: "100%", overflow: "scroll" }}
+            style={{
+              height: "calc(100% - 58px)",
+              overflow: "auto",
+            }}
           />
         </ResizablePanel>
 
