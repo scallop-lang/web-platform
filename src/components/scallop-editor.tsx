@@ -1,7 +1,7 @@
 import { lintGutter } from "@codemirror/lint";
 import type { inferRouterOutputs } from "@trpc/server";
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import CodeMirror, { EditorState, EditorView } from "@uiw/react-codemirror";
+import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import {
   Scallop,
   ScallopHighlighter,
@@ -430,9 +430,14 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             id: project.id,
                           })
                       : () =>
-                          (cmRef.current!.state = EditorState.create({
-                            extensions,
-                          }))
+                          cmRef.current!.view?.dispatch({
+                            changes: {
+                              from: 0,
+                              to: cmRef.current!.view.state.doc.toString()
+                                .length,
+                              insert: "",
+                            },
+                          })
                   }
                 >
                   Continue
