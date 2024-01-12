@@ -24,6 +24,7 @@ import {
   Table,
   UploadCloud,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ElementRef } from "react";
 import { useMemo, useRef, useState } from "react";
@@ -410,16 +411,20 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
 
-                <DropdownMenuSeparator />
+                {type === "project" && !isProjectAuthor ? null : (
+                  <>
+                    <DropdownMenuSeparator />
 
-                <AlertDialogTrigger asChild>
-                  <DropdownMenuItem
-                    className="text-destructive"
-                    disabled={projectIsDeleting}
-                  >
-                    {isProjectAuthor ? <>Delete project</> : <>Reset</>}
-                  </DropdownMenuItem>
-                </AlertDialogTrigger>
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        disabled={projectIsDeleting}
+                      >
+                        {isProjectAuthor ? <>Delete project</> : <>Reset</>}
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
             <AlertDialogContent>
@@ -539,73 +544,100 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               </div>
 
               <div className="flex h-[calc(100%-58px)] flex-col items-center gap-2.5 overflow-y-auto p-2.5">
-                {filteredRelations.map(({ relationNode, table }) => (
-                  <>
-                    <Card
-                      key={table.name}
-                      className="w-full"
+                {relations.length === 0 ? (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-muted-foreground">
+                    <div>
+                      <h3 className="font-mono font-semibold">
+                        No relations defined
+                      </h3>
+                      <p className="max-w-[320px] ">
+                        Create a new relation by writing one in the editor. They
+                        will automatically appear here.
+                      </p>
+                    </div>
+                    <Link
+                      href="https://www.scallop-lang.org/doc/language/relation.html"
+                      target="_blank"
                     >
-                      <CardHeader>
-                        <CardTitle className="flex justify-between font-mono font-bold">
-                          {table.name}{" "}
-                          <Button
-                            size="none"
-                            variant="none"
-                            onClick={() =>
-                              cmRef.current!.view?.dispatch({
-                                effects: EditorView.scrollIntoView(
-                                  relationNode.node.from,
-                                  { y: "start" },
-                                ),
-                              })
-                            }
-                          >
-                            Go
-                            <ArrowUpRight
-                              size={16}
-                              className="ml-0.5"
-                            />
-                          </Button>
-                        </CardTitle>
-                        <CardDescription>
-                          {table.facts.length} total row(s){" "}
-                          {table.facts[0]
-                            ? `of ${table.facts[0].length}-tuple facts`
-                            : ""}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="font-mono text-sm">
-                        <p className="truncate">
-                          {table.facts[0]
-                            ? `(${table.facts[0]
-                                .map(({ content }) => content)
-                                .join(", ")})`
-                            : "<no facts defined>"}
-                        </p>
-                        {table.facts[1] ? (
-                          <p className="text-muted-foreground">
-                            ...and {table.facts.length - 1} more row(s)
-                          </p>
-                        ) : null}
-                      </CardContent>
-                      <CardFooter>
-                        <Button
-                          variant="secondary"
-                          onClick={() => {
-                            setTableOpen(true);
-                            panelGroupRef.current!.setLayout([35, 65]);
-                          }}
+                      <Button
+                        role="link"
+                        variant="secondary"
+                        className="text-muted-foreground"
+                      >
+                        Documentation
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <>
+                    {filteredRelations.map(({ relationNode, table }) => (
+                      <>
+                        <Card
+                          key={table.name}
+                          className="w-full"
                         >
-                          <Table
-                            className="mr-1.5"
-                            size={16}
-                          />{" "}
-                          Open visual editor
-                        </Button>
-                      </CardFooter>
-                    </Card>
+                          <CardHeader>
+                            <CardTitle className="flex justify-between font-mono font-bold">
+                              <h3 className="w-1/2 truncate">{table.name}</h3>{" "}
+                              <Button
+                                size="none"
+                                variant="link"
+                                onClick={() =>
+                                  cmRef.current!.view?.dispatch({
+                                    effects: EditorView.scrollIntoView(
+                                      relationNode.node.from,
+                                      { y: "start" },
+                                    ),
+                                  })
+                                }
+                              >
+                                Jump to line
+                                <ArrowUpRight
+                                  size={16}
+                                  className="ml-0.5"
+                                />
+                              </Button>
+                            </CardTitle>
+                            <CardDescription>
+                              {table.facts[0]
+                                ? `${table.facts[0].length}-tuple facts`
+                                : "Empty relation"}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent className="font-mono text-sm">
+                            <p className="truncate">
+                              {table.facts[0]
+                                ? `(${table.facts[0]
+                                    .map(({ content }) => content)
+                                    .join(", ")})`
+                                : "<no facts defined>"}
+                            </p>
+                            {table.facts[1] ? (
+                              <p className="text-muted-foreground">
+                                ...and {table.facts.length - 1} more row(s)
+                              </p>
+                            ) : null}
+                          </CardContent>
+                          <CardFooter>
+                            <Button
+                              variant="secondary"
+                              onClick={() => {
+                                setTableOpen(true);
+                                panelGroupRef.current!.setLayout([35, 65]);
+                              }}
+                            >
+                              <Table
+                                className="mr-1.5"
+                                size={16}
+                              />{" "}
+                              Open visual editor
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      </>
+                    ))}
                   </>
-                ))}
+                )}
               </div>
             </>
           )}
