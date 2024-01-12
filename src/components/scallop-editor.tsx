@@ -8,6 +8,7 @@ import {
   ScallopLinter,
 } from "codemirror-lang-scallop";
 import {
+  ArrowUpRight,
   ChevronDown,
   Columns2,
   Download,
@@ -18,9 +19,9 @@ import {
   PanelRight,
   Pencil,
   Play,
-  Plus,
   Save,
   Settings,
+  Table,
   UploadCloud,
 } from "lucide-react";
 import { useRouter } from "next/router";
@@ -66,6 +67,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
+import { Badge } from "./ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import {
   Dialog,
   DialogContent,
@@ -186,6 +196,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   );
   const [relations, setRelations] = useState<RelationTableProps[]>([]);
 
+  const [searchResult, setSearchResult] = useState("");
+  const [tableOpen, setTableOpen] = useState(false);
+
   const { mutate: saveProject, isLoading: projectIsSaving } =
     api.project.updateProjectById.useMutation({
       onSuccess: () => toast.success("Project successfully saved!"),
@@ -235,6 +248,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   }
 
   const isProjectAuthor = type === "project" && editor.isAuthor;
+  const filteredRelations = relations.filter(({ table }) =>
+    table.name.includes(searchResult),
+  );
 
   return (
     <>
@@ -491,37 +507,108 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
           defaultSize={25}
           minSize={25}
         >
-          <div className="flex justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
-            <Button>
-              <Plus
-                className="shrink-0 md:mr-1.5"
-                size={16}
-              />{" "}
-              <span className="hidden md:inline">
-                New <span className="hidden lg:inline">relation</span>
-              </span>
-            </Button>
-
-            <Input
-              className="w-1/2 min-w-64"
-              placeholder="Search..."
-            />
-          </div>
-
-          <div className="flex h-full flex-col items-center justify-center gap-2.5 p-2.5">
-            {relations.map(({ table }) => (
-              <div
-                key={table.name}
-                className="w-full rounded-md border-2 border-border p-1.5"
+          {tableOpen ? (
+            <>
+              <p>table here</p>
+              <Button
+                onClick={() => {
+                  setTableOpen(false);
+                  panelGroupRef.current!.setLayout([75, 25]);
+                }}
               >
-                <p className="font-bold">{table.name}</p>
-                <p>
-                  {table.facts[0]?.map(({ content }) => content).join(", ")} and{" "}
-                  {table.facts.length - 1} more row(s)
-                </p>
+                Save
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="flex justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
+                <Badge
+                  variant="secondary"
+                  className="font-mono"
+                >
+                  {searchResult === ""
+                    ? `${relations.length} total`
+                    : `${filteredRelations.length} results`}
+                </Badge>
+
+                <Input
+                  className="w-1/2 min-w-64"
+                  placeholder="Search..."
+                  onChange={(e) => setSearchResult(e.target.value)}
+                />
               </div>
-            ))}
-          </div>
+
+              <div className="flex h-[calc(100%-58px)] flex-col items-center gap-2.5 overflow-y-auto p-2.5">
+                {filteredRelations.map(({ relationNode, table }) => (
+                  <>
+                    <Card
+                      key={table.name}
+                      className="w-full"
+                    >
+                      <CardHeader>
+                        <CardTitle className="flex justify-between font-mono font-bold">
+                          {table.name}{" "}
+                          <Button
+                            size="none"
+                            variant="none"
+                            onClick={() =>
+                              cmRef.current!.view?.dispatch({
+                                effects: EditorView.scrollIntoView(
+                                  relationNode.node.from,
+                                  { y: "start" },
+                                ),
+                              })
+                            }
+                          >
+                            Go
+                            <ArrowUpRight
+                              size={16}
+                              className="ml-0.5"
+                            />
+                          </Button>
+                        </CardTitle>
+                        <CardDescription>
+                          {table.facts.length} total row(s){" "}
+                          {table.facts[0]
+                            ? `of ${table.facts[0].length}-tuple facts`
+                            : ""}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="font-mono text-sm">
+                        <p className="truncate">
+                          {table.facts[0]
+                            ? `(${table.facts[0]
+                                .map(({ content }) => content)
+                                .join(", ")})`
+                            : "<no facts defined>"}
+                        </p>
+                        {table.facts[1] ? (
+                          <p className="text-muted-foreground">
+                            ...and {table.facts.length - 1} more row(s)
+                          </p>
+                        ) : null}
+                      </CardContent>
+                      <CardFooter>
+                        <Button
+                          variant="secondary"
+                          onClick={() => {
+                            setTableOpen(true);
+                            panelGroupRef.current!.setLayout([35, 65]);
+                          }}
+                        >
+                          <Table
+                            className="mr-1.5"
+                            size={16}
+                          />{" "}
+                          Open visual editor
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </>
+                ))}
+              </div>
+            </>
+          )}
         </ResizablePanel>
       </ResizablePanelGroup>
     </>
