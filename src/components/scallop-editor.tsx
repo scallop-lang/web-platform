@@ -1,5 +1,12 @@
+import { lintGutter } from "@codemirror/lint";
 import type { inferRouterOutputs } from "@trpc/server";
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
+import CodeMirror, { EditorView } from "@uiw/react-codemirror";
+import {
+  Scallop,
+  ScallopHighlighter,
+  ScallopLinter,
+} from "codemirror-lang-scallop";
 import {
   ChevronDown,
   Columns2,
@@ -22,7 +29,6 @@ import { useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
 
-import { CodeEditor } from "~/components/code-editor";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -43,6 +49,11 @@ import {
 } from "~/components/ui/resizable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
+import type { RelationTableProps } from "~/utils/relation-button";
+import {
+  parseRelationTables,
+  relationButtonPlugin,
+} from "~/utils/relation-button";
 
 import {
   AlertDialog,
@@ -176,6 +187,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   const [program, setProgram] = useState(
     editor.type === "playground" ? "" : editor.project.program,
   );
+  const [relations, setRelations] = useState<RelationTableProps[]>([]);
 
   const { mutate: saveProject, isLoading: projectIsSaving } =
     api.project.updateProjectById.useMutation({
@@ -197,6 +209,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       onError: (error) =>
         toast.error(`Project failed to delete! Reason: ${error.message}`),
     });
+
+  const syncRelations = EditorView.updateListener.of((viewUpdate) => {
+    setRelations(parseRelationTables(viewUpdate.view));
+  });
 
   let subtitle = "";
   if (type === "playground") {
@@ -442,10 +458,18 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
             </Button>
           </div>
 
-          <CodeEditor
-            cmRef={cmRef}
-            program={program}
-            setProgram={setProgram}
+          <CodeMirror
+            ref={cmRef}
+            value={program}
+            extensions={[
+              Scallop(),
+              ScallopHighlighter("light"),
+              ScallopLinter,
+              lintGutter(),
+              syncRelations,
+              relationButtonPlugin,
+            ]}
+            style={{ height: "100%", overflow: "scroll" }}
           />
         </ResizablePanel>
 
@@ -472,8 +496,19 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
             />
           </div>
 
-          <div className="flex h-full items-center justify-center">
-            hi i&apos;m a table
+          <div className="flex h-full flex-col items-center justify-center gap-2.5 p-2.5">
+            {relations.map(({ table }) => (
+              <div
+                key={table.name}
+                className="w-full rounded-md border-2 border-border p-1.5"
+              >
+                <p className="font-bold">{table.name}</p>
+                <p>
+                  {table.facts[0]?.map(({ content }) => content).join(", ")} and{" "}
+                  {table.facts.length - 1} more row(s)
+                </p>
+              </div>
+            ))}
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
