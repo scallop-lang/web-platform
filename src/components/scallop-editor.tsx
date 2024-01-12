@@ -545,7 +545,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
               <div className="flex h-[calc(100%-58px)] flex-col items-center gap-2.5 overflow-y-auto p-2.5">
                 {relations.length === 0 ? (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-muted-foreground">
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-sm text-muted-foreground">
                     <div>
                       <h3 className="font-mono font-semibold">
                         No relations defined
