@@ -15,8 +15,6 @@ model Project {
   title       String   @db.VarChar(255)
   description String?
   program     String   @db.Text
-  inputs      String   @db.Text
-  outputs     String   @db.Text
   published   Boolean  @default(false)
 
   author   User?   @relation(fields: [authorId], references: [id], onDelete: Cascade)
