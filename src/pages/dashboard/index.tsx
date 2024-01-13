@@ -2,17 +2,16 @@ import { Loader, LogIn, Plus } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
+import { toast } from "sonner";
 
 import ProjectCard from "~/components/project-card";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
-import { useToast } from "~/components/ui/use-toast";
 import { api } from "~/utils/api";
 
 const Dashboard = () => {
   const { data: session, status } = useSession();
-  const { toast } = useToast();
   const router = useRouter();
 
   const { data: projectData, isLoading: projectIsLoading } =
@@ -22,17 +21,16 @@ const Dashboard = () => {
     {
       onSuccess: async ({ id }) => await router.push(`/project/${id}`),
       onError: (error) =>
-        toast({
-          title: "An error occurred",
+        toast.message("An error occurred", {
           description: `Something happened while creating a new project. Reason: ${error.message}`,
         }),
-    }
+    },
   );
 
   if (status === "loading") {
     return (
-      <main className="h-[calc(100vh-53px)] p-4 bg-background">
-        <Skeleton className="h-full w-full rounded-xl flex items-center justify-center">
+      <main className="h-[calc(100vh-53px)] bg-background p-4">
+        <Skeleton className="flex h-full w-full items-center justify-center rounded-xl">
           <p className="text-sm text-muted-foreground">
             Signing into dashboard...
           </p>
@@ -43,7 +41,7 @@ const Dashboard = () => {
 
   if (status === "authenticated") {
     const projectsList: React.ReactNode = projectIsLoading ? (
-      <Skeleton className="w-[350px] h-[200px] rounded-lg flex items-center justify-center">
+      <Skeleton className="flex h-[200px] w-[350px] items-center justify-center rounded-lg">
         <p className="text-sm text-muted-foreground">
           Loading your projects...
         </p>
@@ -60,7 +58,7 @@ const Dashboard = () => {
         />
       ))
     ) : (
-      <Card className="w-[350px] h-[200px] flex items-center justify-center">
+      <Card className="flex h-[200px] w-[350px] items-center justify-center">
         <p className="text-sm text-muted-foreground">
           No projects found. Create one!
         </p>
@@ -71,16 +69,16 @@ const Dashboard = () => {
     const first = name.split(" ")[0];
 
     const createProjectButton = createIsLoading ? (
-      <Card className="w-[350px] p-6 bg-muted transition h-[200px] flex flex-col items-center justify-center">
-        <Loader className="w-8 h-8" />
+      <Card className="flex h-[200px] w-[350px] flex-col items-center justify-center bg-muted p-6 transition">
+        <Loader className="h-8 w-8 animate-spin" />
         <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
           Creating new project...
         </h3>
         <p className="text-sm">Hold on tight.</p>
       </Card>
     ) : (
-      <Card className="w-[350px] p-6 hover:bg-muted transition h-[200px] flex flex-col items-center justify-center">
-        <Plus className="w-8 h-8 text-muted-foreground" />
+      <Card className="flex h-[200px] w-[350px] flex-col items-center justify-center p-6 transition hover:bg-muted">
+        <Plus className="h-8 w-8 text-muted-foreground" />
         <h3 className="scroll-m-20 text-xl font-semibold tracking-tight text-muted-foreground ">
           Create new project
         </h3>
@@ -91,11 +89,11 @@ const Dashboard = () => {
     );
 
     return (
-      <main className="flex flex-col space-y-3 min-h-screen bg-background p-4">
+      <main className="flex min-h-screen flex-col space-y-3 bg-background p-4">
         <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight">
           Welcome back, {first ? first : name}.
         </h2>
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex flex-wrap gap-4">
           <button onClick={() => mutate()}>{createProjectButton}</button>
           {projectsList}
         </div>
@@ -104,7 +102,7 @@ const Dashboard = () => {
   }
 
   return (
-    <main className="flex flex-col items-center justify-center h-[calc(100vh-53px)] bg-background space-y-5">
+    <main className="flex h-[calc(100vh-53px)] flex-col items-center justify-center space-y-5 bg-background">
       <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
         Please sign in to view your dashboard.
       </h3>

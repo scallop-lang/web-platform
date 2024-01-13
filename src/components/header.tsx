@@ -1,14 +1,5 @@
-import {
-  ExternalLink,
-  Laptop2,
-  LogIn,
-  LogOut,
-  Moon,
-  Sun,
-  User,
-} from "lucide-react";
+import { ExternalLink, LogIn, LogOut, User } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,17 +9,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Skeleton } from "~/components/ui/skeleton";
 
 const AvatarDropdown = () => {
-  const { theme, resolvedTheme, setTheme } = useTheme();
   const { data: session, status } = useSession();
 
   let userName: string | null | undefined;
@@ -112,45 +98,6 @@ const AvatarDropdown = () => {
             {subtitle ? subtitle : "You are logged in."}
           </p>
         </DropdownMenuLabel>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <span className="flex flex-col">
-              <p>Appearance</p>
-              <p className="text-sm text-muted-foreground">
-                {theme === "system" ? (
-                  <span className="flex items-center">
-                    <Laptop2 className="mr-1 h-3.5 w-3.5" /> System (
-                    {resolvedTheme})
-                  </span>
-                ) : resolvedTheme === "light" ? (
-                  <span className="flex items-center">
-                    <Sun className="mr-1 h-3.5 w-3.5" /> Light
-                  </span>
-                ) : (
-                  <span className="flex items-center">
-                    <Moon className="mr-1 h-3.5 w-3.5" /> Dark
-                  </span>
-                )}
-              </p>
-            </span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                System
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub>
 
         <DropdownMenuSeparator />
 

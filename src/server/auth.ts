@@ -3,6 +3,7 @@ import type { Role } from "@prisma/client";
 import { type GetServerSidePropsContext } from "next";
 import type { NextAuthOptions } from "next-auth";
 import { getServerSession, type DefaultSession } from "next-auth";
+import type { Adapter } from "next-auth/adapters";
 import GithubProvider from "next-auth/providers/github";
 
 import { env } from "~/env.mjs";
@@ -33,7 +34,7 @@ const authOptions: NextAuthOptions = {
       },
     }),
   },
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(db) as Adapter,
   providers: [
     // [TODO) apparently we're missing a field for GitHub OAuth? LOL
     GithubProvider({
