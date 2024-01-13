@@ -1,77 +1,17 @@
-import { z, type ZodTypeAny } from "zod";
+import { z } from "zod";
 
-// the current Scallop types we support; exported so that we can iterate over them. also see
-// https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions
-const argumentTypes = ["String", "Integer", "Float", "Boolean"] as const;
+const SclProgramSchema = z.string();
 
 const provenances = ["unit", "proofs", "minmaxprob", "addmultprob", "topkproofs"] as const;
-
-const NameSchema = z.string().regex(new RegExp("^[a-z]\\w*$", "i"));
-
-const ArgTypeSchema = z.enum(argumentTypes);
-const ArgSchema = z.object({
-  id: z.string(),
-  name: NameSchema.optional(),
-  type: ArgTypeSchema,
-});
+const SclProvenanceSchema = z.enum(provenances);
+const SclProvenanceKSchema = z.number().positive().optional();
 
 const FactSchema = z.object({
-  id: z.string(),
   tag: z.number(),
   tuple: z.coerce.string().array(),
 });
 
-const SclProgramSchema = z.string();
-
-const SclProvenanceSchema = z.enum(provenances);
-
-const SclRelationSchema = z.object({
-  type: z.enum(["input", "output"]),
-  name: NameSchema,
-  args: ArgSchema.array(),
-  probability: z.boolean(),
-  facts: FactSchema.array(),
-});
-
-type ArgumentType = z.infer<typeof ArgTypeSchema>;
-type Argument = z.infer<typeof ArgSchema>;
-type Fact = z.infer<typeof FactSchema>;
-type SclProgram = z.infer<typeof SclProgramSchema>;
-type SclRelation = z.infer<typeof SclRelationSchema>;
-type SclRelationInput = z.infer<typeof SclRelationInputSchema>;
-type RelationRecord = Record<string, SclRelation>;
-
-const typeToSchema: Record<ArgumentType, ZodTypeAny> = {
-  String: z.coerce.string(),
-  Integer: z.coerce.number().int(),
-  Float: z.coerce.number(),
-  Boolean: z.enum(["true", "false"]).transform((val) => val == "true"),
-};
-
-// generates a Zod schema for the given relation.
-const relationToSchema = (relation: SclRelation) => {
-  const schema = relation.args.map((arg) => typeToSchema[arg.type]);
-  return z
-    .object({
-      id: z.string(),
-      tag: z.number(),
-      tuple: z.tuple(schema as []),
-    })
-    .array();
-};
-
-const SclRelationInputSchema = SclRelationSchema.transform((relation) => {
-  return {
-    ...relation,
-    facts: relationToSchema(relation).parse(relation.facts, {
-      errorMap: (_issue, ctx) => {
-        return {
-          message: `[@rel ${relation.name}]: ${ctx.defaultError}`,
-        };
-      },
-    }),
-  };
-});
+const SclRelationRecordSchema = z.record(z.string(), FactSchema.array());
 
 const UpdateProjectSchema = z
   .object({
@@ -79,34 +19,12 @@ const UpdateProjectSchema = z
     description: z.string().optional(),
     published: z.boolean().optional(),
     program: SclProgramSchema.optional(),
-    inputs: SclRelationInputSchema.array().optional(),
-    outputs: SclRelationSchema.array().optional(),
-  })
-  .transform((project) => {
-    return {
-      ...project,
-      inputs: JSON.stringify(project.inputs),
-      outputs: JSON.stringify(project.outputs),
-    };
   });
 
-export type {
-  Argument,
-  ArgumentType,
-  Fact,
-  RelationRecord,
-  SclProgram,
-  SclRelation,
-  SclRelationInput,
-};
-
 export {
-  ArgSchema,
-  ArgTypeSchema,
-  UpdateProjectSchema,
   SclProgramSchema,
   SclProvenanceSchema,
-  SclRelationInputSchema,
-  SclRelationSchema,
-  FactSchema,
+  SclProvenanceKSchema,
+  SclRelationRecordSchema,
+  UpdateProjectSchema,
 };

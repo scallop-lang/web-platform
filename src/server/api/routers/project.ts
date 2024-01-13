@@ -6,11 +6,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import {
-  UpdateProjectSchema,
-  type SclRelation,
-  type SclRelationInput,
-} from "~/utils/schemas-types";
+import { UpdateProjectSchema } from "~/utils/schemas-types";
 
 export const projectRouter = createTRPCRouter({
   create: protectedProcedure.mutation(async ({ ctx }) => {
@@ -18,8 +14,6 @@ export const projectRouter = createTRPCRouter({
     const project = await ctx.prisma.project.create({
       data: {
         title: "Untitled project",
-        inputs: "[]",
-        outputs: "[]",
         program: "",
         authorId: userId,
       },
@@ -78,11 +72,7 @@ export const projectRouter = createTRPCRouter({
 
       if (!project) throw new TRPCError({ code: "NOT_FOUND" });
 
-      return {
-        ...project,
-        inputs: JSON.parse(project.inputs) as SclRelationInput[],
-        outputs: JSON.parse(project.outputs) as SclRelation[],
-      };
+      return project;
     }),
 
   updateProjectById: protectedProcedure

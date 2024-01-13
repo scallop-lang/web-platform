@@ -94,9 +94,9 @@ import { Textarea } from "./ui/textarea";
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
   | {
-      type: "playground";
-      project: null;
-    }
+    type: "playground";
+    project: null;
+  }
   | { type: "project"; project: Project; isAuthor: boolean };
 
 const EditDetailsButton = ({
@@ -326,9 +326,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     project: {
                       title,
                       description,
-                      program: cmRef.current!.view?.state.doc.toString(),
-                      inputs: Object.values(project.inputs),
-                      outputs: Object.values(project.outputs),
+                      program: cmRef.current!.view?.state.doc.toString()
                     },
                   })
                 }
@@ -461,11 +459,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     ? "Reset editor state?"
                     : `Delete project?`}
                 </AlertDialogTitle>
-                <AlertDialogDescription>{`This action cannot be undone. This will completely ${
-                  type === "playground"
-                    ? "clean and reset the editor, just like a browser refresh."
-                    : `delete your project "${title}" and associated data.`
-                }`}</AlertDialogDescription>
+                <AlertDialogDescription>{`This action cannot be undone. This will completely ${type === "playground"
+                  ? "clean and reset the editor, just like a browser refresh."
+                  : `delete your project "${title}" and associated data.`
+                  }`}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -474,10 +471,18 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   onClick={
                     type === "project" && editor.isAuthor
                       ? () =>
-                          deleteProject({
-                            id: project.id,
-                          })
-                      : () => replaceEditorContent("")
+                        deleteProject({
+                          id: project.id,
+                        })
+                      : () =>
+                        cmRef.current!.view?.dispatch({
+                          changes: {
+                            from: 0,
+                            to: cmRef.current!.view.state.doc.toString()
+                              .length,
+                            insert: "",
+                          },
+                        })
                   }
                 >
                   Continue
@@ -514,7 +519,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 </>
               ) : (
                 <>
-                 <Play className="mr-1.5" size={16} />
+                  <Play className="mr-1.5" size={16} />
                 </>
               )}
               {" "}
@@ -643,8 +648,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             <p className="truncate">
                               {table.facts[0]
                                 ? `(${table.facts[0]
-                                    .map(({ content }) => content)
-                                    .join(", ")})`
+                                  .map(({ content }) => content)
+                                  .join(", ")})`
                                 : "<no facts defined>"}
                             </p>
                             {table.facts[1] ? (
