@@ -5,8 +5,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
   FactSchema,
   SclProgramSchema,
-  SclRelationInputSchema,
-  SclRelationSchema,
+  SclProvenanceSchema,
   type Fact,
 } from "~/utils/schemas-types";
 
@@ -17,8 +16,8 @@ export const scallopRouter = createTRPCRouter({
     .input(
       z.object({
         program: SclProgramSchema,
-        inputs: SclRelationInputSchema.array(),
-        outputs: SclRelationSchema.array(),
+        provenance: SclProvenanceSchema,
+        k: z.number().positive().optional(),
       })
     )
     .mutation(async ({ input }) => {

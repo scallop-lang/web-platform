@@ -200,6 +200,16 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   const [searchResult, setSearchResult] = useState("");
   const [tableOpen, setTableOpen] = useState(false);
 
+  const run = api.scallop.run.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success("Program successfully executed!");
+    },
+    onError: (error) => {
+      toast.error(`An error occurred when running your program: ${error.message}`);
+    },
+  });
+
   const { mutate: saveProject, isLoading: projectIsSaving } =
     api.project.updateProjectById.useMutation({
       onSuccess: () => toast.success("Project successfully saved!"),
@@ -478,11 +488,27 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
           minSize={25}
         >
           <div className="flex justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
-            <Button>
-              <Play
-                className="mr-1.5"
-                size={16}
-              />{" "}
+            <Button
+              onClick={() => {
+                run.mutate({
+                  program: cmRef.current!.view?.state.doc.toString() ?? "",
+                  provenance: "topkproofs", // todo: get this from runtime
+                  k: 3,
+                });
+                toast.loading("Running your program...");
+              }}
+              disabled={run.isLoading}
+            >
+              {run.isLoading ? (
+                <>
+                  <Loader className="mr-1.5" size={16} />
+                </>
+              ) : (
+                <>
+                 <Play className="mr-1.5" size={16} />
+                </>
+              )}
+              {" "}
               Run
             </Button>
 

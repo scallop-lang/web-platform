@@ -4,6 +4,8 @@ import { z, type ZodTypeAny } from "zod";
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions
 const argumentTypes = ["String", "Integer", "Float", "Boolean"] as const;
 
+const provenances = ["unit", "proofs", "minmaxprob", "addmultprob", "topkproofs"] as const;
+
 const NameSchema = z.string().regex(new RegExp("^[a-z]\\w*$", "i"));
 
 const ArgTypeSchema = z.enum(argumentTypes);
@@ -20,6 +22,9 @@ const FactSchema = z.object({
 });
 
 const SclProgramSchema = z.string();
+
+const SclProvenanceSchema = z.enum(provenances);
+
 const SclRelationSchema = z.object({
   type: z.enum(["input", "output"]),
   name: NameSchema,
@@ -98,9 +103,9 @@ export type {
 export {
   ArgSchema,
   ArgTypeSchema,
-  argumentTypes,
   UpdateProjectSchema,
   SclProgramSchema,
+  SclProvenanceSchema,
   SclRelationInputSchema,
   SclRelationSchema,
   FactSchema,
