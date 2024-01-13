@@ -153,20 +153,7 @@ export const relationButtonPlugin = ViewPlugin.fromClass(
           target.getAttribute("name") == "scl-relation-button"
         ) {
           const obj = JSON.parse(target.getAttribute("table") ?? "") as Table;
-          view.dispatch({
-            changes: [
-              {
-                from: obj.facts[0]?.[0]?.from ?? -1,
-                to: obj.facts[0]?.[0]?.to ?? -1,
-                insert: '"Neelay"',
-              },
-              {
-                from: obj.facts[1]?.[0]?.from ?? -1,
-                to: obj.facts[1]?.[0]?.to ?? -1,
-                insert: '"Velingker"',
-              },
-            ],
-          });
+          console.log(obj);
         }
       },
     },
