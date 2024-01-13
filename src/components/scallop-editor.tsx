@@ -11,7 +11,6 @@ import {
   ArrowUpRight,
   ChevronDown,
   Columns2,
-  Download,
   FileDown,
   Loader,
   MoreHorizontal,
@@ -57,6 +56,8 @@ import {
   relationButtonPlugin,
 } from "~/utils/relation-button";
 
+import { ImportFromDriveButton } from "./import-from-drive";
+import { SaveToDriveDialogContent } from "./save-to-drive";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -221,6 +222,20 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         toast.error(`Project failed to delete! Reason: ${error.message}`),
     });
 
+  function replaceEditorContent(newProgram: string) {
+    if (cmRef.current) {
+      cmRef.current.view?.dispatch({
+        changes: {
+          from: 0,
+          to: cmRef.current.view?.state.doc.toString().length,
+          insert: newProgram,
+        },
+      });
+    } else {
+      throw new Error("CodeMirror not present in DOM??");
+    }
+  }
+
   const extensions = useMemo(() => {
     const syncRelations = EditorView.updateListener.of((viewUpdate) => {
       setRelations(parseRelationTables(viewUpdate.state));
@@ -299,8 +314,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   saveProject({
                     id: project.id,
                     project: {
-                      title: title,
-                      description: description,
+                      title,
+                      description,
                       program: cmRef.current!.view?.state.doc.toString(),
                       inputs: Object.values(project.inputs),
                       outputs: Object.values(project.outputs),
@@ -320,43 +335,45 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
           ) : null}
 
           {type === "playground" || editor.isAuthor ? (
-            <Button variant="outline">
-              <Download
-                className="mr-1.5"
-                size={16}
-              />{" "}
-              Import
-            </Button>
+            <ImportFromDriveButton
+              changeEditorFunction={replaceEditorContent}
+            />
           ) : null}
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                Export...{" "}
-                <ChevronDown
-                  className="ml-1.5"
-                  size={15}
-                />
-              </Button>
-            </DropdownMenuTrigger>
+          <Dialog>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  Export...{" "}
+                  <ChevronDown
+                    className="ml-1.5"
+                    size={15}
+                  />
+                </Button>
+              </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <UploadCloud
-                  className="mr-1.5"
-                  size={16}
-                />{" "}
-                Save to Google Drive
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <FileDown
-                  className="mr-1.5"
-                  size={16}
-                />{" "}
-                Download as Scallop (.scl) file
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <DropdownMenuContent align="end">
+                <DialogTrigger asChild>
+                  <DropdownMenuItem>
+                    <UploadCloud
+                      className="mr-1.5"
+                      size={16}
+                    />{" "}
+                    Save to Google Drive
+                  </DropdownMenuItem>
+                </DialogTrigger>
+
+                <DropdownMenuItem>
+                  <FileDown
+                    className="mr-1.5"
+                    size={16}
+                  />{" "}
+                  Download as Scallop (.scl) file
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <SaveToDriveDialogContent cmRef={cmRef} />
+          </Dialog>
 
           <AlertDialog>
             <DropdownMenu>
@@ -450,15 +467,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                           deleteProject({
                             id: project.id,
                           })
-                      : () =>
-                          cmRef.current!.view?.dispatch({
-                            changes: {
-                              from: 0,
-                              to: cmRef.current!.view.state.doc.toString()
-                                .length,
-                              insert: "",
-                            },
-                          })
+                      : () => replaceEditorContent("")
                   }
                 >
                   Continue
@@ -497,7 +506,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
           <CodeMirror
             ref={cmRef}
-            value={editor.type === "playground" ? "" : editor.project.program}
+            value={type === "playground" ? "" : project.program}
             extensions={extensions}
             style={{
               height: "calc(100% - 58px)",
@@ -547,9 +556,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 {relations.length === 0 ? (
                   <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-sm text-muted-foreground">
                     <div>
-                      <h3 className="font-mono font-semibold">
+                      <p className="font-mono font-semibold">
                         No relations defined
-                      </h3>
+                      </p>
                       <p className="max-w-[320px] ">
                         Create a new relation by writing one in the editor. They
                         will automatically appear here.
@@ -578,7 +587,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                         >
                           <CardHeader>
                             <CardTitle className="flex justify-between font-mono font-bold">
-                              <h3 className="w-1/2 truncate">{table.name}</h3>{" "}
+                              <p className="w-1/2 truncate">{table.name}</p>{" "}
                               <Button
                                 size="none"
                                 variant="link"
