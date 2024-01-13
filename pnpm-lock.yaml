@@ -80,6 +80,15 @@ dependencies:
   '@trpc/server':
     specifier: ^10.45.0
     version: 10.45.0
+  '@types/gapi':
+    specifier: ^0.0.47
+    version: 0.0.47
+  '@types/gapi.client.drive-v3':
+    specifier: ^0.0.4
+    version: 0.0.4
+  '@types/google.accounts':
+    specifier: ^0.0.14
+    version: 0.0.14
   '@types/uuid':
     specifier: ^9.0.7
     version: 9.0.7
@@ -116,6 +125,9 @@ dependencies:
   react-dom:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
+  react-google-drive-picker:
+    specifier: ^1.2.2
+    version: 1.2.2(react-dom@18.2.0)(react@18.2.0)
   react-resizable-panels:
     specifier: ^0.0.55
     version: 0.0.55(react-dom@18.2.0)(react@18.2.0)
@@ -639,6 +651,20 @@ packages:
     resolution: {integrity: sha512-z5mY4LStlA3yL7aHT/rqgG614cfcvklS+8oFRFBYrs4YaWLJyKKM4+nN6KopToX0o9Hj6zmH6M5kinOYuy06ug==}
     dependencies:
       '@lezer/common': 1.2.0
+    dev: false
+
+  /@maxim_mazurok/gapi.client.discovery-v1@0.1.20200806:
+    resolution: {integrity: sha512-Wl6UfmZVDdWbY3PUu8E2ULk9RPLjnMqp/iOA4tcK8Ne+U/GmlnWP/e34IaZNGArfl7iXJNOG+/3Rj9L9jQyF9Q==}
+    dependencies:
+      '@types/gapi.client': 1.0.8
+      '@types/gapi.client.discovery-v1': 0.0.4
+    dev: false
+
+  /@maxim_mazurok/gapi.client.drive-v3@0.0.20240108:
+    resolution: {integrity: sha512-qWgGRvjqGUpopcQOB+X4IlkPSmbIlXor4d4zZ5fKa2t/fo4e4JFC7DCYFQC4bAaVMz4W4L+gNyUMOZGJuCcCZA==}
+    dependencies:
+      '@types/gapi.client': 1.0.8
+      '@types/gapi.client.discovery-v1': 0.0.4
     dev: false
 
   /@next/env@14.0.4:
@@ -1708,6 +1734,30 @@ packages:
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
     dev: true
+
+  /@types/gapi.client.discovery-v1@0.0.4:
+    resolution: {integrity: sha512-uevhRumNE65F5mf2gABLaReOmbFSXONuzFZjNR3dYv6BmkHg+wciubHrfBAsp3554zNo3Dcg6dUAlwMqQfpwjQ==}
+    dependencies:
+      '@maxim_mazurok/gapi.client.discovery-v1': 0.1.20200806
+    dev: false
+
+  /@types/gapi.client.drive-v3@0.0.4:
+    resolution: {integrity: sha512-jE37dJ0EzAdY0aJPFOp20xmec/aO0P4HtUIA9k07RMPyedFDOcuMlSac1r0PklwQdgXF7BHaMoObNHNAnwSQUQ==}
+    dependencies:
+      '@maxim_mazurok/gapi.client.drive-v3': 0.0.20240108
+    dev: false
+
+  /@types/gapi.client@1.0.8:
+    resolution: {integrity: sha512-qJQUmmumbYym3Amax0S8CVzuSngcXsC1fJdwRS2zeW5lM63zXkw4wJFP+bG0jzgi0R6EsJKoHnGNVTDbOyG1ng==}
+    dev: false
+
+  /@types/gapi@0.0.47:
+    resolution: {integrity: sha512-/ZsLuq6BffMgbKMtZyDZ8vwQvTyKhKQ1G2K6VyWCgtHHhfSSXbk4+4JwImZiTjWNXfI2q1ZStAwFFHSkNoTkHA==}
+    dev: false
+
+  /@types/google.accounts@0.0.14:
+    resolution: {integrity: sha512-HqIVkVzpiLWhlajhQQd4rIV7czanFvXblJI2J1fSrL+VKQuQwwZ63m35D/mI0flsqKE6p/hNrAG0Yn4FD6JvNA==}
+    dev: false
 
   /@types/json-schema@7.0.15:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -3986,6 +4036,16 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.0
+    dev: false
+
+  /react-google-drive-picker@1.2.2(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-x30mYkt9MIwPCgL+fyK75HZ8E6G5L/WGW0bfMG6kbD4NG2kmdlmV9oH5lPa6P6d46y9hj5Y3btAMrZd4JRRkSA==}
+    peerDependencies:
+      react: '>=17.0.0'
+      react-dom: '>=17.0.0'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /react-is@16.13.1:
