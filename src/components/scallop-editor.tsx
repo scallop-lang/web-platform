@@ -1,4 +1,5 @@
 import { lintGutter } from "@codemirror/lint";
+import type { ColumnDef } from "@tanstack/react-table";
 import type { inferRouterOutputs } from "@trpc/server";
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
@@ -21,7 +22,7 @@ import {
   Play,
   Save,
   Settings,
-  Table,
+  Table as TableIcon,
   UploadCloud,
   X,
 } from "lucide-react";
@@ -52,14 +53,14 @@ import {
 } from "~/components/ui/resizable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
-import type { NodeTableProps } from "~/utils/relation-button";
+import type { NodeTableProps, Table } from "~/utils/relation-button";
 import {
   parseInputRelations,
   relationButtonPlugin,
 } from "~/utils/relation-button";
 
 import { ImportFromDriveButton } from "./import-from-drive";
-import { columns, payments, RelationTable } from "./relation-table";
+import { RelationTable } from "./relation-table";
 import { SaveToDriveDialogContent } from "./save-to-drive";
 import {
   AlertDialog,
@@ -203,6 +204,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
   const [searchResult, setSearchResult] = useState("");
   const [tableOpen, setTableOpen] = useState(false);
+  const [relationTable, setRelationTable] = useState<Table>({
+    name: "",
+    facts: [],
+  });
 
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
@@ -265,6 +270,36 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       relationButtonPlugin,
     ];
   }, []);
+
+  // don't constantly recalculate when 1) no new table is opened, or 2) the table is opened
+  // but nothing has changed. there could be hundreds, thousands of rows
+  const currTable = useMemo(() => {
+    const columns: ColumnDef<Record<string, string>>[] = [];
+    const data: Record<string, string>[] = [];
+
+    // if the relation has no facts, we return early
+    if (!relationTable.facts[0]) {
+      return { columns, data };
+    }
+
+    const numArgs = relationTable.facts[0].length;
+    for (let i = 0; i < numArgs; i++) {
+      const argN = `arg${i}`;
+      columns.push({ accessorKey: argN, header: argN });
+    }
+
+    relationTable.facts.forEach((row) => {
+      const fact: Record<string, string> = {};
+
+      row.forEach((arg, idx) => {
+        fact[`arg${idx}`] = arg.content;
+      });
+
+      data.push(fact);
+    });
+
+    return { columns, data };
+  }, [relationTable]);
 
   let subtitle = "";
   if (type === "playground") {
@@ -593,10 +628,12 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 </Button>
               </div>
 
-              <RelationTable
-                columns={columns}
-                data={payments}
-              />
+              <div className="relative h-[calc(100%-58px)] overflow-auto">
+                <RelationTable
+                  columns={currTable.columns}
+                  data={currTable.data}
+                />
+              </div>
             </>
           ) : (
             <>
@@ -696,11 +733,12 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             <Button
                               variant="secondary"
                               onClick={() => {
+                                setRelationTable(table);
                                 setTableOpen(true);
-                                panelGroupRef.current!.setLayout([35, 65]);
+                                panelGroupRef.current!.setLayout([30, 70]);
                               }}
                             >
-                              <Table
+                              <TableIcon
                                 className="mr-1.5"
                                 size={16}
                               />{" "}
@@ -722,3 +760,4 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 };
 
 export { ScallopEditor };
+

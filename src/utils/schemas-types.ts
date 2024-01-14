@@ -2,8 +2,14 @@ import { z } from "zod";
 
 const SclProgramSchema = z.string();
 
-const provenances = ["unit", "proofs", "minmaxprob", "addmultprob", "topkproofs"] as const;
-const SclProvenanceSchema = z.enum(provenances);
+const Provenances = [
+  "unit",
+  "proofs",
+  "minmaxprob",
+  "addmultprob",
+  "topkproofs",
+] as const;
+const SclProvenanceSchema = z.enum(Provenances);
 const SclProvenanceKSchema = z.number().positive().optional();
 
 const FactSchema = z.object({
@@ -13,18 +19,17 @@ const FactSchema = z.object({
 
 const SclRelationRecordSchema = z.record(z.string(), FactSchema.array());
 
-const UpdateProjectSchema = z
-  .object({
-    title: z.string().max(255).optional(),
-    description: z.string().optional(),
-    published: z.boolean().optional(),
-    program: SclProgramSchema.optional(),
-  });
+const UpdateProjectSchema = z.object({
+  title: z.string().max(255).optional(),
+  description: z.string().optional(),
+  published: z.boolean().optional(),
+  program: SclProgramSchema.optional(),
+});
 
 export {
   SclProgramSchema,
-  SclProvenanceSchema,
   SclProvenanceKSchema,
+  SclProvenanceSchema,
   SclRelationRecordSchema,
   UpdateProjectSchema,
 };
