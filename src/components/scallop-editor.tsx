@@ -33,7 +33,39 @@ import { useMemo, useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
 
+import { ImportFromDriveButton } from "~/components/import-from-drive";
+import { RelationTable } from "~/components/relation-table";
+import { SaveToDriveDialogContent } from "~/components/save-to-drive";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,54 +78,21 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "~/components/ui/resizable";
+import { Switch } from "~/components/ui/switch";
+import { Textarea } from "~/components/ui/textarea";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
 import type { NodeTableProps, Table } from "~/utils/relation-button";
 import {
   parseInputRelations,
-  relationButtonPlugin,
+  relationButtonPluginFactory,
 } from "~/utils/relation-button";
-
-import { ImportFromDriveButton } from "./import-from-drive";
-import { RelationTable } from "./relation-table";
-import { SaveToDriveDialogContent } from "./save-to-drive";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "./ui/alert-dialog";
-import { Badge } from "./ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
-import { Textarea } from "./ui/textarea";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
@@ -267,7 +266,11 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       ScallopLinter,
       lintGutter(),
       syncRelations,
-      relationButtonPlugin,
+      relationButtonPluginFactory(
+        setTableOpen,
+        setRelationTable,
+        panelGroupRef,
+      ),
     ];
   }, []);
 
@@ -600,7 +603,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         >
           {tableOpen ? (
             <>
-              <div className="flex justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
+              <div className="flex items-center justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
                 <Button
                   onClick={() => {
                     setTableOpen(false);
@@ -611,8 +614,14 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     className="mr-1.5"
                     size={16}
                   />{" "}
-                  Confirm edits
+                  Confirm
                 </Button>
+                <p className="w-1/3 truncate text-center">
+                  Relation:{" "}
+                  <span className="font-mono font-bold">
+                    {relationTable.name}
+                  </span>
+                </p>
                 <Button
                   variant="secondary"
                   onClick={() => {
@@ -760,4 +769,3 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 };
 
 export { ScallopEditor };
-
