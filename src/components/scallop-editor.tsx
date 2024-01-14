@@ -9,6 +9,7 @@ import {
 } from "codemirror-lang-scallop";
 import {
   ArrowUpRight,
+  Check,
   ChevronDown,
   Columns2,
   FileDown,
@@ -22,6 +23,7 @@ import {
   Settings,
   Table,
   UploadCloud,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -57,6 +59,7 @@ import {
 } from "~/utils/relation-button";
 
 import { ImportFromDriveButton } from "./import-from-drive";
+import { columns, payments, RelationTable } from "./relation-table";
 import { SaveToDriveDialogContent } from "./save-to-drive";
 import {
   AlertDialog,
@@ -94,9 +97,9 @@ import { Textarea } from "./ui/textarea";
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
   | {
-    type: "playground";
-    project: null;
-  }
+      type: "playground";
+      project: null;
+    }
   | { type: "project"; project: Project; isAuthor: boolean };
 
 const EditDetailsButton = ({
@@ -207,7 +210,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       toast.success("Program successfully executed!");
     },
     onError: (error) => {
-      toast.error(`An error occurred when running your program: ${error.message}`);
+      toast.error(
+        `An error occurred when running your program: ${error.message}`,
+      );
     },
   });
 
@@ -326,7 +331,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     project: {
                       title,
                       description,
-                      program: cmRef.current!.view?.state.doc.toString()
+                      program: cmRef.current!.view?.state.doc.toString(),
                     },
                   })
                 }
@@ -459,10 +464,11 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     ? "Reset editor state?"
                     : `Delete project?`}
                 </AlertDialogTitle>
-                <AlertDialogDescription>{`This action cannot be undone. This will completely ${type === "playground"
-                  ? "clean and reset the editor, just like a browser refresh."
-                  : `delete your project "${title}" and associated data.`
-                  }`}</AlertDialogDescription>
+                <AlertDialogDescription>{`This action cannot be undone. This will completely ${
+                  type === "playground"
+                    ? "clean and reset the editor, just like a browser refresh."
+                    : `delete your project "${title}" and associated data.`
+                }`}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -471,18 +477,18 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   onClick={
                     type === "project" && editor.isAuthor
                       ? () =>
-                        deleteProject({
-                          id: project.id,
-                        })
+                          deleteProject({
+                            id: project.id,
+                          })
                       : () =>
-                        cmRef.current!.view?.dispatch({
-                          changes: {
-                            from: 0,
-                            to: cmRef.current!.view.state.doc.toString()
-                              .length,
-                            insert: "",
-                          },
-                        })
+                          cmRef.current!.view?.dispatch({
+                            changes: {
+                              from: 0,
+                              to: cmRef.current!.view.state.doc.toString()
+                                .length,
+                              insert: "",
+                            },
+                          })
                   }
                 >
                   Continue
@@ -515,14 +521,19 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
             >
               {run.isLoading ? (
                 <>
-                  <Loader className="mr-1.5" size={16} />
+                  <Loader
+                    className="mr-1.5"
+                    size={16}
+                  />
                 </>
               ) : (
                 <>
-                  <Play className="mr-1.5" size={16} />
+                  <Play
+                    className="mr-1.5"
+                    size={16}
+                  />
                 </>
-              )}
-              {" "}
+              )}{" "}
               Run
             </Button>
 
@@ -554,15 +565,38 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         >
           {tableOpen ? (
             <>
-              <p>table here</p>
-              <Button
-                onClick={() => {
-                  setTableOpen(false);
-                  panelGroupRef.current!.setLayout([75, 25]);
-                }}
-              >
-                Save
-              </Button>
+              <div className="flex justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
+                <Button
+                  onClick={() => {
+                    setTableOpen(false);
+                    panelGroupRef.current!.setLayout([75, 25]);
+                  }}
+                >
+                  <Check
+                    className="mr-1.5"
+                    size={16}
+                  />{" "}
+                  Confirm edits
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setTableOpen(false);
+                    panelGroupRef.current!.setLayout([75, 25]);
+                  }}
+                >
+                  <X
+                    className="mr-1.5"
+                    size={16}
+                  />{" "}
+                  Cancel
+                </Button>
+              </div>
+
+              <RelationTable
+                columns={columns}
+                data={payments}
+              />
             </>
           ) : (
             <>
@@ -648,8 +682,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             <p className="truncate">
                               {table.facts[0]
                                 ? `(${table.facts[0]
-                                  .map(({ content }) => content)
-                                  .join(", ")})`
+                                    .map(({ content }) => content)
+                                    .join(", ")})`
                                 : "<no facts defined>"}
                             </p>
                             {table.facts[1] ? (
