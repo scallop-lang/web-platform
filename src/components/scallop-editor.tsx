@@ -1,4 +1,5 @@
 import { lintGutter } from "@codemirror/lint";
+import type { ColumnDef } from "@tanstack/react-table";
 import type { inferRouterOutputs } from "@trpc/server";
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
@@ -9,6 +10,7 @@ import {
 } from "codemirror-lang-scallop";
 import {
   ArrowUpRight,
+  Check,
   ChevronDown,
   Columns2,
   FileDown,
@@ -20,8 +22,9 @@ import {
   Play,
   Save,
   Settings,
-  Table,
+  Table as TableIcon,
   UploadCloud,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -30,7 +33,39 @@ import { useMemo, useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
 
+import { ImportFromDriveButton } from "~/components/import-from-drive";
+import { RelationTable } from "~/components/relation-table";
+import { SaveToDriveDialogContent } from "~/components/save-to-drive";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,60 +78,28 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "~/components/ui/resizable";
+import { Switch } from "~/components/ui/switch";
+import { Textarea } from "~/components/ui/textarea";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
-import type { RelationTableProps } from "~/utils/relation-button";
+import type { NodeTableProps, Table } from "~/utils/relation-button";
 import {
-  parseRelationTables,
-  relationButtonPlugin,
+  parseInputRelations,
+  relationButtonPluginFactory,
 } from "~/utils/relation-button";
-
-import { ImportFromDriveButton } from "./import-from-drive";
-import { SaveToDriveDialogContent } from "./save-to-drive";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "./ui/alert-dialog";
-import { Badge } from "./ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
-import { Textarea } from "./ui/textarea";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
   | {
-    type: "playground";
-    project: null;
-  }
+      type: "playground";
+      project: null;
+    }
   | { type: "project"; project: Project; isAuthor: boolean };
 
 const EditDetailsButton = ({
@@ -196,10 +199,14 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         ? project.description
         : "",
   );
-  const [relations, setRelations] = useState<RelationTableProps[]>([]);
+  const [inputs, setInputs] = useState<NodeTableProps[]>([]);
 
   const [searchResult, setSearchResult] = useState("");
   const [tableOpen, setTableOpen] = useState(false);
+  const [relationTable, setRelationTable] = useState<Table>({
+    name: "",
+    facts: [],
+  });
 
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
@@ -207,7 +214,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       toast.success("Program successfully executed!");
     },
     onError: (error) => {
-      toast.error(`An error occurred when running your program: ${error.message}`);
+      toast.error(
+        `An error occurred when running your program: ${error.message}`,
+      );
     },
   });
 
@@ -248,7 +257,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
   const extensions = useMemo(() => {
     const syncRelations = EditorView.updateListener.of((viewUpdate) => {
-      setRelations(parseRelationTables(viewUpdate.state));
+      setInputs(parseInputRelations(viewUpdate.state));
     });
 
     return [
@@ -257,9 +266,43 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       ScallopLinter,
       lintGutter(),
       syncRelations,
-      relationButtonPlugin,
+      relationButtonPluginFactory(
+        setTableOpen,
+        setRelationTable,
+        panelGroupRef,
+      ),
     ];
   }, []);
+
+  // don't constantly recalculate when 1) no new table is opened, or 2) the table is opened
+  // but nothing has changed. there could be hundreds, thousands of rows
+  const currTable = useMemo(() => {
+    const columns: ColumnDef<Record<string, string>>[] = [];
+    const data: Record<string, string>[] = [];
+
+    // if the relation has no facts, we return early
+    if (!relationTable.facts[0]) {
+      return { columns, data };
+    }
+
+    const numArgs = relationTable.facts[0].length;
+    for (let i = 0; i < numArgs; i++) {
+      const argN = `arg${i}`;
+      columns.push({ accessorKey: argN, header: argN });
+    }
+
+    relationTable.facts.forEach((row) => {
+      const fact: Record<string, string> = {};
+
+      row.forEach((arg, idx) => {
+        fact[`arg${idx}`] = arg.content;
+      });
+
+      data.push(fact);
+    });
+
+    return { columns, data };
+  }, [relationTable]);
 
   let subtitle = "";
   if (type === "playground") {
@@ -274,7 +317,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   }
 
   const isProjectAuthor = type === "project" && editor.isAuthor;
-  const filteredRelations = relations.filter(({ table }) =>
+  const filteredRelations = inputs.filter(({ table }) =>
     table.name.includes(searchResult),
   );
 
@@ -326,7 +369,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     project: {
                       title,
                       description,
-                      program: cmRef.current!.view?.state.doc.toString()
+                      program: cmRef.current!.view?.state.doc.toString(),
                     },
                   })
                 }
@@ -459,10 +502,11 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     ? "Reset editor state?"
                     : `Delete project?`}
                 </AlertDialogTitle>
-                <AlertDialogDescription>{`This action cannot be undone. This will completely ${type === "playground"
-                  ? "clean and reset the editor, just like a browser refresh."
-                  : `delete your project "${title}" and associated data.`
-                  }`}</AlertDialogDescription>
+                <AlertDialogDescription>{`This action cannot be undone. This will completely ${
+                  type === "playground"
+                    ? "clean and reset the editor, just like a browser refresh."
+                    : `delete your project "${title}" and associated data.`
+                }`}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -471,18 +515,18 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   onClick={
                     type === "project" && editor.isAuthor
                       ? () =>
-                        deleteProject({
-                          id: project.id,
-                        })
+                          deleteProject({
+                            id: project.id,
+                          })
                       : () =>
-                        cmRef.current!.view?.dispatch({
-                          changes: {
-                            from: 0,
-                            to: cmRef.current!.view.state.doc.toString()
-                              .length,
-                            insert: "",
-                          },
-                        })
+                          cmRef.current!.view?.dispatch({
+                            changes: {
+                              from: 0,
+                              to: cmRef.current!.view.state.doc.toString()
+                                .length,
+                              insert: "",
+                            },
+                          })
                   }
                 >
                   Continue
@@ -515,14 +559,19 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
             >
               {run.isLoading ? (
                 <>
-                  <Loader className="mr-1.5" size={16} />
+                  <Loader
+                    className="mr-1.5"
+                    size={16}
+                  />
                 </>
               ) : (
                 <>
-                  <Play className="mr-1.5" size={16} />
+                  <Play
+                    className="mr-1.5"
+                    size={16}
+                  />
                 </>
-              )}
-              {" "}
+              )}{" "}
               Run
             </Button>
 
@@ -554,15 +603,46 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         >
           {tableOpen ? (
             <>
-              <p>table here</p>
-              <Button
-                onClick={() => {
-                  setTableOpen(false);
-                  panelGroupRef.current!.setLayout([75, 25]);
-                }}
-              >
-                Save
-              </Button>
+              <div className="flex items-center justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
+                <Button
+                  onClick={() => {
+                    setTableOpen(false);
+                    panelGroupRef.current!.setLayout([75, 25]);
+                  }}
+                >
+                  <Check
+                    className="mr-1.5"
+                    size={16}
+                  />{" "}
+                  Confirm
+                </Button>
+                <p className="w-1/3 truncate text-center">
+                  Relation:{" "}
+                  <span className="font-mono font-bold">
+                    {relationTable.name}
+                  </span>
+                </p>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setTableOpen(false);
+                    panelGroupRef.current!.setLayout([75, 25]);
+                  }}
+                >
+                  <X
+                    className="mr-1.5"
+                    size={16}
+                  />{" "}
+                  Cancel
+                </Button>
+              </div>
+
+              <div className="relative h-[calc(100%-58px)] overflow-auto">
+                <RelationTable
+                  columns={currTable.columns}
+                  data={currTable.data}
+                />
+              </div>
             </>
           ) : (
             <>
@@ -572,7 +652,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   className="font-mono"
                 >
                   {searchResult === ""
-                    ? `${relations.length} total`
+                    ? `${inputs.length} total`
                     : `${filteredRelations.length} results`}
                 </Badge>
 
@@ -584,7 +664,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               </div>
 
               <div className="flex h-[calc(100%-58px)] flex-col items-center gap-2.5 overflow-y-auto p-2.5">
-                {relations.length === 0 ? (
+                {inputs.length === 0 ? (
                   <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-sm text-muted-foreground">
                     <div>
                       <p className="font-mono font-semibold">
@@ -648,8 +728,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             <p className="truncate">
                               {table.facts[0]
                                 ? `(${table.facts[0]
-                                  .map(({ content }) => content)
-                                  .join(", ")})`
+                                    .map(({ content }) => content)
+                                    .join(", ")})`
                                 : "<no facts defined>"}
                             </p>
                             {table.facts[1] ? (
@@ -662,11 +742,12 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             <Button
                               variant="secondary"
                               onClick={() => {
+                                setRelationTable(table);
                                 setTableOpen(true);
-                                panelGroupRef.current!.setLayout([35, 65]);
+                                panelGroupRef.current!.setLayout([30, 70]);
                               }}
                             >
-                              <Table
+                              <TableIcon
                                 className="mr-1.5"
                                 size={16}
                               />{" "}

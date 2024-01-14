@@ -3,6 +3,7 @@ import type { EditorState } from "@codemirror/state";
 import { type Range } from "@codemirror/state";
 import type { DecorationSet, EditorView, ViewUpdate } from "@codemirror/view";
 import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
+import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 
 type TableCell = {
   content: string;
@@ -10,7 +11,7 @@ type TableCell = {
   to: number;
 };
 
-export type Table = {
+type Table = {
   name: string;
   facts: TableCell[][];
 };
@@ -20,44 +21,44 @@ type SyntaxNodeRef = Parameters<
   Parameters<ReturnType<typeof syntaxTree>["iterate"]>["0"]["enter"]
 >["0"];
 
-export type RelationTableProps = {
+type NodeTableProps = {
   relationNode: SyntaxNodeRef;
   table: Table;
 };
 
 class RelationWidget extends WidgetType {
-  constructor(readonly table: string) {
+  constructor(
+    readonly table: Table,
+    readonly setTableOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    readonly setRelationTable: React.Dispatch<React.SetStateAction<Table>>,
+    readonly panelGroupRef: React.RefObject<ImperativePanelGroupHandle>,
+  ) {
     super();
   }
 
   eq(other: RelationWidget) {
-    return other.table == this.table;
+    return other.table.name === this.table.name;
   }
 
   toDOM() {
-    const wrap = document.createElement("span");
-    wrap.setAttribute("aria-hidden", "true");
-
-    const btn = wrap.appendChild(document.createElement("input"));
+    const btn = document.createElement("button");
     btn.type = "button";
-    btn.name = "scl-relation-button";
-    btn.setAttribute("table", this.table);
-    btn.setAttribute(
-      "style",
-      "vertical-align: middle; font-size: 8px; font-weight: bold; margin-left: 4px; border: 1px solid black; border-radius: 20px; cursor: pointer;",
-    );
-    btn.value = " ↪ ";
+    btn.className =
+      "px-1.5 rounded-full font-bold hover:bg-primary/80 transition-colors text-primary-foreground bg-primary ml-1.5 font-mono text-[0.6rem]";
+    btn.innerText = "rel";
 
-    return wrap;
-  }
+    btn.addEventListener("click", () => {
+      this.setTableOpen(true);
+      this.setRelationTable(this.table);
+      this.panelGroupRef.current!.setLayout([30, 70]);
+    });
 
-  ignoreEvent() {
-    return false;
+    return btn;
   }
 }
 
-export function parseRelationTables(state: EditorState) {
-  const nodeTableArr: RelationTableProps[] = [];
+function parseInputRelations(state: EditorState) {
+  const nodeTableArr: NodeTableProps[] = [];
 
   syntaxTree(state).iterate({
     enter: (node) => {
@@ -112,13 +113,23 @@ export function parseRelationTables(state: EditorState) {
   return nodeTableArr;
 }
 
-function relationButtons(view: EditorView) {
+function relationButtons(
+  view: EditorView,
+  setTableOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  setRelationTable: React.Dispatch<React.SetStateAction<Table>>,
+  panelGroupRef: React.RefObject<ImperativePanelGroupHandle>,
+) {
   const widgets: Range<Decoration>[] = [];
-  const nodeTableArr = parseRelationTables(view.state);
+  const nodeTableArr = parseInputRelations(view.state);
 
   nodeTableArr.forEach(({ relationNode, table }) => {
     const deco = Decoration.widget({
-      widget: new RelationWidget(JSON.stringify(table)),
+      widget: new RelationWidget(
+        table,
+        setTableOpen,
+        setRelationTable,
+        panelGroupRef,
+      ),
       side: 1,
     });
 
@@ -128,34 +139,44 @@ function relationButtons(view: EditorView) {
   return Decoration.set(widgets);
 }
 
-export const relationButtonPlugin = ViewPlugin.fromClass(
-  class {
-    decorations: DecorationSet;
+function relationButtonPluginFactory(
+  setTableOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  setRelationTable: React.Dispatch<React.SetStateAction<Table>>,
+  panelGroupRef: React.RefObject<ImperativePanelGroupHandle>,
+) {
+  return ViewPlugin.fromClass(
+    class {
+      decorations: DecorationSet;
 
-    constructor(view: EditorView) {
-      this.decorations = relationButtons(view);
-    }
-
-    update(update: ViewUpdate) {
-      if (update.docChanged || update.viewportChanged) {
-        this.decorations = relationButtons(update.view);
+      constructor(view: EditorView) {
+        this.decorations = relationButtons(
+          view,
+          setTableOpen,
+          setRelationTable,
+          panelGroupRef,
+        );
       }
-    }
-  },
-  {
-    decorations: (v) => v.decorations,
 
-    eventHandlers: {
-      mousedown: (e, view) => {
-        const target = e.target as HTMLElement;
-        if (
-          target.nodeName == "INPUT" &&
-          target.getAttribute("name") == "scl-relation-button"
-        ) {
-          const obj = JSON.parse(target.getAttribute("table") ?? "") as Table;
-          console.log(obj);
+      update(viewUpdate: ViewUpdate) {
+        if (viewUpdate.docChanged) {
+          this.decorations = relationButtons(
+            viewUpdate.view,
+            setTableOpen,
+            setRelationTable,
+            panelGroupRef,
+          );
         }
-      },
+      }
     },
-  },
-);
+    {
+      decorations: (v) => v.decorations,
+    },
+  );
+}
+
+export {
+  parseInputRelations,
+  relationButtonPluginFactory,
+  type NodeTableProps,
+  type Table,
+};
