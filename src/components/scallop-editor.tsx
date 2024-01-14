@@ -52,9 +52,9 @@ import {
 } from "~/components/ui/resizable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
-import type { RelationTableProps } from "~/utils/relation-button";
+import type { NodeTableProps } from "~/utils/relation-button";
 import {
-  parseRelationTables,
+  parseInputRelations,
   relationButtonPlugin,
 } from "~/utils/relation-button";
 
@@ -199,7 +199,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         ? project.description
         : "",
   );
-  const [relations, setRelations] = useState<RelationTableProps[]>([]);
+  const [inputs, setInputs] = useState<NodeTableProps[]>([]);
 
   const [searchResult, setSearchResult] = useState("");
   const [tableOpen, setTableOpen] = useState(false);
@@ -253,7 +253,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
   const extensions = useMemo(() => {
     const syncRelations = EditorView.updateListener.of((viewUpdate) => {
-      setRelations(parseRelationTables(viewUpdate.state));
+      setInputs(parseInputRelations(viewUpdate.state));
     });
 
     return [
@@ -279,7 +279,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   }
 
   const isProjectAuthor = type === "project" && editor.isAuthor;
-  const filteredRelations = relations.filter(({ table }) =>
+  const filteredRelations = inputs.filter(({ table }) =>
     table.name.includes(searchResult),
   );
 
@@ -606,7 +606,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   className="font-mono"
                 >
                   {searchResult === ""
-                    ? `${relations.length} total`
+                    ? `${inputs.length} total`
                     : `${filteredRelations.length} results`}
                 </Badge>
 
@@ -618,7 +618,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               </div>
 
               <div className="flex h-[calc(100%-58px)] flex-col items-center gap-2.5 overflow-y-auto p-2.5">
-                {relations.length === 0 ? (
+                {inputs.length === 0 ? (
                   <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-sm text-muted-foreground">
                     <div>
                       <p className="font-mono font-semibold">
