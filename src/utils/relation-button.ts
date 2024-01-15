@@ -37,7 +37,7 @@ class RelationWidget extends WidgetType {
   }
 
   eq(other: RelationWidget) {
-    return other.table.name === this.table.name;
+    return JSON.stringify(other.table) === JSON.stringify(this.table);
   }
 
   toDOM() {
