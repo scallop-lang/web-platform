@@ -21,7 +21,6 @@ import {
   Pencil,
   Play,
   Save,
-  Settings,
   Table as TableIcon,
   UploadCloud,
   X,
@@ -93,6 +92,9 @@ import {
   parseInputRelations,
   relationButtonPluginFactory,
 } from "~/utils/relation-button";
+
+import type { RuntimeProps } from "./editor/runtime-settings";
+import { RuntimeSettings } from "./editor/runtime-settings";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
@@ -200,6 +202,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         : "",
   );
   const [inputs, setInputs] = useState<NodeTableProps[]>([]);
+  const [runtime, setRuntime] = useState<RuntimeProps>({
+    provenance: "topkproofs",
+    k: 3,
+  });
 
   const [searchResult, setSearchResult] = useState("");
   const [tableOpen, setTableOpen] = useState(false);
@@ -550,8 +556,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               onClick={() => {
                 run.mutate({
                   program: cmRef.current!.view?.state.doc.toString() ?? "",
-                  provenance: "topkproofs", // todo: get this from runtime
-                  k: 3,
+                  provenance: runtime.provenance,
+                  k:
+                    runtime.provenance === "topkproofs" ? runtime.k : undefined,
                 });
                 toast.loading("Running your program...");
               }}
@@ -560,7 +567,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               {run.isLoading ? (
                 <>
                   <Loader
-                    className="mr-1.5"
+                    className="mr-1.5 animate-spin"
                     size={16}
                   />
                 </>
@@ -575,13 +582,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               Run
             </Button>
 
-            <Button variant="outline">
-              <Settings
-                className="mr-1.5"
-                size={16}
-              />{" "}
-              Runtime
-            </Button>
+            <RuntimeSettings
+              runtime={runtime}
+              setRuntime={setRuntime}
+            />
           </div>
 
           <CodeMirror
