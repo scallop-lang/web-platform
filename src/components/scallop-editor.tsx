@@ -567,7 +567,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               {run.isLoading ? (
                 <>
                   <Loader
-                    className="mr-1.5"
+                    className="mr-1.5 animate-spin"
                     size={16}
                   />
                 </>
@@ -582,7 +582,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               Run
             </Button>
 
-            <RuntimeSettings setRuntime={setRuntime} />
+            <RuntimeSettings
+              runtime={runtime}
+              setRuntime={setRuntime}
+            />
           </div>
 
           <CodeMirror
