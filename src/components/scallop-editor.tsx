@@ -1,3 +1,5 @@
+import { table } from "console";
+
 import { lintGutter } from "@codemirror/lint";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { inferRouterOutputs } from "@trpc/server";
@@ -8,7 +10,6 @@ import {
   ScallopHighlighter,
   ScallopLinter,
 } from "codemirror-lang-scallop";
-import { table } from "console";
 import {
   ArrowUpRight,
   Check,
@@ -211,7 +212,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   });
 
   const [tableData, setTableData] = useState<Record<string, string>[]>([]);
-  const [tableColumns, setTableColumns] = useState<ColumnDef<Record<string, string>>[]>([]);
+  const [tableColumns, setTableColumns] = useState<
+    ColumnDef<Record<string, string>>[]
+  >([]);
 
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
@@ -247,8 +250,12 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     });
 
   function ImportEditorContent(newProgram: string) {
-    if(cmRef.current?.view) {
-      replaceEditorContent(newProgram, 0, cmRef.current.view?.state.doc.toString().length);
+    if (cmRef.current?.view) {
+      replaceEditorContent(
+        newProgram,
+        0,
+        cmRef.current.view?.state.doc.toString().length,
+      );
     }
   }
 
@@ -314,7 +321,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
     setTableData(data);
     setTableColumns(columns);
-    
+
     return { columns, data };
   }, [relationTable]);
 
@@ -344,25 +351,29 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     const numArgs = relationTable.facts[0].length;
 
     // help
-    const from = relationTable.facts[0][0]?.from - 1;
+    let from = relationTable.facts[0][0]?.from - 1;
     const to = relationTable.facts[numFacts - 1][numArgs - 1]?.to;
 
-    const newProgram = tableData.map((row, index) => {
-      let rowValues = Object.values(row).join(", ");
-      if (tableData.length === 1) {
-        return `{${rowValues}`;
-      }
-      // add paranthesis but indent if not first row
-      rowValues = (index === 0) ? `(${rowValues}` : `  (${rowValues}`;
-      // add closing paranthesis + comma if not last row
-      rowValues = (index !== tableData.length - 1) ? `${rowValues}),` : `${rowValues}`;
-      return rowValues;
-    }).join("\n")
-    
-    if(from && to) {
+    const newProgram = tableData
+      .map((row, index) => {
+        let rowValues = Object.values(row).join(", ");
+        if (tableData.length === 1) {
+          from++;
+          return `${rowValues}`;
+        }
+        // add paranthesis but indent if not first row
+        rowValues = index === 0 ? `(${rowValues}` : `  (${rowValues}`;
+        // add closing paranthesis + comma if not last row
+        rowValues =
+          index !== tableData.length - 1 ? `${rowValues}),` : `${rowValues}`;
+        return rowValues;
+      })
+      .join("\n");
+
+    if (from && to) {
       replaceEditorContent(newProgram, from, to);
     }
-  }
+  };
 
   return (
     <>
@@ -429,9 +440,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
           ) : null}
 
           {type === "playground" || editor.isAuthor ? (
-            <ImportFromDriveButton
-              changeEditorFunction={ImportEditorContent}
-            />
+            <ImportFromDriveButton changeEditorFunction={ImportEditorContent} />
           ) : null}
 
           <Dialog>

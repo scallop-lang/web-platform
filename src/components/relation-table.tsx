@@ -4,11 +4,7 @@ import {
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { send } from "process";
-
-import React from "react";
-import { useEffect, useState } from "react";
-import { set } from "zod";
+import React, { useState } from "react";
 
 import {
   Table,
@@ -19,9 +15,6 @@ import {
   TableRow,
 } from "~/components/ui/table";
 
-import type { NodeTableProps, Table as RelTable } from "~/utils/relation-button";
-
-
 interface RelationTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -31,9 +24,8 @@ interface RelationTableProps<TData, TValue> {
 const RelationTable = <TData, TValue>({
   columns,
   data,
-  setTableData
+  setTableData,
 }: RelationTableProps<TData, TValue>) => {
-
   // ==================================== HOW THIS WORKS ====================================
   // You rewrite the cell and all of the changes are stored in the tableData state in scallop
   // -editor.tsx. Once you're done making all your changes, you click the "Confirm" button which
@@ -48,7 +40,7 @@ const RelationTable = <TData, TValue>({
       return (
         <input
           value={value as string}
-          onChange={((e) => {
+          onChange={(e) => {
             setValue(e.target.value);
 
             const newData = data;
@@ -57,12 +49,11 @@ const RelationTable = <TData, TValue>({
               (newData[index] as Record<string, unknown>)[id] = e.target.value;
               setTableData(newData);
             }
-          })}
-        >
-        </input>
-      )
+          }}
+        ></input>
+      );
     },
-  }
+  };
 
   const table = useReactTable({
     data,
