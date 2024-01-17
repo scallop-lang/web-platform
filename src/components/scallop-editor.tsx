@@ -8,6 +8,7 @@ import {
   ScallopHighlighter,
   ScallopLinter,
 } from "codemirror-lang-scallop";
+import { table } from "console";
 import {
   ArrowUpRight,
   Check,
@@ -32,6 +33,7 @@ import type { ElementRef } from "react";
 import { useMemo, useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
+import { set } from "zod";
 
 import { ImportFromDriveButton } from "~/components/import-from-drive";
 import { RelationTable } from "~/components/relation-table";
@@ -208,6 +210,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     facts: [],
   });
 
+  const [tableData, setTableData] = useState<Record<string, string>[]>([]);
+  const [tableColumns, setTableColumns] = useState<ColumnDef<Record<string, string>>[]>([]);
+
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
       console.log(data);
@@ -241,12 +246,18 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         toast.error(`Project failed to delete! Reason: ${error.message}`),
     });
 
-  function replaceEditorContent(newProgram: string) {
+  function ImportEditorContent(newProgram: string) {
+    if(cmRef.current?.view) {
+      replaceEditorContent(newProgram, 0, cmRef.current.view?.state.doc.toString().length);
+    }
+  }
+
+  function replaceEditorContent(newProgram: string, f: number, t: number) {
     if (cmRef.current) {
       cmRef.current.view?.dispatch({
         changes: {
-          from: 0,
-          to: cmRef.current.view?.state.doc.toString().length,
+          from: f,
+          to: t,
           insert: newProgram,
         },
       });
@@ -301,6 +312,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       data.push(fact);
     });
 
+    setTableData(data);
+    setTableColumns(columns);
+    
     return { columns, data };
   }, [relationTable]);
 
@@ -320,6 +334,35 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   const filteredRelations = inputs.filter(({ table }) =>
     table.name.includes(searchResult),
   );
+
+  const updateProgram = () => {
+    // is empty table
+    if (!relationTable.facts[0]) {
+      return;
+    }
+    const numFacts = relationTable.facts.length;
+    const numArgs = relationTable.facts[0].length;
+
+    // help
+    const from = relationTable.facts[0][0]?.from - 1;
+    const to = relationTable.facts[numFacts - 1][numArgs - 1]?.to;
+
+    const newProgram = tableData.map((row, index) => {
+      let rowValues = Object.values(row).join(", ");
+      if (tableData.length === 1) {
+        return `{${rowValues}`;
+      }
+      // add paranthesis but indent if not first row
+      rowValues = (index === 0) ? `(${rowValues}` : `  (${rowValues}`;
+      // add closing paranthesis + comma if not last row
+      rowValues = (index !== tableData.length - 1) ? `${rowValues}),` : `${rowValues}`;
+      return rowValues;
+    }).join("\n")
+    
+    if(from && to) {
+      replaceEditorContent(newProgram, from, to);
+    }
+  }
 
   return (
     <>
@@ -387,7 +430,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
           {type === "playground" || editor.isAuthor ? (
             <ImportFromDriveButton
-              changeEditorFunction={replaceEditorContent}
+              changeEditorFunction={ImportEditorContent}
             />
           ) : null}
 
@@ -607,6 +650,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 <Button
                   onClick={() => {
                     setTableOpen(false);
+                    updateProgram();
                     panelGroupRef.current!.setLayout([75, 25]);
                   }}
                 >
@@ -641,6 +685,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 <RelationTable
                   columns={currTable.columns}
                   data={currTable.data}
+                  setTableData={setTableData}
                 />
               </div>
             </>
