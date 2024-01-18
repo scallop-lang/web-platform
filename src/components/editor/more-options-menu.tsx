@@ -32,22 +32,20 @@ import {
 import { api } from "~/utils/api";
 
 const DestructiveAlertDialog = ({
-  children,
   editor,
   cmRef,
   projectTitle,
-  open,
-  onOpenChange,
   setMenuOpen,
+  children,
 }: {
-  children: React.ReactNode;
   editor: ScallopEditorProps;
   cmRef: React.RefObject<ReactCodeMirrorRef>;
   projectTitle: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  children: React.ReactNode;
 }) => {
+  const [open, setOpen] = useState(false);
+
   const router = useRouter();
   const { mutate } = api.project.deleteProjectById.useMutation({
     onSuccess: async ({ title }) => {
@@ -67,7 +65,7 @@ const DestructiveAlertDialog = ({
   return (
     <AlertDialog
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={setOpen}
     >
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogContent>
@@ -126,7 +124,6 @@ const MoreOptionsMenu = ({
   projectTitle: string;
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(false);
 
   return (
     <DropdownMenu
@@ -140,10 +137,7 @@ const MoreOptionsMenu = ({
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        align="end"
-        hidden={alertOpen}
-      >
+      <DropdownMenuContent align="end">
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>Layout...</DropdownMenuSubTrigger>
           <DropdownMenuPortal>
@@ -189,8 +183,6 @@ const MoreOptionsMenu = ({
               editor={editor}
               cmRef={cmRef}
               projectTitle={projectTitle}
-              open={alertOpen}
-              onOpenChange={setAlertOpen}
               setMenuOpen={setMenuOpen}
             >
               <DropdownMenuItem
