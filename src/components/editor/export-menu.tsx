@@ -11,6 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
+import { DownloadFileDialog } from "./download-file-dialog";
+
 const ExportMenu = ({
   cmRef,
   projectTitle,
@@ -19,7 +21,6 @@ const ExportMenu = ({
   projectTitle: string;
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [saveToDriveOpen, setSaveToDriveOpen] = useState(false);
 
   return (
     <DropdownMenu
@@ -36,15 +37,10 @@ const ExportMenu = ({
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        align="end"
-        hidden={saveToDriveOpen}
-      >
+      <DropdownMenuContent align="end">
         <SaveToDriveDialog
           cmRef={cmRef}
           projectTitle={projectTitle}
-          open={saveToDriveOpen}
-          onOpenChange={setSaveToDriveOpen}
           setMenuOpen={setMenuOpen}
         >
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -56,13 +52,19 @@ const ExportMenu = ({
           </DropdownMenuItem>
         </SaveToDriveDialog>
 
-        <DropdownMenuItem>
-          <FileDown
-            className="mr-1.5"
-            size={16}
-          />{" "}
-          Download as Scallop (.scl) file
-        </DropdownMenuItem>
+        <DownloadFileDialog
+          cmRef={cmRef}
+          projectTitle={projectTitle}
+          setMenuOpen={setMenuOpen}
+        >
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <FileDown
+              className="mr-1.5"
+              size={16}
+            />{" "}
+            Download as file
+          </DropdownMenuItem>
+        </DownloadFileDialog>
       </DropdownMenuContent>
     </DropdownMenu>
   );

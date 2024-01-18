@@ -1,5 +1,5 @@
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import { FileDown } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { useState } from "react";
 import useDrivePicker from "react-google-drive-picker";
 import type { CallbackDoc } from "react-google-drive-picker/dist/typeDefs";
@@ -21,21 +21,18 @@ import { Label } from "~/components/ui/label";
 const SaveToDriveDialog = ({
   cmRef,
   projectTitle,
-  open,
-  onOpenChange,
   setMenuOpen,
   children,
 }: {
   cmRef: React.RefObject<ReactCodeMirrorRef>;
   projectTitle: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
   children: React.ReactNode;
 }) => {
   const [openPicker] = useDrivePicker();
   const [key, setKey] = useState<string | undefined>(undefined);
   const [filename, setFilename] = useState(projectTitle);
+  const [open, setOpen] = useState(false);
 
   // ONLY SAVES TO A FOLDER
   // Will work on saving to a file later
@@ -130,7 +127,12 @@ const SaveToDriveDialog = ({
   return (
     <Dialog
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={(open) => {
+        setOpen(open);
+        if (!open) {
+          setMenuOpen(false);
+        }
+      }}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
@@ -157,17 +159,17 @@ const SaveToDriveDialog = ({
           <Button
             disabled={filename.length === 0}
             onClick={() => {
-              onOpenChange(false);
-              setMenuOpen(false);
               download(cmRef.current!.view!.state.doc.toString(), filename);
+              setOpen(false);
+              setMenuOpen(false);
             }}
             className="transition-opacity"
           >
-            <FileDown
+            <ExternalLink
               className="mr-1.5"
               size={16}
             />{" "}
-            Save
+            Open picker
           </Button>
         </DialogFooter>
       </DialogContent>
