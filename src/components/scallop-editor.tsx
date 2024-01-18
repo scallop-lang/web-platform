@@ -1,5 +1,3 @@
-import { table } from "console";
-
 import { lintGutter } from "@codemirror/lint";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { inferRouterOutputs } from "@trpc/server";
@@ -31,10 +29,9 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ElementRef } from "react";
-import { useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
-import { set } from "zod";
 
 import { ImportFromDriveButton } from "~/components/import-from-drive";
 import { RelationTable } from "~/components/relation-table";
@@ -91,7 +88,7 @@ import { Switch } from "~/components/ui/switch";
 import { Textarea } from "~/components/ui/textarea";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
-import type { NodeTableProps, Table } from "~/utils/relation-button";
+import type { NodeTableProps, Table, TableCell } from "~/utils/relation-button";
 import {
   parseInputRelations,
   relationButtonPluginFactory,
@@ -211,10 +208,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     facts: [],
   });
 
-  const [tableData, setTableData] = useState<Record<string, string>[]>([]);
-  const [tableColumns, setTableColumns] = useState<
-    ColumnDef<Record<string, string>>[]
-  >([]);
+  const [tableData, setTableData] = useState<Record<string, TableCell>[]>([]);
 
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
@@ -295,8 +289,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   // don't constantly recalculate when 1) no new table is opened, or 2) the table is opened
   // but nothing has changed. there could be hundreds, thousands of rows
   const currTable = useMemo(() => {
-    const columns: ColumnDef<Record<string, string>>[] = [];
-    const data: Record<string, string>[] = [];
+    const columns: ColumnDef<Record<string, TableCell>>[] = [];
+    const data: Record<string, TableCell>[] = [];
 
     // if the relation has no facts, we return early
     if (!relationTable.facts[0]) {
@@ -306,21 +300,24 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     const numArgs = relationTable.facts[0].length;
     for (let i = 0; i < numArgs; i++) {
       const argN = `arg${i}`;
-      columns.push({ accessorKey: argN, header: argN });
+      columns.push({
+        accessorKey: argN,
+        header: argN,
+        accessorFn: (originalRow) => originalRow[argN]!.content,
+      });
     }
 
     relationTable.facts.forEach((row) => {
-      const fact: Record<string, string> = {};
+      const fact: Record<string, TableCell> = {};
 
       row.forEach((arg, idx) => {
-        fact[`arg${idx}`] = arg.content;
+        fact[`arg${idx}`] = arg;
       });
 
       data.push(fact);
     });
 
     setTableData(data);
-    setTableColumns(columns);
 
     return { columns, data };
   }, [relationTable]);
@@ -351,8 +348,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     const numArgs = relationTable.facts[0].length;
 
     // help
-    let from = relationTable.facts[0][0]?.from - 1;
-    const to = relationTable.facts[numFacts - 1][numArgs - 1]?.to;
+    let from = relationTable.facts[0][0]!.from - 1;
+    const to = relationTable.facts[numFacts - 1]![numArgs - 1]!.to;
 
     const newProgram = tableData
       .map((row, index) => {
@@ -745,7 +742,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 ) : (
                   <>
                     {filteredRelations.map(({ relationNode, table }) => (
-                      <>
+                      <Fragment key={table.name}>
                         <Card
                           key={table.name}
                           className="w-full"
@@ -809,7 +806,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             </Button>
                           </CardFooter>
                         </Card>
-                      </>
+                      </Fragment>
                     ))}
                   </>
                 )}

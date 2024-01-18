@@ -4,24 +4,24 @@ import {
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import {
   Table,
   TableBody,
-  TableCell,
+  TableCell as TableCellComp,
   TableHead,
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
 
-interface RelationTableProps<TData, TValue> {
+interface RelationTableProps<TData, TValue = unknown> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  setTableData: (data: TData[]) => void;
+  setTableData: React.Dispatch<React.SetStateAction<TData[]>>;
 }
 
-const RelationTable = <TData, TValue>({
+const RelationTable = <TData, TValue = unknown>({
   columns,
   data,
   setTableData,
@@ -31,34 +31,33 @@ const RelationTable = <TData, TValue>({
   // -editor.tsx. Once you're done making all your changes, you click the "Confirm" button which
   // updates the program.
 
-  const defaultColumn: Partial<ColumnDef<TData, unknown>> = {
-    cell: ({ getValue, row: { index }, column: { id }, table }) => {
-      const initialValue = getValue();
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const [value, setValue] = useState(initialValue);
-
-      return (
-        <input
-          value={value as string}
-          onChange={(e) => {
-            setValue(e.target.value);
-
-            const newData = data;
-            if (newData && newData[index]) {
-              // magic
-              (newData[index] as Record<string, unknown>)[id] = e.target.value;
-              setTableData(newData);
-            }
-          }}
-        ></input>
-      );
-    },
-  };
-
-  const table = useReactTable({
-    data,
+  const table = useReactTable<TData>({
     columns,
-    defaultColumn,
+    data,
+    defaultColumn: {
+      cell: ({ getValue, row: { index }, column: { id } }) => {
+        const initialValue = getValue();
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [value, setValue] = useState(initialValue);
+
+        return (
+          <input
+            value={value as string}
+            onChange={(e) => {
+              setValue(e.target.value);
+
+              const newData = data;
+              if (newData?.[index]) {
+                // magic
+                (newData[index] as Record<string, unknown>)[id] =
+                  e.target.value;
+                setTableData(newData);
+              }
+            }}
+          />
+        );
+      },
+    },
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -93,20 +92,20 @@ const RelationTable = <TData, TValue>({
               data-state={row.getIsSelected() && "selected"}
             >
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCellComp key={cell.id}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
+                </TableCellComp>
               ))}
             </TableRow>
           ))
         ) : (
           <TableRow>
-            <TableCell
+            <TableCellComp
               colSpan={columns.length}
               className="text-center"
             >
               No facts have been defined for this relation.
-            </TableCell>
+            </TableCellComp>
           </TableRow>
         )}
       </TableBody>
