@@ -102,6 +102,7 @@ const DestructiveAlertDialog = ({
                     insert: "",
                   },
                 });
+                toast.success("Editor successfully reset.");
               }
             }}
           >

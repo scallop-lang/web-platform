@@ -11,14 +11,11 @@ import {
 import {
   ArrowUpRight,
   Check,
-  ChevronDown,
-  FileDown,
   Loader,
   Pencil,
   Play,
   Save,
   Table as TableIcon,
-  UploadCloud,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -29,7 +26,6 @@ import { toast } from "sonner";
 
 import { ImportFromDriveButton } from "~/components/import-from-drive";
 import { RelationTable } from "~/components/relation-table";
-import { SaveToDriveDialogContent } from "~/components/save-to-drive";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -49,12 +45,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import {
@@ -72,6 +62,7 @@ import {
   relationButtonPluginFactory,
 } from "~/utils/relation-button";
 
+import { ExportMenu } from "./editor/export-menu";
 import { MoreOptionsMenu } from "./editor/more-options-menu";
 import type { RuntimeProps } from "./editor/runtime-settings";
 import { RuntimeSettings } from "./editor/runtime-settings";
@@ -361,40 +352,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
             />
           ) : null}
 
-          <Dialog>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  Export...{" "}
-                  <ChevronDown
-                    className="ml-1.5"
-                    size={15}
-                  />
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end">
-                <DialogTrigger asChild>
-                  <DropdownMenuItem>
-                    <UploadCloud
-                      className="mr-1.5"
-                      size={16}
-                    />{" "}
-                    Save to Google Drive
-                  </DropdownMenuItem>
-                </DialogTrigger>
-
-                <DropdownMenuItem>
-                  <FileDown
-                    className="mr-1.5"
-                    size={16}
-                  />{" "}
-                  Download as Scallop (.scl) file
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <SaveToDriveDialogContent cmRef={cmRef} />
-          </Dialog>
+          <ExportMenu
+            cmRef={cmRef}
+            projectTitle={title}
+          />
 
           <MoreOptionsMenu
             editor={editor}
