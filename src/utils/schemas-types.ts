@@ -16,6 +16,7 @@ const FactSchema = z.object({
   tag: z.number(),
   tuple: z.coerce.string().array(),
 });
+type Fact = z.infer<typeof FactSchema>
 
 const SclRelationRecordSchema = z.record(z.string(), FactSchema.array());
 
@@ -34,3 +35,5 @@ export {
   SclRelationRecordSchema,
   UpdateProjectSchema,
 };
+
+export type { Fact };
