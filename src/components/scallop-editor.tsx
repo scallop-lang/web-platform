@@ -259,13 +259,16 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         ? project.description
         : "",
   );
-  const [inputs, setInputs] = useState<NodeTableProps[]>([]);
   const [runtime, setRuntime] = useState<RuntimeProps>({
     provenance: "topkproofs",
     k: 3,
   });
 
+  const [inputs, setInputs] = useState<NodeTableProps[]>([]);
+  const [outputs, setOutputs] = useState<NodeTableProps[]>([]);
+
   const [searchResult, setSearchResult] = useState("");
+
   const [tableOpen, setTableOpen] = useState(false);
   const [relationTable, setRelationTable] = useState<Table>({
     name: "",
@@ -366,7 +369,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       (description.length > 0 ? description : "No description provided");
   }
 
-  const filteredRelations = inputs.filter(({ table }) =>
+  const filteredInputs = inputs.filter(({ table }) =>
     table.name.includes(searchResult),
   );
 
@@ -584,7 +587,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               <div className="h-full overflow-y-auto ">
                 <TabsContent
                   value="inputs"
-                  className="flex h-full flex-col items-center gap-2.5 p-2.5"
+                  className="flex flex-col items-center gap-2.5 data-[state=active]:h-full data-[state=active]:p-2.5"
                 >
                   {inputs.length === 0 ? (
                     <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-sm text-muted-foreground">
@@ -619,11 +622,11 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                       >
                         {searchResult === ""
                           ? `${inputs.length} input relations`
-                          : `${filteredRelations.length} results`}
+                          : `${filteredInputs.length} results`}
                       </Badge>
 
                       <RelationCardList
-                        relationList={filteredRelations}
+                        relationList={filteredInputs}
                         cmRef={cmRef}
                         panelGroupRef={panelGroupRef}
                         setRelationTable={setRelationTable}
@@ -635,9 +638,30 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
                 <TabsContent
                   value="outputs"
-                  className="bg-red-100"
+                  className="flex flex-col items-center justify-center data-[state=active]:h-full data-[state=active]:p-2.5"
                 >
-                  penis
+                  {outputs.length === 0 ? (
+                    <div className="text-center text-sm text-muted-foreground">
+                      <p className="font-mono font-semibold">
+                        No output relations
+                      </p>
+                      <p className="max-w-[320px] text-pretty">
+                        Any output relations from running your program will be
+                        displayed here.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <Badge
+                        variant="outline"
+                        className="font-mono"
+                      >
+                        {searchResult === ""
+                          ? `${outputs.length} output relations`
+                          : `${filteredInputs.length} results`}
+                      </Badge>
+                    </>
+                  )}
                 </TabsContent>
               </div>
             </Tabs>
