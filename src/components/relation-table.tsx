@@ -4,6 +4,8 @@ import {
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
+import Image from "next/image";
+import { z } from "zod";
 
 import {
   Table,
@@ -59,11 +61,29 @@ const RelationTable = <TData, TValue>({
               key={row.id}
               data-state={row.getIsSelected() && "selected"}
             >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
+              {row.getVisibleCells().map((cell) => {
+                const cellValue = cell.getValue();
+                const parsed = z.coerce.string().url().safeParse(cellValue);
+
+                return (
+                  <TableCell key={cell.id}>
+                    {flexRender(
+                      parsed.success ? (
+                        <Image
+                          src={parsed.data}
+                          alt={`Image located at ${parsed.data}`}
+                          width={1920}
+                          height={1080}
+                          style={{ height: "auto" }}
+                        />
+                      ) : (
+                        cell.column.columnDef.cell
+                      ),
+                      cell.getContext(),
+                    )}
+                  </TableCell>
+                );
+              })}
             </TableRow>
           ))
         ) : (

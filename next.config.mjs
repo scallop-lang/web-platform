@@ -9,6 +9,16 @@ const config = {
   reactStrictMode: true,
   trailingSlash: false,
 
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.imgur.com",
+        pathname: "/*",
+      },
+    ],
+  },
+
   // eslint-disable-next-line @typescript-eslint/require-await
   redirects: async () => {
     return [

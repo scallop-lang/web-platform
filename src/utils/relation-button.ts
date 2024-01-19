@@ -17,7 +17,7 @@ type Table = {
   facts: TableCell[][];
 };
 
-type NodeTableProps = {
+type ParsedInputProps = {
   relationNode: SyntaxNodeRef;
   table: Table;
 };
@@ -54,7 +54,7 @@ class RelationWidget extends WidgetType {
 }
 
 function parseInputRelations(state: EditorState) {
-  const nodeTableArr: NodeTableProps[] = [];
+  const nodeTableArr: ParsedInputProps[] = [];
 
   syntaxTree(state).iterate({
     enter: (node) => {
@@ -173,6 +173,7 @@ function relationButtonPluginFactory(
 export {
   parseInputRelations,
   relationButtonPluginFactory,
-  type NodeTableProps,
+  type ParsedInputProps,
   type Table,
+  type TableCell,
 };
