@@ -18,6 +18,7 @@ import {
   Table as TableIcon,
   X,
 } from "lucide-react";
+import Head from "next/head";
 import Link from "next/link";
 import type { ElementRef } from "react";
 import { useMemo, useRef, useState } from "react";
@@ -284,6 +285,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
   return (
     <>
+      <Head>
+        <title>{`${title} — Scallop`}</title>
+      </Head>
+
       <div className="grid grid-cols-1 gap-2.5 border-b-[1.5px] border-border p-4 md:grid-cols-2">
         <div className="col-span-1">
           <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight">
@@ -596,3 +601,4 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 };
 
 export { ScallopEditor, type ScallopEditorProps };
+
