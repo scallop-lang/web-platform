@@ -179,4 +179,5 @@ export {
   relationButtonPluginFactory,
   type NodeTableProps,
   type Table,
+  type TableCell,
 };

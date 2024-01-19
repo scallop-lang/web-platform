@@ -28,7 +28,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ElementRef } from "react";
-import { useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
 
@@ -87,7 +87,7 @@ import { Switch } from "~/components/ui/switch";
 import { Textarea } from "~/components/ui/textarea";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
-import type { NodeTableProps, Table } from "~/utils/relation-button";
+import type { NodeTableProps, Table, TableCell } from "~/utils/relation-button";
 import {
   parseInputRelations,
   relationButtonPluginFactory,
@@ -214,6 +214,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     facts: [],
   });
 
+  const [tableData, setTableData] = useState<Record<string, TableCell>[]>([]);
+
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
       console.log(data);
@@ -247,12 +249,22 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         toast.error(`Project failed to delete! Reason: ${error.message}`),
     });
 
-  function replaceEditorContent(newProgram: string) {
+  function ImportEditorContent(newProgram: string) {
+    if (cmRef.current?.view) {
+      replaceEditorContent(
+        newProgram,
+        0,
+        cmRef.current.view?.state.doc.toString().length,
+      );
+    }
+  }
+
+  function replaceEditorContent(newProgram: string, f: number, t: number) {
     if (cmRef.current) {
       cmRef.current.view?.dispatch({
         changes: {
-          from: 0,
-          to: cmRef.current.view?.state.doc.toString().length,
+          from: f,
+          to: t,
           insert: newProgram,
         },
       });
@@ -283,8 +295,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   // don't constantly recalculate when 1) no new table is opened, or 2) the table is opened
   // but nothing has changed. there could be hundreds, thousands of rows
   const currTable = useMemo(() => {
-    const columns: ColumnDef<Record<string, string>>[] = [];
-    const data: Record<string, string>[] = [];
+    const columns: ColumnDef<Record<string, TableCell>>[] = [];
+    const data: Record<string, TableCell>[] = [];
 
     // if the relation has no facts, we return early
     if (!relationTable.facts[0]) {
@@ -294,18 +306,24 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     const numArgs = relationTable.facts[0].length;
     for (let i = 0; i < numArgs; i++) {
       const argN = `arg${i}`;
-      columns.push({ accessorKey: argN, header: argN });
+      columns.push({
+        accessorKey: argN,
+        header: argN,
+        accessorFn: (originalRow) => originalRow[argN]!.content,
+      });
     }
 
     relationTable.facts.forEach((row) => {
-      const fact: Record<string, string> = {};
+      const fact: Record<string, TableCell> = {};
 
       row.forEach((arg, idx) => {
-        fact[`arg${idx}`] = arg.content;
+        fact[`arg${idx}`] = arg;
       });
 
       data.push(fact);
     });
+
+    setTableData(data);
 
     return { columns, data };
   }, [relationTable]);
@@ -326,6 +344,39 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   const filteredRelations = inputs.filter(({ table }) =>
     table.name.includes(searchResult),
   );
+
+  const updateProgram = () => {
+    // is empty table
+    if (!relationTable.facts[0]) {
+      return;
+    }
+    const numFacts = relationTable.facts.length;
+    const numArgs = relationTable.facts[0].length;
+
+    // help
+    let from = relationTable.facts[0][0]!.from - 1;
+    const to = relationTable.facts[numFacts - 1]![numArgs - 1]!.to;
+
+    const newProgram = tableData
+      .map((row, index) => {
+        let rowValues = Object.values(row).join(", ");
+        if (tableData.length === 1) {
+          from++;
+          return `${rowValues}`;
+        }
+        // add paranthesis but indent if not first row
+        rowValues = index === 0 ? `(${rowValues}` : `  (${rowValues}`;
+        // add closing paranthesis + comma if not last row
+        rowValues =
+          index !== tableData.length - 1 ? `${rowValues}),` : `${rowValues}`;
+        return rowValues;
+      })
+      .join("\n");
+
+    if (from && to) {
+      replaceEditorContent(newProgram, from, to);
+    }
+  };
 
   return (
     <>
@@ -392,9 +443,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
           ) : null}
 
           {type === "playground" || editor.isAuthor ? (
-            <ImportFromDriveButton
-              changeEditorFunction={replaceEditorContent}
-            />
+            <ImportFromDriveButton changeEditorFunction={ImportEditorContent} />
           ) : null}
 
           <Dialog>
@@ -611,6 +660,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 <Button
                   onClick={() => {
                     setTableOpen(false);
+                    updateProgram();
                     panelGroupRef.current!.setLayout([75, 25]);
                   }}
                 >
@@ -645,6 +695,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 <RelationTable
                   columns={currTable.columns}
                   data={currTable.data}
+                  setTableData={setTableData}
                 />
               </div>
             </>
@@ -695,7 +746,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 ) : (
                   <>
                     {filteredRelations.map(({ relationNode, table }) => (
-                      <>
+                      <Fragment key={table.name}>
                         <Card
                           key={table.name}
                           className="w-full"
@@ -759,7 +810,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             </Button>
                           </CardFooter>
                         </Card>
-                      </>
+                      </Fragment>
                     ))}
                   </>
                 )}
