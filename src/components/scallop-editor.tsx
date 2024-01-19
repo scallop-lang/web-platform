@@ -286,7 +286,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   return (
     <>
       <Head>
-        <title>{title} — Scallop</title>
+        <title>{`${title} — Scallop`}</title>
       </Head>
 
       <div className="grid grid-cols-1 gap-2.5 border-b-[1.5px] border-border p-4 md:grid-cols-2">
@@ -601,3 +601,4 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 };
 
 export { ScallopEditor, type ScallopEditorProps };
+
