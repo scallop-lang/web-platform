@@ -73,7 +73,7 @@ function parseInputRelations(state: EditorState) {
           const tuple: string[] = [];
           const tagged = fact.getChild("Tagged");
           let tupleNode = fact.getChild("ConstTuple");
-          let tag = 1;
+          let tag = undefined;
 
           if (tagged) {
             const tagNode = tagged.getChild("Tag");
@@ -103,7 +103,7 @@ function parseInputRelations(state: EditorState) {
 
         nodeTableArr.push({
           relationNode: relationIdNode,
-          table: { name, from: node.from, to: node.to, facts },
+          table: { name, from: factSetNode.from, to: factSetNode.to, facts },
         });
       }
     },

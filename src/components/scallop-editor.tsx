@@ -87,7 +87,7 @@ import { Switch } from "~/components/ui/switch";
 import { Textarea } from "~/components/ui/textarea";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
-import type { NodeTableProps, Table, TableCell } from "~/utils/relation-button";
+import type { NodeTableProps, Table } from "~/utils/relation-button";
 import {
   parseInputRelations,
   relationButtonPluginFactory,
@@ -211,10 +211,12 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   const [tableOpen, setTableOpen] = useState(false);
   const [relationTable, setRelationTable] = useState<Table>({
     name: "",
+    from: 0,
+    to: 0,
     facts: [],
   });
 
-  const [tableData, setTableData] = useState<Record<string, TableCell>[]>([]);
+  const [tableData, setTableData] = useState<Record<string, string>[]>([]);
 
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
@@ -295,28 +297,37 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   // don't constantly recalculate when 1) no new table is opened, or 2) the table is opened
   // but nothing has changed. there could be hundreds, thousands of rows
   const currTable = useMemo(() => {
-    const columns: ColumnDef<Record<string, TableCell>>[] = [];
-    const data: Record<string, TableCell>[] = [];
+    const columns: ColumnDef<Record<string, string>>[] = [];
+    const data: Record<string, string>[] = [];
 
     // if the relation has no facts, we return early
     if (!relationTable.facts[0]) {
       return { columns, data };
     }
 
-    const numArgs = relationTable.facts[0].length;
+    const numArgs = relationTable.facts[0].tuple.length;
+    // add the tag column
+    columns.push({
+      accessorKey: `tag`,
+      header: 'tag',
+      accessorFn: (originalRow) => originalRow.tag,
+    });
+    // add the arg columns
     for (let i = 0; i < numArgs; i++) {
       const argN = `arg${i}`;
       columns.push({
         accessorKey: argN,
         header: argN,
-        accessorFn: (originalRow) => originalRow[argN]!.content,
+        accessorFn: (originalRow) => originalRow[argN],
       });
     }
 
     relationTable.facts.forEach((row) => {
-      const fact: Record<string, TableCell> = {};
+      const fact: Record<string, string> = {};
+      
+      fact.tag = row.tag ? String(row.tag) : "";
 
-      row.forEach((arg, idx) => {
+      row.tuple.forEach((arg, idx) => {
         fact[`arg${idx}`] = arg;
       });
 
@@ -350,32 +361,20 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     if (!relationTable.facts[0]) {
       return;
     }
-    const numFacts = relationTable.facts.length;
-    const numArgs = relationTable.facts[0].length;
 
-    // help
-    let from = relationTable.facts[0][0]!.from - 1;
-    const to = relationTable.facts[numFacts - 1]![numArgs - 1]!.to;
+    let newProgram = tableData
+      .map((row) => {
+        const rowValues = Object.entries(row).filter(([key]) => key !== "tag").map(([_, value]) => value);
+        let rowString = rowValues.join(", ");
+        rowString = row.tag ? `  ${row.tag}::(${rowString}),` : `  (${rowString}),`;
+        return rowString;
+      }).join("\n");
 
-    const newProgram = tableData
-      .map((row, index) => {
-        let rowValues = Object.values(row).join(", ");
-        if (tableData.length === 1) {
-          from++;
-          return `${rowValues}`;
-        }
-        // add paranthesis but indent if not first row
-        rowValues = index === 0 ? `(${rowValues}` : `  (${rowValues}`;
-        // add closing paranthesis + comma if not last row
-        rowValues =
-          index !== tableData.length - 1 ? `${rowValues}),` : `${rowValues}`;
-        return rowValues;
-      })
-      .join("\n");
+    console.log(newProgram);
 
-    if (from && to) {
-      replaceEditorContent(newProgram, from, to);
-    }
+    newProgram = `{\n${newProgram}\n}`
+  
+    replaceEditorContent(newProgram, relationTable.from, relationTable.to);
   };
 
   return (
@@ -775,15 +774,14 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             </CardTitle>
                             <CardDescription>
                               {table.facts[0]
-                                ? `${table.facts[0].length}-tuple facts`
+                                ? `${table.facts[0].tuple.length}-tuple facts`
                                 : "Empty relation"}
                             </CardDescription>
                           </CardHeader>
                           <CardContent className="font-mono text-sm">
                             <p className="truncate">
                               {table.facts[0]
-                                ? `(${table.facts[0]
-                                    .map(({ content }) => content)
+                                ? `(${table.facts[0].tuple
                                     .join(", ")})`
                                 : "<no facts defined>"}
                             </p>
