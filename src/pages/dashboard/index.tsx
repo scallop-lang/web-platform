@@ -1,5 +1,6 @@
 import { Loader, LogIn, Plus } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
 import { toast } from "sonner";
@@ -29,13 +30,19 @@ const Dashboard = () => {
 
   if (status === "loading") {
     return (
-      <main className="h-[calc(100vh-53px)] bg-background p-4">
-        <Skeleton className="flex h-full w-full items-center justify-center rounded-xl">
-          <p className="text-sm text-muted-foreground">
-            Signing into dashboard...
-          </p>
-        </Skeleton>
-      </main>
+      <>
+        <Head>
+          <title>Dashboard — Scallop</title>
+        </Head>
+
+        <main className="h-[calc(100vh-53px)] bg-background p-4">
+          <Skeleton className="flex h-full w-full items-center justify-center rounded-xl">
+            <p className="text-sm text-muted-foreground">
+              Signing into dashboard...
+            </p>
+          </Skeleton>
+        </main>
+      </>
     );
   }
 
@@ -89,27 +96,39 @@ const Dashboard = () => {
     );
 
     return (
-      <main className="flex min-h-screen flex-col space-y-3 bg-background p-4">
-        <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-          Welcome back, {first ? first : name}.
-        </h2>
-        <div className="flex flex-wrap gap-4">
-          <button onClick={() => mutate()}>{createProjectButton}</button>
-          {projectsList}
-        </div>
-      </main>
+      <>
+        <Head>
+          <title>Dashboard — Scallop</title>
+        </Head>
+
+        <main className="flex min-h-screen flex-col space-y-3 bg-background p-4">
+          <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+            Welcome back, {first ? first : name}.
+          </h2>
+          <div className="flex flex-wrap gap-4">
+            <button onClick={() => mutate()}>{createProjectButton}</button>
+            {projectsList}
+          </div>
+        </main>
+      </>
     );
   }
 
   return (
-    <main className="flex h-[calc(100vh-53px)] flex-col items-center justify-center space-y-5 bg-background">
-      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-        Please sign in to view your dashboard.
-      </h3>
-      <Button onClick={() => signIn()}>
-        <LogIn className="mr-2 h-4 w-4" /> Sign in
-      </Button>
-    </main>
+    <>
+      <Head>
+        <title>Dashboard — Scallop</title>
+      </Head>
+
+      <main className="flex h-[calc(100vh-53px)] flex-col items-center justify-center space-y-5 bg-background">
+        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+          Please sign in to view your dashboard.
+        </h3>
+        <Button onClick={() => signIn()}>
+          <LogIn className="mr-2 h-4 w-4" /> Sign in
+        </Button>
+      </main>
+    </>
   );
 };
 
