@@ -27,7 +27,6 @@ import { toast } from "sonner";
 
 import { ImportFromDriveButton } from "~/components/import-from-drive";
 import { RelationTable } from "~/components/relation-table";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -54,6 +53,7 @@ import {
   ResizablePanelGroup,
 } from "~/components/ui/resizable";
 import { Switch } from "~/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Textarea } from "~/components/ui/textarea";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
@@ -67,6 +67,7 @@ import { ExportMenu } from "./editor/export-menu";
 import { MoreOptionsMenu } from "./editor/more-options-menu";
 import type { RuntimeProps } from "./editor/runtime-settings";
 import { RuntimeSettings } from "./editor/runtime-settings";
+import { Badge } from "./ui/badge";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
@@ -150,6 +151,92 @@ const EditDetailsButton = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const RelationCardList = ({
+  relationList,
+  cmRef,
+  panelGroupRef,
+  setRelationTable,
+  setTableOpen,
+}: {
+  relationList: NodeTableProps[];
+  cmRef: React.RefObject<ReactCodeMirrorRef>;
+  panelGroupRef: React.RefObject<ImperativePanelGroupHandle>;
+  setRelationTable: React.Dispatch<React.SetStateAction<Table>>;
+  setTableOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  return (
+    <>
+      {relationList.map(({ relationNode, table }) => (
+        <>
+          <Card
+            key={table.name}
+            className="w-full"
+          >
+            <CardHeader>
+              <CardTitle className="flex justify-between font-mono font-bold">
+                <p className="w-1/2 truncate">{table.name}</p>{" "}
+                <Button
+                  size="none"
+                  variant="link"
+                  onClick={() =>
+                    cmRef.current!.view?.dispatch({
+                      effects: EditorView.scrollIntoView(
+                        relationNode.node.from,
+                        { y: "start" },
+                      ),
+                    })
+                  }
+                >
+                  Jump to line
+                  <ArrowUpRight
+                    size={16}
+                    className="ml-0.5"
+                  />
+                </Button>
+              </CardTitle>
+              <CardDescription>
+                {table.facts[0]
+                  ? `${table.facts[0].length}-tuple facts`
+                  : "Empty relation"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="font-mono text-sm">
+              <p className="truncate">
+                {table.facts[0]
+                  ? `(${table.facts[0]
+                      .map(({ content }) => content)
+                      .join(", ")})`
+                  : "<no facts defined>"}
+              </p>
+              {table.facts[1] ? (
+                <p className="text-muted-foreground">
+                  ...and {table.facts.length - 1} more row(s)
+                </p>
+              ) : null}
+            </CardContent>
+            <CardFooter>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setRelationTable(table);
+                  setTableOpen(true);
+                  panelGroupRef.current!.setLayout([30, 70]);
+                }}
+              >
+                <TableIcon
+                  className="mr-1.5"
+                  size={16}
+                />{" "}
+                Open visual editor
+              </Button>
+            </CardFooter>
+          </Card>
+        </>
+      ))}
+    </>
   );
 };
 
@@ -477,122 +564,83 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               </div>
             </>
           ) : (
-            <>
+            <Tabs
+              defaultValue="inputs"
+              className="h-[calc(100%-68px)]"
+            >
               <div className="flex justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
-                <Badge
-                  variant="secondary"
-                  className="font-mono"
-                >
-                  {searchResult === ""
-                    ? `${inputs.length} total`
-                    : `${filteredRelations.length} results`}
-                </Badge>
+                <TabsList className="grid h-9 w-1/2 max-w-48 grid-cols-2">
+                  <TabsTrigger value="inputs">Inputs</TabsTrigger>
+                  <TabsTrigger value="outputs">Outputs</TabsTrigger>
+                </TabsList>
 
                 <Input
-                  className="w-1/2 min-w-64"
+                  className="w-1/2"
                   placeholder="Search..."
                   onChange={(e) => setSearchResult(e.target.value)}
                 />
               </div>
 
-              <div className="flex h-[calc(100%-58px)] flex-col items-center gap-2.5 overflow-y-auto p-2.5">
-                {inputs.length === 0 ? (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-sm text-muted-foreground">
-                    <div>
-                      <p className="font-mono font-semibold">
-                        No relations defined
-                      </p>
-                      <p className="max-w-[320px] ">
-                        Create a new relation by writing one in the editor. They
-                        will automatically appear here.
-                      </p>
-                    </div>
-                    <Link
-                      href="https://www.scallop-lang.org/doc/language/relation.html"
-                      target="_blank"
-                    >
-                      <Button
-                        role="link"
-                        variant="secondary"
-                        className="text-muted-foreground"
+              <div className="h-full overflow-y-auto ">
+                <TabsContent
+                  value="inputs"
+                  className="flex h-full flex-col items-center gap-2.5 p-2.5"
+                >
+                  {inputs.length === 0 ? (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-sm text-muted-foreground">
+                      <div>
+                        <p className="font-mono font-semibold">
+                          No input relations defined
+                        </p>
+                        <p className="max-w-[320px] ">
+                          Create a new input relation by writing one in the
+                          editor. They will automatically appear here.
+                        </p>
+                      </div>
+
+                      <Link
+                        href="https://www.scallop-lang.org/doc/language/relation.html"
+                        target="_blank"
                       >
-                        Documentation
-                      </Button>
-                    </Link>
-                  </div>
-                ) : (
-                  <>
-                    {filteredRelations.map(({ relationNode, table }) => (
-                      <>
-                        <Card
-                          key={table.name}
-                          className="w-full"
+                        <Button
+                          role="link"
+                          variant="secondary"
+                          className="text-muted-foreground"
                         >
-                          <CardHeader>
-                            <CardTitle className="flex justify-between font-mono font-bold">
-                              <p className="w-1/2 truncate">{table.name}</p>{" "}
-                              <Button
-                                size="none"
-                                variant="link"
-                                onClick={() =>
-                                  cmRef.current!.view?.dispatch({
-                                    effects: EditorView.scrollIntoView(
-                                      relationNode.node.from,
-                                      { y: "start" },
-                                    ),
-                                  })
-                                }
-                              >
-                                Jump to line
-                                <ArrowUpRight
-                                  size={16}
-                                  className="ml-0.5"
-                                />
-                              </Button>
-                            </CardTitle>
-                            <CardDescription>
-                              {table.facts[0]
-                                ? `${table.facts[0].length}-tuple facts`
-                                : "Empty relation"}
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent className="font-mono text-sm">
-                            <p className="truncate">
-                              {table.facts[0]
-                                ? `(${table.facts[0]
-                                    .map(({ content }) => content)
-                                    .join(", ")})`
-                                : "<no facts defined>"}
-                            </p>
-                            {table.facts[1] ? (
-                              <p className="text-muted-foreground">
-                                ...and {table.facts.length - 1} more row(s)
-                              </p>
-                            ) : null}
-                          </CardContent>
-                          <CardFooter>
-                            <Button
-                              variant="secondary"
-                              onClick={() => {
-                                setRelationTable(table);
-                                setTableOpen(true);
-                                panelGroupRef.current!.setLayout([30, 70]);
-                              }}
-                            >
-                              <TableIcon
-                                className="mr-1.5"
-                                size={16}
-                              />{" "}
-                              Open visual editor
-                            </Button>
-                          </CardFooter>
-                        </Card>
-                      </>
-                    ))}
-                  </>
-                )}
+                          Documentation
+                        </Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <>
+                      <Badge
+                        variant="outline"
+                        className="font-mono"
+                      >
+                        {searchResult === ""
+                          ? `${inputs.length} input relations`
+                          : `${filteredRelations.length} results`}
+                      </Badge>
+
+                      <RelationCardList
+                        relationList={filteredRelations}
+                        cmRef={cmRef}
+                        panelGroupRef={panelGroupRef}
+                        setRelationTable={setRelationTable}
+                        setTableOpen={setTableOpen}
+                      />
+                    </>
+                  )}
+                </TabsContent>
+
+                <TabsContent
+                  value="outputs"
+                  className="bg-red-100"
+                >
+                  penis
+                </TabsContent>
               </div>
-            </>
+            </Tabs>
           )}
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -601,4 +649,3 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 };
 
 export { ScallopEditor, type ScallopEditorProps };
-
