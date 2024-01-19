@@ -11,22 +11,14 @@ import {
 import {
   ArrowUpRight,
   Check,
-  ChevronDown,
-  Columns2,
-  FileDown,
   Loader,
-  MoreHorizontal,
-  PanelLeft,
-  PanelRight,
   Pencil,
   Play,
   Save,
   Table as TableIcon,
-  UploadCloud,
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import type { ElementRef } from "react";
 import { useMemo, useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
@@ -34,18 +26,6 @@ import { toast } from "sonner";
 
 import { ImportFromDriveButton } from "~/components/import-from-drive";
 import { RelationTable } from "~/components/relation-table";
-import { SaveToDriveDialogContent } from "~/components/save-to-drive";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "~/components/ui/alert-dialog";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -65,17 +45,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import {
@@ -93,6 +62,8 @@ import {
   relationButtonPluginFactory,
 } from "~/utils/relation-button";
 
+import { ExportMenu } from "./editor/export-menu";
+import { MoreOptionsMenu } from "./editor/more-options-menu";
 import type { RuntimeProps } from "./editor/runtime-settings";
 import { RuntimeSettings } from "./editor/runtime-settings";
 
@@ -184,7 +155,6 @@ const EditDetailsButton = ({
 const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   const { type, project } = editor;
 
-  const router = useRouter();
   const panelGroupRef = useRef<ImperativePanelGroupHandle>(null);
   const cmRef = useRef<ReactCodeMirrorRef>(null);
 
@@ -231,20 +201,6 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       onSuccess: () => toast.success("Project successfully saved!"),
       onError: (error) =>
         toast.error(`Project failed to save! Reason: ${error.message}`),
-    });
-
-  const { mutate: deleteProject, isLoading: projectIsDeleting } =
-    api.project.deleteProjectById.useMutation({
-      onSuccess: async ({ title }) => {
-        toast.success(
-          <p>
-            Project <b>{title}</b> successfully deleted!
-          </p>,
-        );
-        await router.push("/dashboard");
-      },
-      onError: (error) =>
-        toast.error(`Project failed to delete! Reason: ${error.message}`),
     });
 
   function replaceEditorContent(newProgram: string) {
@@ -322,7 +278,6 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       (description.length > 0 ? description : "No description provided");
   }
 
-  const isProjectAuthor = type === "project" && editor.isAuthor;
   const filteredRelations = inputs.filter(({ table }) =>
     table.name.includes(searchResult),
   );
@@ -397,149 +352,17 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
             />
           ) : null}
 
-          <Dialog>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  Export...{" "}
-                  <ChevronDown
-                    className="ml-1.5"
-                    size={15}
-                  />
-                </Button>
-              </DropdownMenuTrigger>
+          <ExportMenu
+            cmRef={cmRef}
+            projectTitle={title}
+          />
 
-              <DropdownMenuContent align="end">
-                <DialogTrigger asChild>
-                  <DropdownMenuItem>
-                    <UploadCloud
-                      className="mr-1.5"
-                      size={16}
-                    />{" "}
-                    Save to Google Drive
-                  </DropdownMenuItem>
-                </DialogTrigger>
-
-                <DropdownMenuItem>
-                  <FileDown
-                    className="mr-1.5"
-                    size={16}
-                  />{" "}
-                  Download as Scallop (.scl) file
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <SaveToDriveDialogContent cmRef={cmRef} />
-          </Dialog>
-
-          <AlertDialog>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  <span className="sr-only">More options</span>
-                  <MoreHorizontal size={18} />
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end">
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Layout...</DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          panelGroupRef.current?.setLayout([25, 75])
-                        }
-                      >
-                        <PanelLeft
-                          className="mr-1.5"
-                          size={16}
-                        />{" "}
-                        25%—75%
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem
-                        onClick={() =>
-                          panelGroupRef.current?.setLayout([50, 50])
-                        }
-                      >
-                        <Columns2
-                          className="mr-1.5"
-                          size={16}
-                        />{" "}
-                        50%—50%
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem
-                        onClick={() =>
-                          panelGroupRef.current?.setLayout([75, 25])
-                        }
-                      >
-                        <PanelRight
-                          className="mr-1.5"
-                          size={16}
-                        />{" "}
-                        75%—25%
-                      </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-
-                {type === "project" && !isProjectAuthor ? null : (
-                  <>
-                    <DropdownMenuSeparator />
-
-                    <AlertDialogTrigger asChild>
-                      <DropdownMenuItem
-                        className="text-destructive"
-                        disabled={projectIsDeleting}
-                      >
-                        {isProjectAuthor ? <>Delete project</> : <>Reset</>}
-                      </DropdownMenuItem>
-                    </AlertDialogTrigger>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  {type === "playground"
-                    ? "Reset editor state?"
-                    : `Delete project?`}
-                </AlertDialogTitle>
-                <AlertDialogDescription>{`This action cannot be undone. This will completely ${
-                  type === "playground"
-                    ? "clean and reset the editor, just like a browser refresh."
-                    : `delete your project "${title}" and associated data.`
-                }`}</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
-                  onClick={
-                    type === "project" && editor.isAuthor
-                      ? () =>
-                          deleteProject({
-                            id: project.id,
-                          })
-                      : () =>
-                          cmRef.current!.view?.dispatch({
-                            changes: {
-                              from: 0,
-                              to: cmRef.current!.view.state.doc.toString()
-                                .length,
-                              insert: "",
-                            },
-                          })
-                  }
-                >
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <MoreOptionsMenu
+            editor={editor}
+            panelGroupRef={panelGroupRef}
+            cmRef={cmRef}
+            projectTitle={title}
+          />
         </div>
       </div>
 
@@ -772,4 +595,4 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   );
 };
 
-export { ScallopEditor };
+export { ScallopEditor, type ScallopEditorProps };
