@@ -43,6 +43,7 @@
     "@types/uuid": "^9.0.7",
     "@uiw/codemirror-themes": "^4.21.21",
     "@uiw/react-codemirror": "^4.21.21",
+    "@vercel/analytics": "^1.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "codemirror-lang-scallop": "^1.1.1",
