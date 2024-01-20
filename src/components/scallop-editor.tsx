@@ -14,6 +14,7 @@ import {
   ChevronDown,
   Columns2,
   FileDown,
+  ListX,
   Loader,
   MoreHorizontal,
   PanelLeft,
@@ -22,6 +23,7 @@ import {
   Play,
   Save,
   Table as TableIcon,
+  Tag,
   UploadCloud,
   X,
 } from "lucide-react";
@@ -95,6 +97,7 @@ import {
 
 import type { RuntimeProps } from "./editor/runtime-settings";
 import { RuntimeSettings } from "./editor/runtime-settings";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
@@ -309,8 +312,14 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
     // add the tag column
     columns.push({
+      id: "tag",
       accessorKey: "tag",
-      header: "tag",
+      header: () => (
+        <Tag
+          size={18}
+          className="stroke-muted-foreground"
+        />
+      ),
       accessorFn: (originalRow) => originalRow.tag,
     });
 
@@ -325,9 +334,29 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       });
     }
 
+    columns.push({
+      id: "deleteRow",
+      cell: ({ table, row }) => (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => table.options.meta?.removeRow(row.index)}
+            >
+              <span className="sr-only">Delete row</span>
+              <ListX size={16} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Delete row</p>
+          </TooltipContent>
+        </Tooltip>
+      ),
+    });
+
     relationTable.facts.forEach((row) => {
       const fact: Record<string, string> = {};
-
       fact.tag = row.tag;
 
       row.tuple.forEach((arg, idx) => {

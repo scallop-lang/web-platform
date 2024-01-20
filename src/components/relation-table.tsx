@@ -4,10 +4,11 @@ import {
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { ListPlus, X } from "lucide-react";
+import { ListPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import {
   Table,
   TableBody,
@@ -16,6 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+
+import { TooltipProvider } from "./ui/tooltip";
 
 interface RelationTableProps<TData, TValue = unknown> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,7 +49,7 @@ const RelationTable = <TData, TValue = unknown>({
         }, [initialValue]);
 
         return (
-          <input
+          <Input
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onBlur={() =>
@@ -60,13 +63,13 @@ const RelationTable = <TData, TValue = unknown>({
     getCoreRowModel: getCoreRowModel(),
 
     meta: {
-      updateData: (rowIndex: number, columnId: string, value: unknown) => {
+      updateData: (rowIndex: number, columnId: string, value: TData) => {
         // Skip page index reset until after next rerender
-        return setTableData((old) =>
-          old.map((row, index) => {
+        return setTableData((oldData) =>
+          oldData.map((row, index) => {
             if (index === rowIndex) {
               return {
-                ...old[rowIndex]!,
+                ...oldData[rowIndex]!,
                 [columnId]: value,
               };
             }
@@ -84,81 +87,76 @@ const RelationTable = <TData, TValue = unknown>({
           newRow[key] = "";
         });
 
-        const newData = [...data, newRow as unknown as TData];
+        const newData = [...data, newRow as TData];
 
         setTableData(newData);
       },
 
       removeRow: (rowIndex: number) => {
-        const newData = (old: TData[]) =>
+        const newTableDataFilter = (old: TData[]) =>
           old.filter((_, index: number) => index !== rowIndex);
 
-        setTableData(newData);
+        setTableData(newTableDataFilter);
       },
     },
   });
 
   return (
     <>
-      <Table className="border-b-[1.5px] border-border">
-        <TableHeader className="sticky top-0 bg-secondary">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead
-                    key={header.id}
-                    className="font-mono"
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-                <div>
-                  <Button
-                    onClick={() => {
-                      table.options.meta?.removeRow(row.index);
-                    }}
-                    variant="destructive"
-                  >
-                    <X
-                      className=""
-                      size={16}
-                    />
-                  </Button>
-                </div>
+      <TooltipProvider>
+        <Table className="border-b-[1.5px] border-border">
+          <TableHeader className="sticky top-0 bg-secondary">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className="font-mono"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="text-center font-mono text-muted-foreground"
-              >
-                No facts have been defined for this relation.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  className="last:pr-2.5"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  No facts have been defined for this relation.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TooltipProvider>
 
       <div className="p-2.5">
         <Button
