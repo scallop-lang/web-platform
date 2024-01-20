@@ -45,7 +45,7 @@
     "@uiw/react-codemirror": "^4.21.21",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "codemirror-lang-scallop": "^1.1.1",
+    "codemirror-lang-scallop": "^1.1.4",
     "geist": "^1.2.0",
     "lucide-react": "^0.307.0",
     "next": "^14.0.4",
