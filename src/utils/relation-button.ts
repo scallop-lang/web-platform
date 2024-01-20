@@ -157,14 +157,12 @@ function relationButtonPluginFactory(
       }
 
       update(viewUpdate: ViewUpdate) {
-        if (viewUpdate.docChanged) {
-          this.decorations = relationButtons(
-            viewUpdate.view,
-            setTableOpen,
-            setRelationTable,
-            panelGroupRef,
-          );
-        }
+        this.decorations = relationButtons(
+          viewUpdate.view,
+          setTableOpen,
+          setRelationTable,
+          panelGroupRef,
+        );
       }
     },
     {
