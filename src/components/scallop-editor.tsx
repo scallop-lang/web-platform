@@ -99,9 +99,9 @@ import { RuntimeSettings } from "./editor/runtime-settings";
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
   | {
-      type: "playground";
-      project: null;
-    }
+    type: "playground";
+    project: null;
+  }
   | { type: "project"; project: Project; isAuthor: boolean };
 
 const EditDetailsButton = ({
@@ -324,8 +324,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
     relationTable.facts.forEach((row) => {
       const fact: Record<string, string> = {};
-      
-      fact.tag = row.tag ? String(row.tag) : "";
+
+      fact.tag = row.tag;
 
       row.tuple.forEach((arg, idx) => {
         fact[`arg${idx}`] = arg;
@@ -373,7 +373,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     console.log(newProgram);
 
     newProgram = `{\n${newProgram}\n}`
-  
+
     replaceEditorContent(newProgram, relationTable.from, relationTable.to);
   };
 
@@ -556,11 +556,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     ? "Reset editor state?"
                     : `Delete project?`}
                 </AlertDialogTitle>
-                <AlertDialogDescription>{`This action cannot be undone. This will completely ${
-                  type === "playground"
-                    ? "clean and reset the editor, just like a browser refresh."
-                    : `delete your project "${title}" and associated data.`
-                }`}</AlertDialogDescription>
+                <AlertDialogDescription>{`This action cannot be undone. This will completely ${type === "playground"
+                  ? "clean and reset the editor, just like a browser refresh."
+                  : `delete your project "${title}" and associated data.`
+                  }`}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -569,18 +568,18 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   onClick={
                     type === "project" && editor.isAuthor
                       ? () =>
-                          deleteProject({
-                            id: project.id,
-                          })
+                        deleteProject({
+                          id: project.id,
+                        })
                       : () =>
-                          cmRef.current!.view?.dispatch({
-                            changes: {
-                              from: 0,
-                              to: cmRef.current!.view.state.doc.toString()
-                                .length,
-                              insert: "",
-                            },
-                          })
+                        cmRef.current!.view?.dispatch({
+                          changes: {
+                            from: 0,
+                            to: cmRef.current!.view.state.doc.toString()
+                              .length,
+                            insert: "",
+                          },
+                        })
                   }
                 >
                   Continue
@@ -782,7 +781,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             <p className="truncate">
                               {table.facts[0]
                                 ? `(${table.facts[0].tuple
-                                    .join(", ")})`
+                                  .join(", ")})`
                                 : "<no facts defined>"}
                             </p>
                             {table.facts[1] ? (

@@ -73,12 +73,12 @@ function parseInputRelations(state: EditorState) {
           const tuple: string[] = [];
           const tagged = fact.getChild("Tagged");
           let tupleNode = fact.getChild("ConstTuple");
-          let tag = undefined;
+          let tag = "";
 
           if (tagged) {
             const tagNode = tagged.getChild("Tag");
             if (tagNode) {
-              tag = parseFloat(state.doc.sliceString(tagNode.from, tagNode.to));
+              tag = state.doc.sliceString(tagNode.from, tagNode.to);
             }
             tupleNode = tagged.getChild("ConstTuple");
           }

@@ -13,7 +13,7 @@ const SclProvenanceSchema = z.enum(Provenances);
 const SclProvenanceKSchema = z.number().positive().optional();
 
 const FactSchema = z.object({
-  tag: z.number().optional(),
+  tag: z.coerce.string(),
   tuple: z.coerce.string().array(),
 });
 type Fact = z.infer<typeof FactSchema>
