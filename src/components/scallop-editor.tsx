@@ -693,7 +693,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               <div className="relative h-[calc(100%-58px)] overflow-auto">
                 <RelationTable
                   columns={currTable.columns}
-                  data={currTable.data}
+                  data={tableData}
                   setTableData={setTableData}
                 />
               </div>
