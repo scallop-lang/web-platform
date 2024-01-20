@@ -99,9 +99,9 @@ import { RuntimeSettings } from "./editor/runtime-settings";
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
   | {
-    type: "playground";
-    project: null;
-  }
+      type: "playground";
+      project: null;
+    }
   | { type: "project"; project: Project; isAuthor: boolean };
 
 const EditDetailsButton = ({
@@ -306,15 +306,18 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     }
 
     const numArgs = relationTable.facts[0].tuple.length;
+
     // add the tag column
     columns.push({
-      accessorKey: `tag`,
-      header: 'tag',
+      accessorKey: "tag",
+      header: "tag",
       accessorFn: (originalRow) => originalRow.tag,
     });
-    // add the arg columns
+
+    // add the args columns
     for (let i = 0; i < numArgs; i++) {
       const argN = `arg${i}`;
+
       columns.push({
         accessorKey: argN,
         header: argN,
@@ -364,15 +367,20 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
     let newProgram = tableData
       .map((row) => {
-        const rowValues = Object.entries(row).filter(([key]) => key !== "tag").map(([_, value]) => value);
+        const rowValues = Object.entries(row)
+          .filter(([key]) => key !== "tag")
+          .map(([_, value]) => value);
         let rowString = rowValues.join(", ");
-        rowString = row.tag ? `  ${row.tag}::(${rowString}),` : `  (${rowString}),`;
+        rowString = row.tag
+          ? `  ${row.tag}::(${rowString}),`
+          : `  (${rowString}),`;
         return rowString;
-      }).join("\n");
+      })
+      .join("\n");
 
     console.log(newProgram);
 
-    newProgram = `{\n${newProgram}\n}`
+    newProgram = `{\n${newProgram}\n}`;
 
     replaceEditorContent(newProgram, relationTable.from, relationTable.to);
   };
@@ -556,10 +564,11 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     ? "Reset editor state?"
                     : `Delete project?`}
                 </AlertDialogTitle>
-                <AlertDialogDescription>{`This action cannot be undone. This will completely ${type === "playground"
-                  ? "clean and reset the editor, just like a browser refresh."
-                  : `delete your project "${title}" and associated data.`
-                  }`}</AlertDialogDescription>
+                <AlertDialogDescription>{`This action cannot be undone. This will completely ${
+                  type === "playground"
+                    ? "clean and reset the editor, just like a browser refresh."
+                    : `delete your project "${title}" and associated data.`
+                }`}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -568,18 +577,18 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   onClick={
                     type === "project" && editor.isAuthor
                       ? () =>
-                        deleteProject({
-                          id: project.id,
-                        })
+                          deleteProject({
+                            id: project.id,
+                          })
                       : () =>
-                        cmRef.current!.view?.dispatch({
-                          changes: {
-                            from: 0,
-                            to: cmRef.current!.view.state.doc.toString()
-                              .length,
-                            insert: "",
-                          },
-                        })
+                          cmRef.current!.view?.dispatch({
+                            changes: {
+                              from: 0,
+                              to: cmRef.current!.view.state.doc.toString()
+                                .length,
+                              insert: "",
+                            },
+                          })
                   }
                 >
                   Continue
@@ -780,8 +789,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                           <CardContent className="font-mono text-sm">
                             <p className="truncate">
                               {table.facts[0]
-                                ? `(${table.facts[0].tuple
-                                  .join(", ")})`
+                                ? `(${table.facts[0].tuple.join(", ")})`
                                 : "<no facts defined>"}
                             </p>
                             {table.facts[1] ? (
