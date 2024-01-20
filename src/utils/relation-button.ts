@@ -103,7 +103,7 @@ function parseInputRelations(state: EditorState) {
 
         nodeTableArr.push({
           relationNode: relationIdNode,
-          table: { name, from: node.from, to: node.to, facts },
+          table: { name, from: factSetNode.from, to: factSetNode.to, facts },
         });
       }
     },
