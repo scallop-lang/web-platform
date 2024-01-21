@@ -102,9 +102,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
   | {
-    type: "playground";
-    project: null;
-  }
+      type: "playground";
+      project: null;
+    }
   | { type: "project"; project: Project; isAuthor: boolean };
 
 const EditDetailsButton = ({
@@ -315,10 +315,14 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       id: "tag",
       accessorKey: "tag",
       header: () => (
-        <Tag
-          size={18}
-          className="stroke-muted-foreground"
-        />
+        <>
+          <span className="sr-only">Tag</span>
+          <Tag
+            size={18}
+            aria-label="Tag"
+            className="stroke-muted-foreground"
+          />
+        </>
       ),
       accessorFn: (originalRow) => originalRow.tag,
     });
@@ -433,7 +437,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         <div className="col-span-1 flex flex-wrap items-center gap-2 sm:justify-end">
           {type === "project" && editor.isAuthor ? (
             <>
-              <span className="flex items-center gap-1.5">
+              <span className="flex h-9 items-center gap-1.5 rounded-md border border-input px-4 py-2">
                 <Label htmlFor="publish-switch">
                   {published ? "Published!" : "Unpublished"}
                 </Label>
@@ -591,10 +595,11 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     ? "Reset editor state?"
                     : `Delete project?`}
                 </AlertDialogTitle>
-                <AlertDialogDescription>{`This action cannot be undone. This will completely ${type === "playground"
-                  ? "clean and reset the editor, just like a browser refresh."
-                  : `delete your project "${title}" and associated data.`
-                  }`}</AlertDialogDescription>
+                <AlertDialogDescription>{`This action cannot be undone. This will completely ${
+                  type === "playground"
+                    ? "clean and reset the editor, just like a browser refresh."
+                    : `delete your project "${title}" and associated data.`
+                }`}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -603,18 +608,18 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   onClick={
                     type === "project" && editor.isAuthor
                       ? () =>
-                        deleteProject({
-                          id: project.id,
-                        })
+                          deleteProject({
+                            id: project.id,
+                          })
                       : () =>
-                        cmRef.current!.view?.dispatch({
-                          changes: {
-                            from: 0,
-                            to: cmRef.current!.view.state.doc.toString()
-                              .length,
-                            insert: "",
-                          },
-                        })
+                          cmRef.current!.view?.dispatch({
+                            changes: {
+                              from: 0,
+                              to: cmRef.current!.view.state.doc.toString()
+                                .length,
+                              insert: "",
+                            },
+                          })
                   }
                 >
                   Continue

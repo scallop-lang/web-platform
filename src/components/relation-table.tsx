@@ -130,10 +130,7 @@ const RelationTable = <TData, TValue = unknown>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className="last:pr-2.5"
-                >
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
@@ -158,7 +155,7 @@ const RelationTable = <TData, TValue = unknown>({
         </Table>
       </TooltipProvider>
 
-      <div className="p-2.5">
+      <div className="p-1.5">
         <Button
           className="w-full"
           onClick={table.options.meta?.addRow}
