@@ -31,6 +31,8 @@ export const scallopRouter = createTRPCRouter({
         body: JSON.stringify(input),
       });
 
+      console.log(res);
+
       if (!res.ok) {
         const msg = z.string()
           .parse(res.body);
