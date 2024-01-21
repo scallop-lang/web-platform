@@ -1,13 +1,15 @@
-import { GeistMono, GeistSans } from "geist/font";
+import { Analytics } from "@vercel/analytics/react";
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 
-import CommonLayout from "~/components/common-layout";
+import Header from "~/components/layout/header";
+import { Toaster } from "~/components/ui/sonner";
 
 import "~/styles/globals.css";
 
-import { Toaster } from "~/components/ui/sonner";
 import { api } from "~/utils/api";
 
 const App = ({
@@ -15,7 +17,7 @@ const App = ({
   pageProps: { session, ...pageProps },
 }: AppProps<{ session: Session }>) => {
   return (
-    <SessionProvider session={session}>
+    <>
       <style
         jsx
         global
@@ -28,13 +30,24 @@ const App = ({
           font-family: ${GeistMono.style.fontFamily};
         }
       `}</style>
-      <CommonLayout
-        className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}
-      >
+
+      <SessionProvider session={session}>
+        <Header />
         <Component {...pageProps} />
-      </CommonLayout>
-      <Toaster richColors />
-    </SessionProvider>
+      </SessionProvider>
+
+      <Analytics />
+      <Toaster
+        richColors
+        closeButton
+        toastOptions={{
+          style: {
+            "--font-geist-sans": GeistSans.style.fontFamily,
+          } as React.CSSProperties,
+          className: "font-sans",
+        }}
+      />
+    </>
   );
 };
 

@@ -3,11 +3,10 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
-  FactSchema,
   SclProgramSchema,
-  SclRelationInputSchema,
-  SclRelationSchema,
-  type Fact,
+  SclProvenanceSchema,
+  SclProvenanceKSchema,
+  SclRelationRecordSchema,
 } from "~/utils/schemas-types";
 
 import { env } from "../../../env.mjs";
@@ -17,8 +16,8 @@ export const scallopRouter = createTRPCRouter({
     .input(
       z.object({
         program: SclProgramSchema,
-        inputs: SclRelationInputSchema.array(),
-        outputs: SclRelationSchema.array(),
+        provenance: SclProvenanceSchema,
+        k: SclProvenanceKSchema,
       })
     )
     .mutation(async ({ input }) => {
@@ -51,16 +50,6 @@ export const scallopRouter = createTRPCRouter({
         }
       }
 
-      const body: Record<string, Fact[]> = z
-        .record(z.string(), FactSchema.array())
-        .parse(await res.json(), {
-          errorMap: (_issue, ctx) => {
-            return {
-              message: `[@output]: ${ctx.defaultError}`,
-            };
-          },
-        });
-
-      return body;
+      return SclRelationRecordSchema.parse(await res.json());
     }),
 });
