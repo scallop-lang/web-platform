@@ -5,16 +5,13 @@ import type { DecorationSet, EditorView, ViewUpdate } from "@codemirror/view";
 import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
 import type { SyntaxNodeRef } from "@lezer/common";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
-
-type TableCell = {
-  content: string;
-  from: number;
-  to: number;
-};
+import type { Fact } from "~/utils/schemas-types";
 
 type Table = {
   name: string;
-  facts: TableCell[][];
+  from: number;
+  to: number;
+  facts: Fact[];
 };
 
 type ParsedInputProps = {
@@ -66,41 +63,43 @@ function parseInputRelations(state: EditorState) {
           relationIdNode.from,
           relationIdNode.to,
         );
-        const facts: TableCell[][] = [];
+        const facts: Fact[] = [];
 
         factSetNode.getChildren("ListItem").forEach((fact) => {
-          const tuple: TableCell[] = [];
-          const tupleNode = fact.getChild("ConstTuple");
+          const tuple: string[] = [];
+          const tagged = fact.getChild("Tagged");
+          let tupleNode = fact.getChild("ConstTuple");
+          let tag = "";
+
+          if (tagged) {
+            const tagNode = tagged.getChild("Tag");
+            if (tagNode) {
+              tag = state.doc.sliceString(tagNode.from, tagNode.to);
+            }
+            tupleNode = tagged.getChild("ConstTuple");
+          }
 
           if (tupleNode) {
             const constantNode = tupleNode.getChild("Constant");
 
             if (constantNode) {
-              tuple.push({
-                content: state.doc.sliceString(
-                  constantNode.from,
-                  constantNode.to,
-                ),
-                from: constantNode.from,
-                to: constantNode.to,
-              });
+              tuple.push(state.doc.sliceString(
+                constantNode.from,
+                constantNode.to,
+              ));
             } else {
               tupleNode.getChildren("ListItem").forEach((constant) => {
-                tuple.push({
-                  content: state.doc.sliceString(constant.from, constant.to),
-                  from: constant.from,
-                  to: constant.to,
-                });
+                tuple.push(state.doc.sliceString(constant.from, constant.to));
               });
             }
           }
 
-          facts.push(tuple);
+          facts.push({ tag, tuple });
         });
 
         nodeTableArr.push({
           relationNode: relationIdNode,
-          table: { name, facts },
+          table: { name, from: factSetNode.from, to: factSetNode.to, facts },
         });
       }
     },
@@ -154,14 +153,12 @@ function relationButtonPluginFactory(
       }
 
       update(viewUpdate: ViewUpdate) {
-        if (viewUpdate.docChanged) {
-          this.decorations = relationButtons(
-            viewUpdate.view,
-            setTableOpen,
-            setRelationTable,
-            panelGroupRef,
-          );
-        }
+        this.decorations = relationButtons(
+          viewUpdate.view,
+          setTableOpen,
+          setRelationTable,
+          panelGroupRef,
+        );
       }
     },
     {
