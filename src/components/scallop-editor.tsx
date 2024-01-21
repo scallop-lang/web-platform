@@ -618,7 +618,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               defaultValue="inputs"
               value={tabValue}
               onValueChange={setTabValue}
-              className="h-[calc(100%-68px)]"
+              className="h-[calc(100%-58px)]"
             >
               <div className="flex justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
                 <TabsList className="grid h-9 w-1/2 max-w-48 grid-cols-2">
@@ -633,7 +633,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 />
               </div>
 
-              <div className="h-full overflow-y-auto ">
+              <div className="mb-2.5 h-full overflow-y-auto">
                 <TabsContent
                   value="inputs"
                   className="flex flex-col items-center gap-2.5 data-[state=active]:h-full data-[state=active]:p-2.5"
