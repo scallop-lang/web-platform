@@ -23,6 +23,7 @@ import {
 import { TooltipProvider } from "./ui/tooltip";
 
 interface RelationTableProps<TData, TValue = unknown> {
+  type: "inputs" | "outputs";
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   setTableData: React.Dispatch<React.SetStateAction<TData[]>>;
@@ -34,6 +35,7 @@ interface RelationTableProps<TData, TValue = unknown> {
  * you click the "Confirm" button which updates the program.
  */
 const RelationTable = <TData, TValue = unknown>({
+  type,
   columns,
   data,
   setTableData,
@@ -41,66 +43,83 @@ const RelationTable = <TData, TValue = unknown>({
   const table = useReactTable<TData>({
     columns,
     data,
-    defaultColumn: {
-      cell: function Cell({ getValue, row: { index }, column: { id }, table }) {
-        const initialValue = getValue() as string;
-        const [value, setValue] = useState(initialValue);
+    defaultColumn:
+      type === "inputs"
+        ? {
+            cell: function Cell({
+              getValue,
+              row: { index },
+              column: { id },
+              table,
+            }) {
+              const initialValue = getValue() as string;
+              const [value, setValue] = useState(initialValue);
 
-        useEffect(() => {
-          setValue(initialValue);
-        }, [initialValue]);
+              useEffect(() => {
+                setValue(initialValue);
+              }, [initialValue]);
 
-        return (
-          <Input
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onBlur={() =>
-              table.options.meta?.updateData(index, id, value as TData)
-            }
-          />
-        );
-      },
-    },
+              return (
+                <Input
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  onBlur={() =>
+                    table.options.meta?.updateData(index, id, value as TData)
+                  }
+                />
+              );
+            },
+          }
+        : {
+            cell: ({ getValue }) => (
+              <div className="flex min-h-9 w-full items-center rounded-md border border-input bg-transparent px-1.5 py-1 text-sm">
+                {getValue() as string}
+              </div>
+            ),
+          },
 
     getCoreRowModel: getCoreRowModel(),
 
-    meta: {
-      updateData: (rowIndex: number, columnId: string, value: TData) => {
-        // Skip page index reset until after next rerender
-        return setTableData((oldData) =>
-          oldData.map((row, index) => {
-            if (index === rowIndex) {
-              return {
-                ...oldData[rowIndex]!,
-                [columnId]: value,
-              };
-            }
-            return row;
-          }),
-        );
-      },
+    meta:
+      type === "inputs"
+        ? {
+            updateData: (rowIndex: number, columnId: string, value: TData) => {
+              // Skip page index reset until after next rerender
+              return setTableData((oldData) =>
+                oldData.map((row, index) => {
+                  if (index === rowIndex) {
+                    return {
+                      ...oldData[rowIndex]!,
+                      [columnId]: value,
+                    };
+                  }
+                  return row;
+                }),
+              );
+            },
 
-      addRow: () => {
-        const newRow: Record<string, string> = {};
-        newRow.tag = "";
+            addRow: () => {
+              const newRow: Record<string, string> = {};
+              newRow.tag = "";
 
-        columns.map((_, index) => {
-          const key = index === 0 ? "tag" : `arg${index - 1}`;
-          newRow[key] = "";
-        });
+              columns.map((_, index) => {
+                const key = index === 0 ? "tag" : `arg${index - 1}`;
+                newRow[key] = "";
+              });
 
-        const newData = [...data, newRow as TData];
+              const newData = [...data, newRow as TData];
 
-        setTableData(newData);
-      },
+              setTableData(newData);
+            },
 
-      removeRow: (rowIndex: number) => {
-        const newTableDataFilter = (old: TData[]) =>
-          old.filter((_, index: number) => index !== rowIndex);
+            removeRow: (rowIndex: number) => {
+              const newTableDataFilter = (old: TData[]) =>
+                old.filter((_, index: number) => index !== rowIndex);
 
-        setTableData(newTableDataFilter);
-      },
-    },
+              setTableData(newTableDataFilter);
+            },
+          }
+        : undefined,
   });
 
   return (
@@ -147,6 +166,7 @@ const RelationTable = <TData, TValue = unknown>({
                               width={1920}
                               height={1080}
                               style={{ height: "auto" }}
+                              className="rounded-md bg-muted"
                             />
                           ) : (
                             cell.column.columnDef.cell
@@ -173,19 +193,21 @@ const RelationTable = <TData, TValue = unknown>({
         </Table>
       </TooltipProvider>
 
-      <div className="p-1.5">
-        <Button
-          className="w-full"
-          onClick={table.options.meta?.addRow}
-          variant="outline"
-        >
-          <ListPlus
-            className="mr-1.5"
-            size={16}
-          />{" "}
-          Add new row
-        </Button>
-      </div>
+      {type === "inputs" ? (
+        <div className="p-1.5">
+          <Button
+            className="w-full"
+            onClick={table.options.meta?.addRow}
+            variant="outline"
+          >
+            <ListPlus
+              className="mr-1.5"
+              size={16}
+            />{" "}
+            Add new row
+          </Button>
+        </div>
+      ) : null}
     </>
   );
 };
