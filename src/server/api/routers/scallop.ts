@@ -32,20 +32,17 @@ export const scallopRouter = createTRPCRouter({
       });
 
       if (!res.ok) {
-        const json = z
-          .object({
-            error: z.string(),
-          })
-          .parse(await res.json());
+        const msg = z.string()
+          .parse(res.body);
         if (res.status >= 500) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: json.error,
+            message: msg,
           });
         } else {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: json.error,
+            message: msg,
           });
         }
       }
