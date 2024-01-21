@@ -96,7 +96,6 @@ const SaveToDriveDialog = ({
         prompt: key ? "" : "select_account",
         callback: (response) => {
           setKey(response.expires_in);
-          console.log(response);
           openPicker({
             clientId:
               "494588134232-gvaumsid2ucu5ckfrh45oer4ku2ch1bf.apps.googleusercontent.com",

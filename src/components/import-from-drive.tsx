@@ -15,6 +15,7 @@ const ImportFromDriveButton = ({
   const [key, setKey] = useState<string | undefined>(undefined);
 
   const loadFile = async (file: CallbackDoc, token: string | undefined) => {
+    console.log(file);
     try {
       await fetch(
         `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
@@ -42,7 +43,7 @@ const ImportFromDriveButton = ({
       google.accounts.oauth2.initTokenClient({
         client_id:
           "494588134232-gvaumsid2ucu5ckfrh45oer4ku2ch1bf.apps.googleusercontent.com",
-        scope: "https://www.googleapis.com/auth/drive.file",
+        scope: "https://www.googleapis.com/auth/drive.readonly",
         prompt: key ? "" : "select_account",
         callback: (response) => {
           setKey(response ? response.access_token : undefined);
