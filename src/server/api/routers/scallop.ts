@@ -51,7 +51,7 @@ export const scallopRouter = createTRPCRouter({
         return SclRelationRecordSchema.parse(await res.json());
       } catch (_) {
         console.log(res);
-        return "bruh";
+        return {};
       }
     }),
 });
