@@ -134,31 +134,29 @@ const RelationTable = <TData, TValue = unknown>({
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => {
-                const cellValue = cell.getValue();
-                const parsed = z.coerce.string().url().safeParse(cellValue);
+                    const cellValue = cell.getValue();
+                    const parsed = z.coerce.string().url().safeParse(cellValue);
 
-                return (
+                    return (
                       <TableCell key={cell.id}>
                         {flexRender(
-                        
-                      parsed.success ? (
-                        <Image
-                          src={parsed.data}
-                          alt={`Image located at ${parsed.data}`}
-                          width={1920}
-                          height={1080}
-                          style={{ height: "auto" }}
-                        />
-                      ) : (
-                        cell.column.columnDef.cell
-                      ),
-                     
-                        cell.getContext(),
-                      ,
-                    )}
+                          parsed.success ? (
+                            <Image
+                              src={parsed.data}
+                              alt={`Image located at ${parsed.data}`}
+                              width={1920}
+                              height={1080}
+                              style={{ height: "auto" }}
+                            />
+                          ) : (
+                            cell.column.columnDef.cell
+                          ),
+
+                          cell.getContext(),
+                        )}
                       </TableCell>
                     );
-              })}
+                  })}
                 </TableRow>
               ))
             ) : (
@@ -193,4 +191,3 @@ const RelationTable = <TData, TValue = unknown>({
 };
 
 export { RelationTable };
-

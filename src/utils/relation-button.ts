@@ -5,6 +5,7 @@ import type { DecorationSet, EditorView, ViewUpdate } from "@codemirror/view";
 import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
 import type { SyntaxNodeRef } from "@lezer/common";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
+
 import type { Fact } from "~/utils/schemas-types";
 
 type Table = {
@@ -83,10 +84,9 @@ function parseInputRelations(state: EditorState) {
             const constantNode = tupleNode.getChild("Constant");
 
             if (constantNode) {
-              tuple.push(state.doc.sliceString(
-                constantNode.from,
-                constantNode.to,
-              ));
+              tuple.push(
+                state.doc.sliceString(constantNode.from, constantNode.to),
+              );
             } else {
               tupleNode.getChildren("ListItem").forEach((constant) => {
                 tuple.push(state.doc.sliceString(constant.from, constant.to));
@@ -172,5 +172,4 @@ export {
   relationButtonPluginFactory,
   type ParsedInputProps,
   type Table,
-  type TableCell,
 };

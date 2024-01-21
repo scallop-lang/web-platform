@@ -59,11 +59,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Textarea } from "~/components/ui/textarea";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
-import type {
-  ParsedInputProps,
-  Table,
-  TableCell,
-} from "~/utils/relation-button";
+import type { ParsedInputProps, Table } from "~/utils/relation-button";
 import {
   parseInputRelations,
   relationButtonPluginFactory,
@@ -205,28 +201,24 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     onSuccess: (data) => {
       const newOutputs: Table[] = [];
 
-      for (const [name, factsArr] of Object.entries(data)) {
-        const facts: TableCell[][] = [];
-
-        factsArr.forEach(({ tuple }) => {
-          const fact: TableCell[] = [];
-
-          tuple.forEach((arg) => {
-            fact.push({ content: arg, from: 0, to: 0 });
-          });
-
-          facts.push(fact);
-        });
-
-        newOutputs.push({ name, facts });
-      }
+      Object.entries(data).forEach(([name, facts]) =>
+        newOutputs.push({ name, from: -1, to: -1, facts }),
+      );
 
       setOutputs(newOutputs);
+
+      toast.dismiss();
       toast.success("Program successfully executed!");
     },
+
     onError: (error) => {
       toast.error(
-        `An error occurred when running your program: ${error.message}`,
+        <div className="space-y-2.5">
+          <p className="font-semibold">
+            An error occurred when running your program:
+          </p>
+          <p className="font-mono text-xs">{error.message}</p>
+        </div>,
       );
     },
   });
@@ -660,7 +652,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                       </Badge>
 
                       {filteredInputs.map(
-                        ({ relationNode, table: { name, facts } }) => (
+                        ({
+                          relationNode,
+                          table: { name, from, to, facts },
+                        }) => (
                           <Card
                             key={name}
                             className="w-full"
@@ -689,16 +684,14 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                               </CardTitle>
                               <CardDescription>
                                 {facts[0]
-                                  ? `${facts[0].length}-tuple facts`
+                                  ? `${facts[0].tuple.length}-tuple facts`
                                   : "Empty input relation"}
                               </CardDescription>
                             </CardHeader>
                             <CardContent className="font-mono text-sm">
                               <p className="truncate">
                                 {facts[0]
-                                  ? `(${facts[0]
-                                      .map(({ content }) => content)
-                                      .join(", ")})`
+                                  ? `(${facts[0].tuple.join(", ")})`
                                   : "<no facts defined>"}
                               </p>
                               {facts[1] ? (
@@ -711,7 +704,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                               <Button
                                 variant="secondary"
                                 onClick={() => {
-                                  setRelationTable({ name, facts });
+                                  setRelationTable({ name, from, to, facts });
                                   setTableOpen(true);
                                   panelGroupRef.current!.setLayout([30, 70]);
                                 }}
@@ -755,7 +748,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                           : `${filteredOutputs.length} results`}
                       </Badge>
 
-                      {filteredOutputs.map(({ name, facts }) => (
+                      {filteredOutputs.map(({ name, from, to, facts }) => (
                         <Card
                           key={name}
                           className="w-full"
@@ -766,16 +759,14 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             </CardTitle>
                             <CardDescription>
                               {facts[0]
-                                ? `${facts[0].length}-tuple facts`
+                                ? `${facts[0].tuple.length}-tuple facts`
                                 : "Empty output relation"}
                             </CardDescription>
                           </CardHeader>
                           <CardContent className="font-mono text-sm">
                             <p className="truncate">
                               {facts[0]
-                                ? `(${facts[0]
-                                    .map(({ content }) => content)
-                                    .join(", ")})`
+                                ? `(${facts[0].tuple.join(", ")})`
                                 : "<no facts specified>"}
                             </p>
                             {facts[1] ? (
@@ -788,7 +779,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             <Button
                               variant="secondary"
                               onClick={() => {
-                                setRelationTable({ name, facts });
+                                setRelationTable({ name, from, to, facts });
                                 setTableOpen(true);
                                 panelGroupRef.current!.setLayout([30, 70]);
                               }}
