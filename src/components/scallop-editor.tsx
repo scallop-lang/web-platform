@@ -11,17 +11,19 @@ import {
 import {
   ArrowUpRight,
   Check,
+  ListX,
   Loader,
   Pencil,
   Play,
   Save,
   Table as TableIcon,
+  Tag,
   X,
 } from "lucide-react";
 import Head from "next/head";
 import Link from "next/link";
 import type { ElementRef } from "react";
-import { useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
 
@@ -67,6 +69,7 @@ import { ExportMenu } from "./editor/export-menu";
 import { MoreOptionsMenu } from "./editor/more-options-menu";
 import type { RuntimeProps } from "./editor/runtime-settings";
 import { RuntimeSettings } from "./editor/runtime-settings";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 type ScallopEditorProps =
@@ -182,8 +185,12 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   const [tableOpen, setTableOpen] = useState(false);
   const [relationTable, setRelationTable] = useState<Table>({
     name: "",
+    from: 0,
+    to: 0,
     facts: [],
   });
+
+  const [tableData, setTableData] = useState<Record<string, string>[]>([]);
 
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
@@ -204,12 +211,22 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         toast.error(`Project failed to save! Reason: ${error.message}`),
     });
 
-  function replaceEditorContent(newProgram: string) {
+  function ImportEditorContent(newProgram: string) {
+    if (cmRef.current?.view) {
+      replaceEditorContent(
+        newProgram,
+        0,
+        cmRef.current.view?.state.doc.toString().length,
+      );
+    }
+  }
+
+  function replaceEditorContent(newProgram: string, f: number, t: number) {
     if (cmRef.current) {
       cmRef.current.view?.dispatch({
         changes: {
-          from: 0,
-          to: cmRef.current.view?.state.doc.toString().length,
+          from: f,
+          to: t,
           insert: newProgram,
         },
       });
@@ -248,21 +265,69 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       return { columns, data };
     }
 
-    const numArgs = relationTable.facts[0].length;
+    const numArgs = relationTable.facts[0].tuple.length;
+
+    // add the tag column
+    columns.push({
+      id: "tag",
+      accessorKey: "tag",
+      header: () => (
+        <>
+          <span className="sr-only">Tag</span>
+          <Tag
+            size={18}
+            aria-label="Tag"
+            className="stroke-muted-foreground"
+          />
+        </>
+      ),
+      accessorFn: (originalRow) => originalRow.tag,
+    });
+
+    // add the args columns
     for (let i = 0; i < numArgs; i++) {
       const argN = `arg${i}`;
-      columns.push({ accessorKey: argN, header: argN });
+
+      columns.push({
+        accessorKey: argN,
+        header: argN,
+        accessorFn: (originalRow) => originalRow[argN],
+      });
     }
+
+    columns.push({
+      id: "deleteRow",
+      cell: ({ table, row }) => (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => table.options.meta?.removeRow(row.index)}
+            >
+              <span className="sr-only">Delete row</span>
+              <ListX size={16} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Delete row</p>
+          </TooltipContent>
+        </Tooltip>
+      ),
+    });
 
     relationTable.facts.forEach((row) => {
       const fact: Record<string, string> = {};
+      fact.tag = row.tag;
 
-      row.forEach((arg, idx) => {
-        fact[`arg${idx}`] = arg.content;
+      row.tuple.forEach((arg, idx) => {
+        fact[`arg${idx}`] = arg;
       });
 
       data.push(fact);
     });
+
+    setTableData(data);
 
     return { columns, data };
   }, [relationTable]);
@@ -282,6 +347,30 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   const filteredRelations = inputs.filter(({ table }) =>
     table.name.includes(searchResult),
   );
+
+  const updateProgram = () => {
+    // is empty table
+    if (!relationTable.facts[0]) {
+      return;
+    }
+
+    let newProgram = tableData
+      .map((row) => {
+        const rowValues = Object.entries(row)
+          .filter(([key]) => key !== "tag")
+          .map(([_, value]) => value);
+        let rowString = rowValues.join(", ");
+        rowString = row.tag
+          ? `  ${row.tag}::(${rowString}),`
+          : `  (${rowString}),`;
+        return rowString;
+      })
+      .join("\n");
+
+    newProgram = `{\n${newProgram}\n}`;
+
+    replaceEditorContent(newProgram, relationTable.from, relationTable.to);
+  };
 
   return (
     <>
@@ -308,7 +397,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         <div className="col-span-1 flex flex-wrap items-center gap-2 sm:justify-end">
           {type === "project" && editor.isAuthor ? (
             <>
-              <span className="flex items-center gap-1.5">
+              <span className="flex h-9 items-center gap-1.5 rounded-md border border-input px-4 py-2">
                 <Label htmlFor="publish-switch">
                   {published ? "Published!" : "Unpublished"}
                 </Label>
@@ -352,9 +441,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
           ) : null}
 
           {type === "playground" || editor.isAuthor ? (
-            <ImportFromDriveButton
-              changeEditorFunction={replaceEditorContent}
-            />
+            <ImportFromDriveButton changeEditorFunction={ImportEditorContent} />
           ) : null}
 
           <ExportMenu
@@ -439,6 +526,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 <Button
                   onClick={() => {
                     setTableOpen(false);
+                    updateProgram();
                     panelGroupRef.current!.setLayout([75, 25]);
                   }}
                 >
@@ -472,7 +560,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               <div className="relative h-[calc(100%-58px)] overflow-auto">
                 <RelationTable
                   columns={currTable.columns}
-                  data={currTable.data}
+                  data={tableData}
+                  setTableData={setTableData}
                 />
               </div>
             </>
@@ -523,7 +612,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                 ) : (
                   <>
                     {filteredRelations.map(({ relationNode, table }) => (
-                      <>
+                      <Fragment key={table.name}>
                         <Card
                           key={table.name}
                           className="w-full"
@@ -552,16 +641,14 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             </CardTitle>
                             <CardDescription>
                               {table.facts[0]
-                                ? `${table.facts[0].length}-tuple facts`
+                                ? `${table.facts[0].tuple.length}-tuple facts`
                                 : "Empty relation"}
                             </CardDescription>
                           </CardHeader>
                           <CardContent className="font-mono text-sm">
                             <p className="truncate">
                               {table.facts[0]
-                                ? `(${table.facts[0]
-                                    .map(({ content }) => content)
-                                    .join(", ")})`
+                                ? `(${table.facts[0].tuple.join(", ")})`
                                 : "<no facts defined>"}
                             </p>
                             {table.facts[1] ? (
@@ -587,7 +674,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             </Button>
                           </CardFooter>
                         </Card>
-                      </>
+                      </Fragment>
                     ))}
                   </>
                 )}
@@ -601,4 +688,3 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 };
 
 export { ScallopEditor, type ScallopEditorProps };
-
