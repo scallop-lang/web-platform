@@ -3,6 +3,7 @@ import type { EditorState } from "@codemirror/state";
 import { type Range } from "@codemirror/state";
 import type { DecorationSet, EditorView, ViewUpdate } from "@codemirror/view";
 import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
+import type { SyntaxNodeRef } from "@lezer/common";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import type { Fact } from "~/utils/schemas-types";
 
@@ -12,11 +13,6 @@ type Table = {
   to: number;
   facts: Fact[];
 };
-
-// because `SyntaxNodeRef` isn't exposed to us for some reason, thanks lezer
-type SyntaxNodeRef = Parameters<
-  Parameters<ReturnType<typeof syntaxTree>["iterate"]>["0"]["enter"]
->["0"];
 
 type NodeTableProps = {
   relationNode: SyntaxNodeRef;
@@ -34,7 +30,7 @@ class RelationWidget extends WidgetType {
   }
 
   eq(other: RelationWidget) {
-    return other.table.name === this.table.name;
+    return JSON.stringify(other.table) === JSON.stringify(this.table);
   }
 
   toDOM() {

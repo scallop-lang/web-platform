@@ -1,5 +1,5 @@
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import { FileDown } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { useState } from "react";
 import useDrivePicker from "react-google-drive-picker";
 import type { CallbackDoc } from "react-google-drive-picker/dist/typeDefs";
@@ -7,23 +7,32 @@ import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
 import {
+  Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 
-const SaveToDriveDialogContent = ({
+const SaveToDriveDialog = ({
   cmRef,
+  projectTitle,
+  setMenuOpen,
+  children,
 }: {
   cmRef: React.RefObject<ReactCodeMirrorRef>;
+  projectTitle: string;
+  setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  children: React.ReactNode;
 }) => {
   const [openPicker] = useDrivePicker();
   const [key, setKey] = useState<string | undefined>(undefined);
-  const [filename, setFilename] = useState("raw");
+  const [filename, setFilename] = useState(projectTitle);
+  const [open, setOpen] = useState(false);
 
   // ONLY SAVES TO A FOLDER
   // Will work on saving to a file later
@@ -116,44 +125,56 @@ const SaveToDriveDialogContent = ({
   };
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Save to Drive</DialogTitle>
-        <DialogDescription>
-          Save the editor as a Scallop (.scl) file to your Google Drive. After
-          clicking the button below, you will be prompted to select a folder to
-          save the file to.
-        </DialogDescription>
-      </DialogHeader>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        setOpen(open);
+        if (!open) {
+          setMenuOpen(false);
+        }
+      }}
+    >
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Save to Drive</DialogTitle>
+          <DialogDescription>
+            Save the editor as a Scallop (.scl) file to your Google Drive. You
+            will be prompted to select a folder to save the file to.
+          </DialogDescription>
+        </DialogHeader>
 
-      <div>
-        <Label htmlFor="filename">Filename</Label>
-        <Input
-          type="text"
-          placeholder="Filename (required)"
-          id="filename"
-          value={filename}
-          onChange={(e) => setFilename(e.target.value)}
-        />
-      </div>
+        <div>
+          <Label htmlFor="filename">Filename</Label>
+          <Input
+            type="text"
+            placeholder="Filename (required)"
+            id="filename"
+            value={filename}
+            onChange={(e) => setFilename(e.target.value)}
+          />
+        </div>
 
-      <DialogFooter>
-        <Button
-          disabled={filename.length === 0}
-          onClick={() =>
-            download(cmRef.current!.view!.state.doc.toString(), filename)
-          }
-          className="transition"
-        >
-          <FileDown
-            className="mr-1.5"
-            size={16}
-          />{" "}
-          Save
-        </Button>
-      </DialogFooter>
-    </DialogContent>
+        <DialogFooter>
+          <Button
+            disabled={filename.length === 0}
+            onClick={() => {
+              download(cmRef.current!.view!.state.doc.toString(), filename);
+              setOpen(false);
+              setMenuOpen(false);
+            }}
+            className="transition-opacity"
+          >
+            <ExternalLink
+              className="mr-1.5"
+              size={16}
+            />{" "}
+            Open picker
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export { SaveToDriveDialogContent };
+export { SaveToDriveDialog };
