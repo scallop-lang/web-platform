@@ -31,9 +31,6 @@ export const scallopRouter = createTRPCRouter({
         body: JSON.stringify(input),
       });
 
-      console.log("test");
-      console.log(res);
-
       if (!res.ok) {
         const msg = z.string()
           .parse(res.body);
@@ -50,6 +47,11 @@ export const scallopRouter = createTRPCRouter({
         }
       }
 
-      return SclRelationRecordSchema.parse(await res.json());
+      try {
+        return SclRelationRecordSchema.parse(await res.json());
+      } catch (_) {
+        console.log(res);
+        return "bruh";
+      }
     }),
 });
