@@ -37,7 +37,16 @@ const App = ({
       </SessionProvider>
 
       <Analytics />
-      <Toaster richColors />
+      <Toaster
+        richColors
+        closeButton
+        toastOptions={{
+          style: {
+            "--font-geist-sans": GeistSans.style.fontFamily,
+          } as React.CSSProperties,
+          className: "font-sans",
+        }}
+      />
     </>
   );
 };

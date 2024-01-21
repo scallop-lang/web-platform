@@ -23,13 +23,12 @@ import {
 import Head from "next/head";
 import Link from "next/link";
 import type { ElementRef } from "react";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
 
 import { ImportFromDriveButton } from "~/components/import-from-drive";
 import { RelationTable } from "~/components/relation-table";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -56,10 +55,12 @@ import {
   ResizablePanelGroup,
 } from "~/components/ui/resizable";
 import { Switch } from "~/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Textarea } from "~/components/ui/textarea";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
-import type { NodeTableProps, Table } from "~/utils/relation-button";
+import { cn } from "~/utils/cn";
+import type { ParsedInputProps, Table } from "~/utils/relation-button";
 import {
   parseInputRelations,
   relationButtonPluginFactory,
@@ -69,15 +70,22 @@ import { ExportMenu } from "./editor/export-menu";
 import { MoreOptionsMenu } from "./editor/more-options-menu";
 import type { RuntimeProps } from "./editor/runtime-settings";
 import { RuntimeSettings } from "./editor/runtime-settings";
+import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
+
 type ScallopEditorProps =
   | {
       type: "playground";
       project: null;
     }
   | { type: "project"; project: Project; isAuthor: boolean };
+
+type CurrentRelationProps = {
+  type: "inputs" | "outputs";
+  table: Table;
+};
 
 const EditDetailsButton = ({
   defaultTitle,
@@ -175,31 +183,51 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         ? project.description
         : "",
   );
-  const [inputs, setInputs] = useState<NodeTableProps[]>([]);
   const [runtime, setRuntime] = useState<RuntimeProps>({
     provenance: "topkproofs",
     k: 3,
   });
 
+  const [inputs, setInputs] = useState<ParsedInputProps[]>([]);
+  const [outputs, setOutputs] = useState<Table[]>([]);
+
   const [searchResult, setSearchResult] = useState("");
   const [tableOpen, setTableOpen] = useState(false);
-  const [relationTable, setRelationTable] = useState<Table>({
-    name: "",
-    from: 0,
-    to: 0,
-    facts: [],
-  });
+  const [tabValue, setTabValue] = useState("inputs");
 
   const [tableData, setTableData] = useState<Record<string, string>[]>([]);
+  const [currRelation, setCurrRelation] = useState<CurrentRelationProps>({
+    type: "inputs",
+    table: {
+      name: "",
+      from: 0,
+      to: 0,
+      facts: [],
+    },
+  });
 
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
-      console.log(data);
-      toast.success("Program successfully executed!");
+      const newOutputs: Table[] = [];
+
+      Object.entries(data).forEach(([name, facts]) =>
+        newOutputs.push({ name, from: -1, to: -1, facts }),
+      );
+
+      setOutputs(newOutputs);
+
+      toast.dismiss();
+      toast.success("Program successfully executed! Check the Outputs tab.");
     },
+
     onError: (error) => {
       toast.error(
-        `An error occurred when running your program: ${error.message}`,
+        <div className="space-y-2.5">
+          <p className="font-semibold">
+            An error occurred when running your program:
+          </p>
+          <p className="font-mono text-xs">{error.message}</p>
+        </div>,
       );
     },
   });
@@ -246,11 +274,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       ScallopLinter,
       lintGutter(),
       syncRelations,
-      relationButtonPluginFactory(
-        setTableOpen,
-        setRelationTable,
-        panelGroupRef,
-      ),
+      relationButtonPluginFactory(setTableOpen, setCurrRelation, panelGroupRef),
     ];
   }, []);
 
@@ -260,12 +284,14 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     const columns: ColumnDef<Record<string, string>>[] = [];
     const data: Record<string, string>[] = [];
 
+    const { type, table } = currRelation;
+
     // if the relation has no facts, we return early
-    if (!relationTable.facts[0]) {
+    if (!table.facts[0]) {
       return { columns, data };
     }
 
-    const numArgs = relationTable.facts[0].tuple.length;
+    const numArgs = table.facts[0].tuple.length;
 
     // add the tag column
     columns.push({
@@ -295,28 +321,31 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       });
     }
 
-    columns.push({
-      id: "deleteRow",
-      cell: ({ table, row }) => (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => table.options.meta?.removeRow(row.index)}
-            >
-              <span className="sr-only">Delete row</span>
-              <ListX size={16} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Delete row</p>
-          </TooltipContent>
-        </Tooltip>
-      ),
-    });
+    // only add delete row functionality if it's an input relation
+    if (type === "inputs") {
+      columns.push({
+        id: "deleteRow",
+        cell: ({ table, row }) => (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => table.options.meta?.removeRow(row.index)}
+              >
+                <span className="sr-only">Delete row</span>
+                <ListX size={16} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Delete row</p>
+            </TooltipContent>
+          </Tooltip>
+        ),
+      });
+    }
 
-    relationTable.facts.forEach((row) => {
+    table.facts.forEach((row) => {
       const fact: Record<string, string> = {};
       fact.tag = row.tag;
 
@@ -330,7 +359,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
     setTableData(data);
 
     return { columns, data };
-  }, [relationTable]);
+  }, [currRelation]);
 
   let subtitle = "";
   if (type === "playground") {
@@ -344,13 +373,21 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       (description.length > 0 ? description : "No description provided");
   }
 
-  const filteredRelations = inputs.filter(({ table }) =>
-    table.name.includes(searchResult),
+  const filteredInputs = useMemo(
+    () => inputs.filter(({ table }) => table.name.includes(searchResult)),
+    [inputs, searchResult],
+  );
+
+  const filteredOutputs = useMemo(
+    () => outputs.filter((table) => table.name.includes(searchResult)),
+    [outputs, searchResult],
   );
 
   const updateProgram = () => {
+    const { table } = currRelation;
+
     // is empty table
-    if (!relationTable.facts[0]) {
+    if (!table.facts[0]) {
       return;
     }
 
@@ -369,7 +406,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
 
     newProgram = `{\n${newProgram}\n}`;
 
-    replaceEditorContent(newProgram, relationTable.from, relationTable.to);
+    replaceEditorContent(newProgram, table.from, table.to);
   };
 
   return (
@@ -522,28 +559,38 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         >
           {tableOpen ? (
             <>
-              <div className="flex items-center justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
-                <Button
-                  onClick={() => {
-                    setTableOpen(false);
-                    updateProgram();
-                    panelGroupRef.current!.setLayout([75, 25]);
-                  }}
+              <div className="flex items-center justify-between gap-2.5 border-b-[1.5px] border-border p-2.5">
+                {currRelation.type === "inputs" ? (
+                  <Button
+                    onClick={() => {
+                      setTableOpen(false);
+                      updateProgram();
+                      panelGroupRef.current!.setLayout([75, 25]);
+                    }}
+                  >
+                    <Check
+                      className="mr-1.5"
+                      size={16}
+                    />{" "}
+                    Confirm
+                  </Button>
+                ) : null}
+
+                <p
+                  className={cn("truncate text-center text-sm", {
+                    "w-1/3": currRelation.type === "inputs",
+                  })}
                 >
-                  <Check
-                    className="mr-1.5"
-                    size={16}
-                  />{" "}
-                  Confirm
-                </Button>
-                <p className="w-1/3 truncate text-center">
-                  Relation:{" "}
+                  {`${currRelation.type === "inputs" ? "Input" : "Output"}: `}
                   <span className="font-mono font-bold">
-                    {relationTable.name}
+                    {currRelation.table.name}
                   </span>
                 </p>
+
                 <Button
-                  variant="secondary"
+                  variant={
+                    currRelation.type === "inputs" ? "secondary" : "default"
+                  }
                   onClick={() => {
                     setTableOpen(false);
                     panelGroupRef.current!.setLayout([75, 25]);
@@ -553,12 +600,13 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                     className="mr-1.5"
                     size={16}
                   />{" "}
-                  Cancel
+                  {currRelation.type === "inputs" ? "Cancel" : "Close"}
                 </Button>
               </div>
 
               <div className="relative h-[calc(100%-58px)] overflow-auto">
                 <RelationTable
+                  type={currRelation.type}
                   columns={currTable.columns}
                   data={tableData}
                   setTableData={setTableData}
@@ -566,94 +614,190 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
               </div>
             </>
           ) : (
-            <>
+            <Tabs
+              defaultValue="inputs"
+              value={tabValue}
+              onValueChange={setTabValue}
+              className="h-[calc(100%-58px)]"
+            >
               <div className="flex justify-between gap-1.5 border-b-[1.5px] border-border p-2.5">
-                <Badge
-                  variant="secondary"
-                  className="font-mono"
-                >
-                  {searchResult === ""
-                    ? `${inputs.length} total`
-                    : `${filteredRelations.length} results`}
-                </Badge>
+                <TabsList className="grid h-9 w-1/2 max-w-48 grid-cols-2">
+                  <TabsTrigger value="inputs">Inputs</TabsTrigger>
+                  <TabsTrigger value="outputs">Outputs</TabsTrigger>
+                </TabsList>
 
                 <Input
-                  className="w-1/2 min-w-64"
+                  className="w-1/2"
                   placeholder="Search..."
                   onChange={(e) => setSearchResult(e.target.value)}
                 />
               </div>
 
-              <div className="flex h-[calc(100%-58px)] flex-col items-center gap-2.5 overflow-y-auto p-2.5">
-                {inputs.length === 0 ? (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-sm text-muted-foreground">
-                    <div>
+              <div className="mb-2.5 h-full overflow-y-auto">
+                <TabsContent
+                  value="inputs"
+                  className="flex flex-col items-center gap-2.5 data-[state=active]:h-full data-[state=active]:p-2.5"
+                >
+                  {inputs.length === 0 ? (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-[1.5rem] text-center text-sm text-muted-foreground">
+                      <div>
+                        <p className="font-mono font-semibold">
+                          No input relations defined
+                        </p>
+                        <p className="max-w-[320px] ">
+                          Create a new input relation by writing one in the
+                          editor. They will automatically appear here.
+                        </p>
+                      </div>
+
+                      <Link
+                        href="https://www.scallop-lang.org/doc/language/relation.html"
+                        target="_blank"
+                      >
+                        <Button
+                          role="link"
+                          variant="secondary"
+                          className="text-muted-foreground"
+                        >
+                          Documentation
+                        </Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <>
+                      <Badge
+                        variant="outline"
+                        className="font-mono"
+                      >
+                        {searchResult === ""
+                          ? `${inputs.length} input relations`
+                          : `${filteredInputs.length} results`}
+                      </Badge>
+
+                      {filteredInputs.map(
+                        ({
+                          relationNode,
+                          table: { name, from, to, facts },
+                        }) => (
+                          <Card
+                            key={name}
+                            className="w-full"
+                          >
+                            <CardHeader>
+                              <CardTitle className="flex justify-between font-mono font-bold">
+                                <p className="w-1/2 truncate">{name}</p>{" "}
+                                <Button
+                                  size="none"
+                                  variant="link"
+                                  onClick={() =>
+                                    cmRef.current!.view?.dispatch({
+                                      effects: EditorView.scrollIntoView(
+                                        relationNode.node.from,
+                                        { y: "start" },
+                                      ),
+                                    })
+                                  }
+                                >
+                                  Jump to line
+                                  <ArrowUpRight
+                                    size={16}
+                                    className="ml-0.5"
+                                  />
+                                </Button>
+                              </CardTitle>
+                              <CardDescription>
+                                {facts[0]
+                                  ? `${facts[0].tuple.length}-tuple facts`
+                                  : "Empty input relation"}
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent className="font-mono text-sm">
+                              <p className="truncate">
+                                {facts[0]
+                                  ? `(${facts[0].tuple.join(", ")})`
+                                  : "<no facts defined>"}
+                              </p>
+                              {facts[1] ? (
+                                <p className="text-muted-foreground">
+                                  ...and {facts.length - 1} more row(s)
+                                </p>
+                              ) : null}
+                            </CardContent>
+                            <CardFooter>
+                              <Button
+                                variant="secondary"
+                                onClick={() => {
+                                  setCurrRelation({
+                                    type: "inputs",
+                                    table: { name, from, to, facts },
+                                  });
+                                  setTableOpen(true);
+                                  panelGroupRef.current!.setLayout([30, 70]);
+                                }}
+                              >
+                                <TableIcon
+                                  className="mr-1.5"
+                                  size={16}
+                                />{" "}
+                                Open visual editor
+                              </Button>
+                            </CardFooter>
+                          </Card>
+                        ),
+                      )}
+                    </>
+                  )}
+                </TabsContent>
+
+                <TabsContent
+                  value="outputs"
+                  className="flex flex-col items-center gap-2.5 data-[state=active]:h-full data-[state=active]:p-2.5"
+                >
+                  {outputs.length === 0 ? (
+                    <div className="flex h-full flex-col items-center justify-center text-center text-sm text-muted-foreground">
                       <p className="font-mono font-semibold">
-                        No relations defined
+                        No output relations
                       </p>
-                      <p className="max-w-[320px] ">
-                        Create a new relation by writing one in the editor. They
-                        will automatically appear here.
+                      <p className="max-w-[320px] text-pretty">
+                        Any output relations from running your program will be
+                        displayed here.
                       </p>
                     </div>
-                    <Link
-                      href="https://www.scallop-lang.org/doc/language/relation.html"
-                      target="_blank"
-                    >
-                      <Button
-                        role="link"
-                        variant="secondary"
-                        className="text-muted-foreground"
+                  ) : (
+                    <>
+                      <Badge
+                        variant="outline"
+                        className="font-mono"
                       >
-                        Documentation
-                      </Button>
-                    </Link>
-                  </div>
-                ) : (
-                  <>
-                    {filteredRelations.map(({ relationNode, table }) => (
-                      <Fragment key={table.name}>
+                        {searchResult === ""
+                          ? `${outputs.length} output relations`
+                          : `${filteredOutputs.length} results`}
+                      </Badge>
+
+                      {filteredOutputs.map(({ name, from, to, facts }) => (
                         <Card
-                          key={table.name}
+                          key={name}
                           className="w-full"
                         >
                           <CardHeader>
                             <CardTitle className="flex justify-between font-mono font-bold">
-                              <p className="w-1/2 truncate">{table.name}</p>{" "}
-                              <Button
-                                size="none"
-                                variant="link"
-                                onClick={() =>
-                                  cmRef.current!.view?.dispatch({
-                                    effects: EditorView.scrollIntoView(
-                                      relationNode.node.from,
-                                      { y: "start" },
-                                    ),
-                                  })
-                                }
-                              >
-                                Jump to line
-                                <ArrowUpRight
-                                  size={16}
-                                  className="ml-0.5"
-                                />
-                              </Button>
+                              <p className="w-1/2 truncate">{name}</p>{" "}
                             </CardTitle>
                             <CardDescription>
-                              {table.facts[0]
-                                ? `${table.facts[0].tuple.length}-tuple facts`
-                                : "Empty relation"}
+                              {facts[0]
+                                ? `${facts[0].tuple.length}-tuple facts`
+                                : "Empty output relation"}
                             </CardDescription>
                           </CardHeader>
                           <CardContent className="font-mono text-sm">
                             <p className="truncate">
-                              {table.facts[0]
-                                ? `(${table.facts[0].tuple.join(", ")})`
-                                : "<no facts defined>"}
+                              {facts[0]
+                                ? `(${facts[0].tuple.join(", ")})`
+                                : "<no facts specified>"}
                             </p>
-                            {table.facts[1] ? (
+                            {facts[1] ? (
                               <p className="text-muted-foreground">
-                                ...and {table.facts.length - 1} more row(s)
+                                ...and {facts.length - 1} more row(s)
                               </p>
                             ) : null}
                           </CardContent>
@@ -661,7 +805,10 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                             <Button
                               variant="secondary"
                               onClick={() => {
-                                setRelationTable(table);
+                                setCurrRelation({
+                                  type: "outputs",
+                                  table: { name, from, to, facts },
+                                });
                                 setTableOpen(true);
                                 panelGroupRef.current!.setLayout([30, 70]);
                               }}
@@ -670,16 +817,16 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                                 className="mr-1.5"
                                 size={16}
                               />{" "}
-                              Open visual editor
+                              Open in table view
                             </Button>
                           </CardFooter>
                         </Card>
-                      </Fragment>
-                    ))}
-                  </>
-                )}
+                      ))}
+                    </>
+                  )}
+                </TabsContent>
               </div>
-            </>
+            </Tabs>
           )}
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -687,4 +834,4 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
   );
 };
 
-export { ScallopEditor, type ScallopEditorProps };
+export { ScallopEditor, type CurrentRelationProps, type ScallopEditorProps };

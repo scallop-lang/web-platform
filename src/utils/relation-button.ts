@@ -4,7 +4,10 @@ import { type Range } from "@codemirror/state";
 import type { DecorationSet, EditorView, ViewUpdate } from "@codemirror/view";
 import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
 import type { SyntaxNodeRef } from "@lezer/common";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
+
+import type { CurrentRelationProps } from "~/components/scallop-editor";
 import type { Fact } from "~/utils/schemas-types";
 
 type Table = {
@@ -14,7 +17,7 @@ type Table = {
   facts: Fact[];
 };
 
-type NodeTableProps = {
+type ParsedInputProps = {
   relationNode: SyntaxNodeRef;
   table: Table;
 };
@@ -22,8 +25,8 @@ type NodeTableProps = {
 class RelationWidget extends WidgetType {
   constructor(
     readonly table: Table,
-    readonly setTableOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    readonly setRelationTable: React.Dispatch<React.SetStateAction<Table>>,
+    readonly setTableOpen: Dispatch<SetStateAction<boolean>>,
+    readonly setRelationTable: Dispatch<SetStateAction<CurrentRelationProps>>,
     readonly panelGroupRef: React.RefObject<ImperativePanelGroupHandle>,
   ) {
     super();
@@ -42,7 +45,7 @@ class RelationWidget extends WidgetType {
 
     btn.addEventListener("click", () => {
       this.setTableOpen(true);
-      this.setRelationTable(this.table);
+      this.setRelationTable({ type: "inputs", table: this.table });
       this.panelGroupRef.current!.setLayout([30, 70]);
     });
 
@@ -51,7 +54,7 @@ class RelationWidget extends WidgetType {
 }
 
 function parseInputRelations(state: EditorState) {
-  const nodeTableArr: NodeTableProps[] = [];
+  const nodeTableArr: ParsedInputProps[] = [];
 
   syntaxTree(state).iterate({
     enter: (node) => {
@@ -83,10 +86,9 @@ function parseInputRelations(state: EditorState) {
             const constantNode = tupleNode.getChild("Constant");
 
             if (constantNode) {
-              tuple.push(state.doc.sliceString(
-                constantNode.from,
-                constantNode.to,
-              ));
+              tuple.push(
+                state.doc.sliceString(constantNode.from, constantNode.to),
+              );
             } else {
               tupleNode.getChildren("ListItem").forEach((constant) => {
                 tuple.push(state.doc.sliceString(constant.from, constant.to));
@@ -110,9 +112,9 @@ function parseInputRelations(state: EditorState) {
 
 function relationButtons(
   view: EditorView,
-  setTableOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  setRelationTable: React.Dispatch<React.SetStateAction<Table>>,
-  panelGroupRef: React.RefObject<ImperativePanelGroupHandle>,
+  setTableOpen: Dispatch<SetStateAction<boolean>>,
+  setRelationTable: Dispatch<SetStateAction<CurrentRelationProps>>,
+  panelGroupRef: RefObject<ImperativePanelGroupHandle>,
 ) {
   const widgets: Range<Decoration>[] = [];
   const nodeTableArr = parseInputRelations(view.state);
@@ -135,9 +137,9 @@ function relationButtons(
 }
 
 function relationButtonPluginFactory(
-  setTableOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  setRelationTable: React.Dispatch<React.SetStateAction<Table>>,
-  panelGroupRef: React.RefObject<ImperativePanelGroupHandle>,
+  setTableOpen: Dispatch<SetStateAction<boolean>>,
+  setRelationTable: Dispatch<SetStateAction<CurrentRelationProps>>,
+  panelGroupRef: RefObject<ImperativePanelGroupHandle>,
 ) {
   return ViewPlugin.fromClass(
     class {
@@ -170,6 +172,6 @@ function relationButtonPluginFactory(
 export {
   parseInputRelations,
   relationButtonPluginFactory,
-  type NodeTableProps,
+  type ParsedInputProps,
   type Table,
 };
