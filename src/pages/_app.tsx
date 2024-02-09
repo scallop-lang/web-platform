@@ -5,7 +5,7 @@ import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 
-import Header from "~/components/layout/header";
+import Header from "~/components/header/header";
 import { Toaster } from "~/components/ui/sonner";
 
 import "~/styles/globals.css";

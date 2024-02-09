@@ -1,6 +1,11 @@
-import { ExternalLink, LogIn, LogOut, User } from "lucide-react";
+import {
+  ExternalLink,
+  LayoutDashboard,
+  LogIn,
+  LogOut,
+  User,
+} from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -27,9 +32,7 @@ const AvatarDropdown = () => {
     subtitle = "Loading...";
     avatar = <Skeleton className="h-9 w-9 cursor-pointer rounded-full" />;
     accountOption = <DropdownMenuItem disabled>Loading...</DropdownMenuItem>;
-  }
-
-  if (status === "authenticated") {
+  } else if (status === "authenticated") {
     const imageUrl = session.user?.image;
 
     userName = session.user?.name;
@@ -57,9 +60,7 @@ const AvatarDropdown = () => {
         </span>
       </DropdownMenuItem>
     );
-  }
-
-  if (status === "unauthenticated") {
+  } else if (status === "unauthenticated") {
     userName = "Guest";
     subtitle = "Sign in to save your progress and to access the dashboard.";
 
@@ -99,6 +100,20 @@ const AvatarDropdown = () => {
           </p>
         </DropdownMenuLabel>
 
+        <DropdownMenuSeparator className="xs:hidden" />
+
+        <DropdownMenuItem
+          asChild
+          className="xs:hidden"
+        >
+          <Link
+            href="/dashboard"
+            className="flex grow items-center justify-between"
+          >
+            Dashboard <LayoutDashboard size={16} />
+          </Link>
+        </DropdownMenuItem>
+
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
@@ -126,50 +141,4 @@ const AvatarDropdown = () => {
   );
 };
 
-const Header = () => {
-  return (
-    <header className="flex w-full items-center justify-between border-b border-border bg-background p-2">
-      <nav className="flex space-x-5">
-        <Link
-          href="/"
-          className="ml-1 flex items-center space-x-1.5 hover:underline"
-        >
-          <Image
-            width={18}
-            height={18}
-            src="/content/logo.svg"
-            alt="Scallop logo"
-          />
-          <h4 className="scroll-m-20 text-lg font-semibold tracking-tight">
-            Scallop
-          </h4>
-        </Link>
-
-        <Link
-          href="/play"
-          className="flex items-center text-sm font-medium hover:underline"
-        >
-          Playground
-        </Link>
-
-        <Link
-          href="/featured"
-          className="flex items-center text-sm font-medium hover:underline"
-        >
-          Featured
-        </Link>
-      </nav>
-      <div className="flex space-x-5">
-        <Link
-          href="/dashboard"
-          className="flex items-center text-sm font-medium hover:underline"
-        >
-          Dashboard
-        </Link>
-        <AvatarDropdown />
-      </div>
-    </header>
-  );
-};
-
-export default Header;
+export { AvatarDropdown };

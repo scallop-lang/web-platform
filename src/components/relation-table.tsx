@@ -19,8 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-
-import { TooltipProvider } from "./ui/tooltip";
+import { TooltipProvider } from "~/components/ui/tooltip";
 
 interface RelationTableProps<TData, TValue = unknown> {
   type: "inputs" | "outputs";

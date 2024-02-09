@@ -27,8 +27,13 @@ import { useMemo, useRef, useState } from "react";
 import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
 
-import { ImportFromDriveButton } from "~/components/import-from-drive";
+import { ExportMenu } from "~/components/editor-menu/export-menu";
+import { ImportFromDriveButton } from "~/components/editor-menu/import-from-drive";
+import { MoreOptionsMenu } from "~/components/editor-menu/more-options-menu";
 import { RelationTable } from "~/components/relation-table";
+import type { RuntimeProps } from "~/components/runtime-settings";
+import { RuntimeSettings } from "~/components/runtime-settings";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -57,6 +62,11 @@ import {
 import { Switch } from "~/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Textarea } from "~/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
 import { cn } from "~/utils/cn";
@@ -65,13 +75,6 @@ import {
   parseInputRelations,
   relationButtonPluginFactory,
 } from "~/utils/relation-button";
-
-import { ExportMenu } from "./editor/export-menu";
-import { MoreOptionsMenu } from "./editor/more-options-menu";
-import type { RuntimeProps } from "./editor/runtime-settings";
-import { RuntimeSettings } from "./editor/runtime-settings";
-import { Badge } from "./ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 

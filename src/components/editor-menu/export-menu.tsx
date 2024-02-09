@@ -2,7 +2,8 @@ import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { ChevronDown, FileDown, UploadCloud } from "lucide-react";
 import { useState } from "react";
 
-import { SaveToDriveDialog } from "~/components/save-to-drive";
+import { DownloadFileDialog } from "~/components/editor-menu/download-file-dialog";
+import { SaveToDriveDialog } from "~/components/editor-menu/save-to-drive";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -10,8 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-
-import { DownloadFileDialog } from "./download-file-dialog";
 
 const ExportMenu = ({
   cmRef,
