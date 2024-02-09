@@ -217,10 +217,16 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       setOutputs(newOutputs);
 
       toast.dismiss();
-      toast.success("Program successfully executed! Check the Outputs tab.");
+      toast.success(
+        <p>
+          Your program has successfully executed! Check the{" "}
+          <span className="font-bold">Outputs</span> tab for the results.
+        </p>,
+      );
     },
 
     onError: (error) => {
+      toast.dismiss();
       toast.error(
         <div className="space-y-2.5">
           <p className="font-semibold">
@@ -228,6 +234,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
           </p>
           <p className="font-mono text-xs">{error.message}</p>
         </div>,
+        {
+          duration: Infinity,
+        },
       );
     },
   });
@@ -239,7 +248,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
         toast.error(`Project failed to save! Reason: ${error.message}`),
     });
 
-  function ImportEditorContent(newProgram: string) {
+  function importEditorContent(newProgram: string) {
     if (cmRef.current?.view) {
       replaceEditorContent(
         newProgram,
@@ -478,7 +487,7 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
           ) : null}
 
           {type === "playground" || editor.isAuthor ? (
-            <ImportFromDriveButton changeEditorFunction={ImportEditorContent} />
+            <ImportFromDriveButton changeEditorFunction={importEditorContent} />
           ) : null}
 
           <ExportMenu
@@ -512,7 +521,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
                   k:
                     runtime.provenance === "topkproofs" ? runtime.k : undefined,
                 });
-                toast.loading("Running your program...");
+                toast.loading("Running your program...", {
+                  duration: Infinity,
+                });
               }}
               disabled={run.isLoading}
             >
