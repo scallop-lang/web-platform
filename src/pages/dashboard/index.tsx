@@ -47,9 +47,11 @@ const Dashboard = () => {
     case "loading":
       content = (
         <>
-          <Skeleton className="h-12 rounded-md" />
+          <Skeleton className="h-6 rounded-md" />
 
-          <Skeleton className="h-9 w-24 rounded-md" />
+          <Skeleton className="h-9 w-32 rounded-md" />
+
+          <Skeleton className="h-6 rounded-md" />
 
           <div className="grid grid-cols-2 gap-2.5">
             <Skeleton className="h-32 rounded-md" />
@@ -124,7 +126,7 @@ const Dashboard = () => {
                 Your projects
               </h2>
 
-              <div className="xs:grid-cols-2 grid grid-cols-1 gap-2.5 text-sm">
+              <div className="grid grid-cols-1 gap-2.5 text-sm xs:grid-cols-2">
                 {projectsList}
               </div>
             </>

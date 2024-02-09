@@ -89,7 +89,7 @@ export const projectRouter = createTRPCRouter({
       return project;
     }),
 
-  getFeaturedProjects: publicProcedure.query(async ({ ctx }) => {
+  getExampleProjects: publicProcedure.query(async ({ ctx }) => {
     const projects = await ctx.prisma.project.findMany({
       where: {
         author: {

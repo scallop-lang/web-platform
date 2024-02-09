@@ -2,10 +2,11 @@ import { ArrowRight, BookCopy } from "lucide-react";
 import Head from "next/head";
 import Link from "next/link";
 
+import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/utils/api";
 
-const Featured = () => {
-  const { data } = api.project.getFeaturedProjects.useQuery();
+const Examples = () => {
+  const examples = api.project.getExampleProjects.useQuery();
 
   return (
     <>
@@ -39,26 +40,37 @@ const Featured = () => {
             From the Scallop team
           </h2>
 
-          <div className="xs:grid-cols-2 grid grid-cols-1 gap-2.5 text-sm">
-            {data?.map(({ id, title, description, createdAt }) => (
-              <Link
-                key={id}
-                href={`/project/${id}`}
-                className="group rounded-md border border-border p-5 shadow-sm transition-colors hover:bg-secondary"
-              >
-                <h3 className="flex items-center font-semibold group-hover:underline">
-                  {title}{" "}
-                  <ArrowRight
-                    size={16}
-                    className="ml-1 transition group-hover:translate-x-1"
-                  />
-                </h3>
-                <p>{description}</p>
-                <p className="text-muted-foreground">
-                  Created on {createdAt.toLocaleDateString()}
-                </p>
-              </Link>
-            ))}
+          <div className="grid grid-cols-1 gap-2.5 text-sm xs:grid-cols-2">
+            {examples.isLoading ? (
+              <>
+                <Skeleton className="h-28 rounded-md" />
+                <Skeleton className="h-28 rounded-md" />
+                <Skeleton className="h-28 rounded-md" />
+                <Skeleton className="h-28 rounded-md" />
+              </>
+            ) : (
+              <>
+                {examples.data?.map(({ id, title, description, createdAt }) => (
+                  <Link
+                    key={id}
+                    href={`/project/${id}`}
+                    className="group rounded-md border border-border p-5 shadow-sm transition-colors hover:bg-secondary"
+                  >
+                    <h3 className="flex items-center font-semibold group-hover:underline">
+                      {title}{" "}
+                      <ArrowRight
+                        size={16}
+                        className="ml-1 transition group-hover:translate-x-1"
+                      />
+                    </h3>
+                    <p>{description}</p>
+                    <p className="text-muted-foreground">
+                      Created on {createdAt.toLocaleDateString()}
+                    </p>
+                  </Link>
+                ))}
+              </>
+            )}
           </div>
         </section>
       </main>
@@ -66,4 +78,4 @@ const Featured = () => {
   );
 };
 
-export default Featured;
+export default Examples;
