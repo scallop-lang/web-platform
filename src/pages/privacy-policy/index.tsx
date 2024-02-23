@@ -266,7 +266,9 @@ const PrivacyPolicy = () => {
                 personal information for any other purpose with Your consent.
               </li>
             </ul>
+          </div>
 
+          <div className="space-y-3">
             <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
               Retention of Your Personal Data
             </h3>
