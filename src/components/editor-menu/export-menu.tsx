@@ -1,9 +1,8 @@
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import { ChevronDown, FileDown, UploadCloud } from "lucide-react";
+import { ChevronDown, FileDown } from "lucide-react";
 import { useState } from "react";
 
 import { DownloadFileDialog } from "~/components/editor-menu/download-file-dialog";
-import { SaveToDriveDialog } from "~/components/editor-menu/save-to-drive";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -37,7 +36,7 @@ const ExportMenu = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
-        <SaveToDriveDialog
+        {/* <SaveToDriveDialog
           cmRef={cmRef}
           projectTitle={projectTitle}
           setMenuOpen={setMenuOpen}
@@ -49,7 +48,7 @@ const ExportMenu = ({
             />{" "}
             Save to Google Drive
           </DropdownMenuItem>
-        </SaveToDriveDialog>
+        </SaveToDriveDialog> */}
 
         <DownloadFileDialog
           cmRef={cmRef}

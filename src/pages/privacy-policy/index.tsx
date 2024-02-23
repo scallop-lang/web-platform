@@ -455,10 +455,10 @@ const PrivacyPolicy = () => {
             <li>
               By email:{" "}
               <Link
-                href="mailto:scallop-lang+owners@seas.upenn.edu"
+                href="mailto:scallop-lang@seas.upenn.edu"
                 className="font-medium hover:underline"
               >
-                scallop-lang+owners@seas.upenn.edu
+                scallop-lang@seas.upenn.edu
               </Link>
             </li>
           </ul>
