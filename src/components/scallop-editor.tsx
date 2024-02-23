@@ -28,7 +28,6 @@ import type { ImperativePanelGroupHandle } from "react-resizable-panels";
 import { toast } from "sonner";
 
 import { ExportMenu } from "~/components/editor-menu/export-menu";
-import { ImportFromDriveButton } from "~/components/editor-menu/import-from-drive";
 import { MoreOptionsMenu } from "~/components/editor-menu/more-options-menu";
 import { RelationTable } from "~/components/relation-table";
 import type { RuntimeProps } from "~/components/runtime-settings";
@@ -489,9 +488,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
             </>
           ) : null}
 
-          {type === "playground" || editor.isAuthor ? (
+          {/* {type === "playground" || editor.isAuthor ? (
             <ImportFromDriveButton changeEditorFunction={importEditorContent} />
-          ) : null}
+          ) : null} */}
 
           <ExportMenu
             cmRef={cmRef}

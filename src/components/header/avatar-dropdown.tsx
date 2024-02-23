@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   LogIn,
   LogOut,
+  Shield,
   User,
 } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -120,7 +121,7 @@ const AvatarDropdown = () => {
           onClick={() => window.open("https://www.scallop-lang.org/", "_blank")}
         >
           <span className="flex grow items-center justify-between">
-            Visit scallop-lang <ExternalLink className="h-4 w-4" />
+            Visit scallop-lang.org <ExternalLink className="h-4 w-4" />
           </span>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -131,6 +132,17 @@ const AvatarDropdown = () => {
           <span className="flex grow items-center justify-between">
             Language documentation <ExternalLink className="h-4 w-4" />
           </span>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem asChild>
+          <Link
+            href="/privacy-policy"
+            className="flex grow items-center justify-between"
+          >
+            Privacy policy <Shield size={16} />
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
