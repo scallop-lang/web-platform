@@ -5,11 +5,10 @@ import type { CallbackDoc } from "react-google-drive-picker/dist/typeDefs";
 import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
-
 import { env } from "~/env.mjs";
 
-const clientKey : string = env.GOOGLE_CLIENT_ID;
-const developerKey: string  = env.GOOGLE_DEV_KEY;
+const clientKey = env.GOOGLE_CLIENT_ID;
+const developerKey = env.GOOGLE_DEV_KEY;
 
 const ImportFromDriveButton = ({
   changeEditorFunction,

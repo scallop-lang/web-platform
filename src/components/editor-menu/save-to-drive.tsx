@@ -17,21 +17,17 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-
-
 import { env } from "~/env.mjs";
 
-const clientKey : string = env.GOOGLE_CLIENT_ID;
-const developerKey: string  = env.GOOGLE_DEV_KEY;
+const clientKey = env.GOOGLE_CLIENT_ID;
+const developerKey = env.GOOGLE_DEV_KEY;
 
 const SaveToDriveDialog = ({
   cmRef,
-  projectTitle,
   setMenuOpen,
   children,
 }: {
   cmRef: React.RefObject<ReactCodeMirrorRef>;
-  projectTitle: string;
   setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
   children: React.ReactNode;
 }) => {

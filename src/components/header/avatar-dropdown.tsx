@@ -117,21 +117,32 @@ const AvatarDropdown = () => {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={() => window.open("https://www.scallop-lang.org/", "_blank")}
-        >
-          <span className="flex grow items-center justify-between">
-            Visit scallop-lang.org <ExternalLink className="h-4 w-4" />
-          </span>
+        <DropdownMenuItem asChild>
+          <Link
+            href="https://discord.gg/QVFnzJMvNB"
+            className="flex grow items-center justify-between"
+            target="_blank"
+          >
+            Join Discord server <ExternalLink size={16} />
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() =>
-            window.open("https://www.scallop-lang.org/doc/index.html", "_blank")
-          }
-        >
-          <span className="flex grow items-center justify-between">
-            Language documentation <ExternalLink className="h-4 w-4" />
-          </span>
+        <DropdownMenuItem asChild>
+          <Link
+            href="https://www.scallop-lang.org"
+            className="flex grow items-center justify-between"
+            target="_blank"
+          >
+            scallop-lang.org <ExternalLink size={16} />
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link
+            href="https://www.scallop-lang.org/doc/index.html"
+            className="flex grow items-center justify-between"
+            target="_blank"
+          >
+            Language documentation <ExternalLink size={16} />
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
