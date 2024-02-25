@@ -18,6 +18,12 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 
+
+import { env } from "~/env.mjs";
+
+const clientKey : string = env.GOOGLE_CLIENT_ID;
+const developerKey: string  = env.GOOGLE_DEV_KEY;
+
 const SaveToDriveDialog = ({
   cmRef,
   projectTitle,
@@ -30,8 +36,8 @@ const SaveToDriveDialog = ({
   children: React.ReactNode;
 }) => {
   const [openPicker] = useDrivePicker();
-  const [key, setKey] = useState<string | undefined>(undefined);
-  const [filename, setFilename] = useState(projectTitle);
+  const [active, setActive] = useState<boolean | undefined>(undefined);
+  const [filename, setFilename] = useState("raw");
   const [open, setOpen] = useState(false);
 
   // ONLY SAVES TO A FOLDER
@@ -90,16 +96,14 @@ const SaveToDriveDialog = ({
   const download = (content: string, filename: string) => {
     const client: google.accounts.oauth2.TokenClient =
       google.accounts.oauth2.initTokenClient({
-        client_id:
-          "494588134232-gvaumsid2ucu5ckfrh45oer4ku2ch1bf.apps.googleusercontent.com",
+        client_id: clientKey,
         scope: "https://www.googleapis.com/auth/drive.file",
-        prompt: key ? "" : "select_account",
+        prompt: active ? "" : "select_account",
         callback: (response) => {
-          setKey(response.expires_in);
+          setActive(response === null);
           openPicker({
-            clientId:
-              "494588134232-gvaumsid2ucu5ckfrh45oer4ku2ch1bf.apps.googleusercontent.com",
-            developerKey: "AIzaSyBDRsgSPlCLFUe6RZ6zNT12LaeA4ip7aa4",
+            clientId: clientKey,
+            developerKey: developerKey,
             viewId: "FOLDERS",
             setIncludeFolders: true,
             setSelectFolderEnabled: true,
