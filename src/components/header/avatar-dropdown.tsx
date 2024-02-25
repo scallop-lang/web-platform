@@ -128,6 +128,18 @@ const AvatarDropdown = () => {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
+            href="https://github.com/scallop-lang/web-platform"
+            className="flex grow items-center justify-between"
+            target="_blank"
+          >
+            Open source on GitHub! <ExternalLink size={16} />
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem asChild>
+          <Link
             href="https://www.scallop-lang.org"
             className="flex grow items-center justify-between"
             target="_blank"
