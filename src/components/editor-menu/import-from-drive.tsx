@@ -6,13 +6,18 @@ import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
 
+import { env } from "~/env.mjs";
+
+const clientKey : string = env.GOOGLE_CLIENT_ID;
+const developerKey: string  = env.GOOGLE_DEV_KEY;
+
 const ImportFromDriveButton = ({
   changeEditorFunction,
 }: {
   changeEditorFunction: (value: string) => void;
 }) => {
   const [openPicker] = useDrivePicker();
-  const [key, setKey] = useState<string | undefined>(undefined);
+  const [active, setActive] = useState<boolean | undefined>(undefined);
 
   const loadFile = async (file: CallbackDoc, token: string | undefined) => {
     console.log(file);
@@ -41,16 +46,14 @@ const ImportFromDriveButton = ({
   const handleOpenPicker = () => {
     const client: google.accounts.oauth2.TokenClient =
       google.accounts.oauth2.initTokenClient({
-        client_id:
-          "494588134232-gvaumsid2ucu5ckfrh45oer4ku2ch1bf.apps.googleusercontent.com",
+        client_id: clientKey,
         scope: "https://www.googleapis.com/auth/drive.readonly",
-        prompt: key ? "" : "select_account",
+        prompt: active ? "" : "select_account",
         callback: (response) => {
-          setKey(response ? response.access_token : undefined);
+          setActive(response === null);
           openPicker({
-            clientId:
-              "494588134232-gvaumsid2ucu5ckfrh45oer4ku2ch1bf.apps.googleusercontent.com",
-            developerKey: "AIzaSyBDRsgSPlCLFUe6RZ6zNT12LaeA4ip7aa4",
+            clientId: clientKey,
+            developerKey: developerKey,
             token: response ? response.access_token : undefined,
             callbackFunction(data) {
               const elements = Array.from(
