@@ -5,10 +5,9 @@ import type { CallbackDoc } from "react-google-drive-picker/dist/typeDefs";
 import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
-import { env } from "~/env.mjs";
 
-const clientKey = env.GOOGLE_CLIENT_ID;
-const developerKey = env.GOOGLE_DEV_KEY;
+const clientKey = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+const developerKey = process.env.NEXT_PUBLIC_GOOGLE_DEV_KEY;
 
 const ImportFromDriveButton = ({
   changeEditorFunction,
@@ -45,14 +44,14 @@ const ImportFromDriveButton = ({
   const handleOpenPicker = () => {
     const client: google.accounts.oauth2.TokenClient =
       google.accounts.oauth2.initTokenClient({
-        client_id: clientKey,
+        client_id: clientKey!,
         scope: "https://www.googleapis.com/auth/drive.readonly",
         prompt: active ? "" : "select_account",
         callback: (response) => {
           setActive(response === null);
           openPicker({
-            clientId: clientKey,
-            developerKey: developerKey,
+            clientId: clientKey!,
+            developerKey: developerKey!,
             token: response ? response.access_token : undefined,
             callbackFunction(data) {
               const elements = Array.from(

@@ -74,6 +74,8 @@ import {
   parseInputRelations,
   relationButtonPluginFactory,
 } from "~/utils/relation-button";
+import { ImportFromDriveButton } from "~/components/editor-menu/import-from-drive";
+import { useSession } from "next-auth/react";
 
 type Project = inferRouterOutputs<AppRouter>["project"]["getProjectById"];
 
@@ -207,6 +209,8 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
       facts: [],
     },
   });
+  
+  const { data: session } = useSession();
 
   const run = api.scallop.run.useMutation({
     onSuccess: (data) => {
@@ -488,9 +492,9 @@ const ScallopEditor = ({ editor }: { editor: ScallopEditorProps }) => {
             </>
           ) : null}
 
-          {/* {type === "playground" || editor.isAuthor ? (
+          {(type === "playground" || editor.isAuthor)  && session?.user.role === "ADMIN" ? (
             <ImportFromDriveButton changeEditorFunction={importEditorContent} />
-          ) : null} */}
+          ) : null}
 
           <ExportMenu
             cmRef={cmRef}

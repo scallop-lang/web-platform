@@ -17,10 +17,9 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { env } from "~/env.mjs";
 
-const clientKey = env.GOOGLE_CLIENT_ID;
-const developerKey = env.GOOGLE_DEV_KEY;
+const clientKey = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+const developerKey = process.env.NEXT_PUBLIC_GOOGLE_DEV_KEY;
 
 const SaveToDriveDialog = ({
   cmRef,
@@ -92,14 +91,14 @@ const SaveToDriveDialog = ({
   const download = (content: string, filename: string) => {
     const client: google.accounts.oauth2.TokenClient =
       google.accounts.oauth2.initTokenClient({
-        client_id: clientKey,
+        client_id: clientKey!,
         scope: "https://www.googleapis.com/auth/drive.file",
         prompt: active ? "" : "select_account",
         callback: (response) => {
           setActive(response === null);
           openPicker({
-            clientId: clientKey,
-            developerKey: developerKey,
+            clientId: clientKey!,
+            developerKey: developerKey!,
             viewId: "FOLDERS",
             setIncludeFolders: true,
             setSelectFolderEnabled: true,
