@@ -20,8 +20,8 @@ export const env = createEnv({
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     GITHUB_ID: process.env.GITHUB_ID,
     GITHUB_SECRET: process.env.GITHUB_SECRET,
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-    GOOGLE_DEV_KEY: process.env.GOOGLE_DEV_KEY,
+    GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    GOOGLE_DEV_KEY: process.env.NEXT_PUBLIC_GOOGLE_DEV_KEY,
   },
 
   skipValidation: Boolean(process.env.SKIP_ENV_VALIDATION),

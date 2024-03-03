@@ -1,5 +1,5 @@
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import { ChevronDown, FileDown } from "lucide-react";
+import { ChevronDown, FileDown, UploadCloud } from "lucide-react";
 import { useState } from "react";
 
 import { DownloadFileDialog } from "~/components/editor-menu/download-file-dialog";
@@ -10,6 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { SaveToDriveDialog } from "./save-to-drive";
+import { useSession } from "next-auth/react";
 
 const ExportMenu = ({
   cmRef,
@@ -19,6 +21,7 @@ const ExportMenu = ({
   projectTitle: string;
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { data: session } = useSession();
 
   return (
     <DropdownMenu
@@ -36,9 +39,8 @@ const ExportMenu = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
-        {/* <SaveToDriveDialog
+        {session?.user.role === "ADMIN" ? <SaveToDriveDialog
           cmRef={cmRef}
-          projectTitle={projectTitle}
           setMenuOpen={setMenuOpen}
         >
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -48,7 +50,7 @@ const ExportMenu = ({
             />{" "}
             Save to Google Drive
           </DropdownMenuItem>
-        </SaveToDriveDialog> */}
+        </SaveToDriveDialog> : null}
 
         <DownloadFileDialog
           cmRef={cmRef}
