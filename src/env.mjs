@@ -11,6 +11,7 @@ export const env = createEnv({
     GITHUB_SECRET: z.string(),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_DEV_KEY: z.string(),
+    GOOGLE_SECRET: z.string()
   },
 
   runtimeEnv: {
@@ -22,6 +23,7 @@ export const env = createEnv({
     GITHUB_SECRET: process.env.GITHUB_SECRET,
     GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
     GOOGLE_DEV_KEY: process.env.NEXT_PUBLIC_GOOGLE_DEV_KEY,
+    GOOGLE_SECRET: process.env.GOOGLE_SECRET
   },
 
   skipValidation: Boolean(process.env.SKIP_ENV_VALIDATION),
