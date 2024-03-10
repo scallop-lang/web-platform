@@ -5,6 +5,7 @@ import type { NextAuthOptions } from "next-auth";
 import { getServerSession, type DefaultSession } from "next-auth";
 import type { Adapter } from "next-auth/adapters";
 import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 import { env } from "~/env.mjs";
 import { db } from "~/server/db";
@@ -41,6 +42,17 @@ const authOptions: NextAuthOptions = {
       clientId: env.GITHUB_ID,
       clientSecret: env.GITHUB_SECRET,
     }),
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_SECRET,
+      authorization: {
+        params: {
+          prompt:'consent',
+          access_type: 'offline',
+          response_type: 'code'
+        }
+      }
+    })
   ],
 };
 
